@@ -1,0 +1,26 @@
+{
+    "root": {
+        "init":{
+            "redisHost": "127.0.0.1:6379",
+            "redisPersistent": "1",
+            "redisConnectTimeout": "",
+            "redisOptsSerializer": ""
+        }
+    },
+    "my": {
+        "init":{
+            "redisHost": "127.0.0.1:6379"
+        }
+    },
+    "mygroup": {
+        "init":{
+            "redisHost": "127.0.0.1:6379"
+        },
+        "g0":{
+            "redisHost": "127.0.0.1:6379"
+        },
+        "g1":{
+            "redisHost": "127.0.0.1:6379"
+        }
+    }
+}

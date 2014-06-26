@@ -1,0 +1,50 @@
+{
+    "root": {
+        "init":{
+            "dbDriver": "mysql",
+            "dbCharset": "utf8",
+            "dbCharsetCollection": "utf8",
+            "dbShowError": "1",
+            "dbCache": "0",
+            "dbCacheTimeout": "0",
+            "dbDiskCachePath": "\/tmp",
+            "dbConn": "1",
+            "dbHost": "127.0.0.1:3306",
+            "dbUser": "root",
+            "dbPasswd": "",
+            "dbSchema": "test"
+        }
+    },
+    "my": {
+        "init":{
+            "dbDriver": "mysql",
+            "dbHost": "127.0.0.1:3306",
+            "dbUser": "root",
+            "dbPasswd": "",
+            "dbSchema": "test"
+        }
+    },
+    "mygroup": {
+        "init":{
+            "dbDriver": "mysql",
+            "dbHost": "127.0.0.1:3306",
+            "dbUser": "root",
+            "dbPasswd": "",
+            "dbSchema": "test"
+        },
+        "g0":{
+            "dbDriver": "mysql",
+            "dbHost": "127.0.0.1:3306",
+            "dbUser": "root",
+            "dbPasswd": "",
+            "dbSchema": "test"
+        },
+        "g1":{
+            "dbDriver": "mysql",
+            "dbHost": "127.0.0.1:3306",
+            "dbUser": "root",
+            "dbPasswd": "",
+            "dbSchema": "test"
+        }
+    }
+}

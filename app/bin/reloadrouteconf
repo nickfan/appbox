@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Description
+ *
+ * @project appbox
+ * @package 
+ * @author nickfan<nickfan81@gmail.com>
+ * @link http://www.axiong.me
+ * @version $Id$
+ * @lastmodified: 2014-06-26 12:13
+ *
+ */
+
+require_once '../bootstrap/bootstrap.php';
+
+use Nickfan\AppBox\Support\Facades\DataRouteConf;
+
+$status = DataRouteConf::cacheFlush();
+
+if($status){
+    echo 'route conf cache reloaded.'.PHP_EOL;
+}

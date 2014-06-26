@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="AppBox" basedir="." default="install">
+
+    <property name="package" value="${phing.project.name}" override="true" />
+    <property name="installdir" value="install" override="true" />
+    <property name="srcdir" value="${project.basedir}" override="true" />
+
+    <!-- ============================================  -->
+    <!-- Target: phpunit                               -->
+    <!-- ============================================  -->
+    <target name="phpunit">
+        <phpunit haltonfailure="true" printsummary="true" bootstrap="tests/bootstrap.php" >
+            <batchtest>
+                <fileset dir="./tests">
+                    <include name="**/*Test.php" />
+                </fileset>
+            </batchtest>
+        </phpunit>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: install                               -->
+    <!-- ============================================  -->
+    <target name="install" depends="phpunit">
+        <echo msg="AppBox" />
+    </target>
+
+</project>

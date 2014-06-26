@@ -1,0 +1,23 @@
+{
+    "root": {
+        "init":{
+            "beanstalkHosts": "127.0.0.1:11300,localhost:11300"
+        }
+    },
+    "my": {
+        "init":{
+            "beanstalkHosts": "127.0.0.1:11300,localhost:11300"
+        }
+    },
+    "mygroup": {
+        "init":{
+            "beanstalkHosts": "127.0.0.1:11300,localhost:11300"
+        },
+        "g0":{
+            "beanstalkHosts": "127.0.0.1:11300,localhost:11300"
+        },
+        "g1":{
+            "beanstalkHosts": "127.0.0.1:11300,localhost:11300"
+        }
+    }
+}

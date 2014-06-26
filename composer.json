@@ -1,0 +1,33 @@
+{
+    "name": "nickfan/appbox",
+    "description": "application container",
+    "homepage": "https://github.com/nickfan/appbox",
+    "license": "MIT",
+    "repositories" : [
+    ],
+    "authors": [
+        {
+            "name": "nickfan",
+            "email": "nickfan81@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.0",
+        "ulrichsg/getopt-php": "2.1.*",
+        "jeremeamia/superclosure": "~1.0",
+        "pimple/pimple": "~2.1",
+        "patchwork/utf8": "~1.1",
+        "jv2222/ezsql":"dev-master",
+        "pda/pheanstalk":"dev-master",
+        "predis/predis":"dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Nickfan\\MyApp": "src/",
+            "Nickfan\\AppBox": "src/"
+        },
+        "files": [
+        ]
+    }
+}
