@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -20,5 +20,5 @@ $confDict = Config::get('common.itemPerPages');
 var_dump($confDict);
 $clearResult = DataRouteConf::cacheFlush();
 var_dump($clearResult);
-$routeConf = DataRouteConf::getRouteConfByScript('redis','mygroup',array('id'=>3));
+$routeConf = DataRouteConf::getRouteConfByScript('redis', 'mygroup', array('id' => 3));
 var_dump($routeConf);

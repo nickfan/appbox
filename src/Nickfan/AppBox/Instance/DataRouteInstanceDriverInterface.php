@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,18 +12,22 @@
  */
 
 
-
 namespace Nickfan\AppBox\Instance;
 
 
 interface DataRouteInstanceDriverInterface {
 
-    public function __construct($routeIdSet=array(),$settings=array());
+    public function __construct($routeIdSet = array(), $settings = array());
+
     public function setup();
+
     public function isAvailable();
 
     public function getInstance();
+
     public function close();
+
     public function getRouteIdSet();
+
     public function getSettings();
 }

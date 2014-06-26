@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,10 +12,8 @@
  */
 
 
-
 namespace Nickfan\AppBox\Support;
 
-use ReflectionClass;
 abstract class ServiceProvider {
 
     /**
@@ -35,11 +33,10 @@ abstract class ServiceProvider {
     /**
      * Create a new service provider instance.
      *
-     * @param  \Nickfan\AppBox\Foundation\AppBox  $app
+     * @param  \Nickfan\AppBox\Foundation\AppBox $app
      * @return void
      */
-    public function __construct($app)
-    {
+    public function __construct($app) {
         $this->app = $app;
     }
 
@@ -48,7 +45,8 @@ abstract class ServiceProvider {
      *
      * @return void
      */
-    public function boot() {}
+    public function boot() {
+    }
 
     /**
      * Register the service provider.
@@ -63,8 +61,7 @@ abstract class ServiceProvider {
      *
      * @return array
      */
-    public function provides()
-    {
+    public function provides() {
         return array();
     }
 
@@ -73,8 +70,7 @@ abstract class ServiceProvider {
      *
      * @return array
      */
-    public function when()
-    {
+    public function when() {
         return array();
     }
 
@@ -83,8 +79,7 @@ abstract class ServiceProvider {
      *
      * @return bool
      */
-    public function isDeferred()
-    {
+    public function isDeferred() {
         return $this->defer;
     }
 

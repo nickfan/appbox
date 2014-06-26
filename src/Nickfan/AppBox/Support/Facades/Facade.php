@@ -33,11 +33,10 @@ abstract class Facade {
     /**
      * Hotswap the underlying instance behind the facade.
      *
-     * @param  mixed  $instance
+     * @param  mixed $instance
      * @return void
      */
-    public static function swap($instance)
-    {
+    public static function swap($instance) {
         static::$resolvedInstance[static::getFacadeAccessor()] = $instance;
 
         static::$app->instance(static::getFacadeAccessor(), $instance);
@@ -48,8 +47,7 @@ abstract class Facade {
      *
      * @return mixed
      */
-    public static function getFacadeRoot()
-    {
+    public static function getFacadeRoot() {
         return static::resolveFacadeInstance(static::getFacadeAccessor());
     }
 
@@ -60,12 +58,11 @@ abstract class Facade {
      *
      * @throws \RuntimeException
      */
-    protected static function getFacadeAccessor()
-    {
+    protected static function getFacadeAccessor() {
         $className = get_called_class();
-        $sepNsPos = strrpos($className,'\\');
-        if($sepNsPos!==false){
-            $className = substr($className,$sepNsPos+1);
+        $sepNsPos = strrpos($className, '\\');
+        if ($sepNsPos !== false) {
+            $className = substr($className, $sepNsPos + 1);
         }
         return strtolower($className);
         //throw new \RuntimeException("Facade does not implement getFacadeAccessor method.");
@@ -74,15 +71,15 @@ abstract class Facade {
     /**
      * Resolve the facade root instance from the container.
      *
-     * @param  string  $name
+     * @param  string $name
      * @return mixed
      */
-    protected static function resolveFacadeInstance($name)
-    {
-        if (is_object($name)) return $name;
+    protected static function resolveFacadeInstance($name) {
+        if (is_object($name)) {
+            return $name;
+        }
 
-        if (isset(static::$resolvedInstance[$name]))
-        {
+        if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }
 
@@ -92,11 +89,10 @@ abstract class Facade {
     /**
      * Clear a resolved facade instance.
      *
-     * @param  string  $name
+     * @param  string $name
      * @return void
      */
-    public static function clearResolvedInstance($name)
-    {
+    public static function clearResolvedInstance($name) {
         unset(static::$resolvedInstance[$name]);
     }
 
@@ -105,8 +101,7 @@ abstract class Facade {
      *
      * @return void
      */
-    public static function clearResolvedInstances()
-    {
+    public static function clearResolvedInstances() {
         static::$resolvedInstance = array();
     }
 
@@ -115,35 +110,31 @@ abstract class Facade {
      *
      * @return \Nickfan\AppBox\Foundation\AppBox
      */
-    public static function getFacadeApplication()
-    {
+    public static function getFacadeApplication() {
         return static::$app;
     }
 
     /**
      * Set the application instance.
      *
-     * @param  \Nickfan\AppBox\Foundation\AppBox  $app
+     * @param  \Nickfan\AppBox\Foundation\AppBox $app
      * @return void
      */
-    public static function setFacadeApplication($app)
-    {
+    public static function setFacadeApplication($app) {
         static::$app = $app;
     }
 
     /**
      * Handle dynamic, static calls to the object.
      *
-     * @param  string  $method
-     * @param  array   $args
+     * @param  string $method
+     * @param  array $args
      * @return mixed
      */
-    public static function __callStatic($method, $args)
-    {
+    public static function __callStatic($method, $args) {
         $instance = static::getFacadeRoot();
 
-        switch (count($args))
-        {
+        switch (count($args)) {
             case 0:
                 return $instance->$method();
 

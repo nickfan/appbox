@@ -14,8 +14,8 @@
 namespace Nickfan\AppBox\Config;
 
 use ArrayAccess;
-use Nickfan\AppBox\Common\Usercache\UsercacheInterface;
 use Nickfan\AppBox\Common\Exception\FileNotFoundException;
+use Nickfan\AppBox\Common\Usercache\UsercacheInterface;
 use Nickfan\AppBox\Support\Util;
 
 class Repository implements ArrayAccess {

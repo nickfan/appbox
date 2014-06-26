@@ -2,4 +2,5 @@
 
 namespace Nickfan\AppBox\Common\Exception;
 
-class AppBoxException extends \Exception implements AppBoxExceptionInterface {}
+class AppBoxException extends \Exception implements AppBoxExceptionInterface {
+}

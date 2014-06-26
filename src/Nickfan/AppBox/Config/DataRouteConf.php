@@ -14,12 +14,12 @@
 namespace Nickfan\AppBox\Config;
 
 use ArrayAccess;
+use Jeremeamia\SuperClosure\SerializableClosure;
 use Nickfan\AppBox\Common\Exception\FileNotFoundException;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\Common\Exception\UnexpectedValueException;
 use Nickfan\AppBox\Common\Usercache\UsercacheInterface;
 use Nickfan\AppBox\Support\Util;
-use Jeremeamia\SuperClosure\SerializableClosure;
 
 class DataRouteConf implements ArrayAccess {
     const VERSION = '1.0';
@@ -43,7 +43,7 @@ class DataRouteConf implements ArrayAccess {
      * @var array
      */
     protected $itemsConf = array();
-    
+
     protected $parsedScript = array();
 
     /**
@@ -52,8 +52,6 @@ class DataRouteConf implements ArrayAccess {
      * @var array
      */
     protected $itemsScript = array();
-    
-    
 
 
     /**
@@ -72,56 +70,66 @@ class DataRouteConf implements ArrayAccess {
         return self::VERSION;
     }
 
-    public function getRouteConfByScript($driver,$routeKey,$attributes=array()){
-        $parsedSet = $this->getRouteConfKeySetByScript($driver,$routeKey,$attributes);
-        if(is_null($parsedSet)){
+    public function getRouteConfByScript($driver, $routeKey, $attributes = array()) {
+        $parsedSet = $this->getRouteConfKeySetByScript($driver, $routeKey, $attributes);
+        if (is_null($parsedSet)) {
             // got no script
-            throw new RuntimeException('got no route script:'.$driver);
+            throw new RuntimeException('got no route script:' . $driver);
             //return $this->getRouteConfInit($driver,$routeKey);
         }
-        return $this->getRouteConfSubset($driver,$parsedSet['routeKey'],$parsedSet['group']);
+        return $this->getRouteConfSubset($driver, $parsedSet['routeKey'], $parsedSet['group']);
     }
 
-    public function getRouteConfByRouteConfKeySet($driver,$parsedSet){
-        if(is_null($parsedSet)){
+    public function getRouteConfByRouteConfKeySet($driver, $parsedSet) {
+        if (is_null($parsedSet)) {
             // got no script
-            throw new RuntimeException('got no route script:'.$driver);
+            throw new RuntimeException('got no route script:' . $driver);
             //return $this->getRouteConfInit($driver,$routeKey);
         }
-        return $this->getRouteConfSubset($driver,$parsedSet['routeKey'],$parsedSet['group']);
+        return $this->getRouteConfSubset($driver, $parsedSet['routeKey'], $parsedSet['group']);
     }
-    public function getRouteConfKeySetByScript($driver,$routeKey,$attributes=array()){
+
+    public function getRouteConfKeySetByScript($driver, $routeKey, $attributes = array()) {
         $routeScriptClosure = $this->getScript($driver);
-        if(!is_null($routeScriptClosure)){
-            return call_user_func_array($routeScriptClosure,array($routeKey,$attributes));
-        }else{
+        if (!is_null($routeScriptClosure)) {
+            return call_user_func_array($routeScriptClosure, array($routeKey, $attributes));
+        } else {
             return null;
         }
     }
 
-    public function getRouteScriptClosure($driver){
+    public function getRouteScriptClosure($driver) {
         return $this->getScript($driver);
     }
-    public function getRootConfTree($driver){
-        return $this->getConf($driver.'.'.self::CONF_KEY_ROOT,array());
+
+    public function getRootConfTree($driver) {
+        return $this->getConf($driver . '.' . self::CONF_KEY_ROOT, array());
     }
 
-    public function getRootInitConf($driver){
-        return $this->getConf($driver.'.'.self::CONF_KEY_ROOT.'.'.self::CONF_LABEL_INIT,array());
+    public function getRootInitConf($driver) {
+        return $this->getConf($driver . '.' . self::CONF_KEY_ROOT . '.' . self::CONF_LABEL_INIT, array());
     }
 
-    public function getRouteConfInit($driver,$routeKey){
-        return array_merge($this->getRootInitConf($driver),$this->getConf($driver.'.'.$routeKey.'.'.self::CONF_LABEL_INIT,array()));
+    public function getRouteConfInit($driver, $routeKey) {
+        return array_merge(
+            $this->getRootInitConf($driver),
+            $this->getConf($driver . '.' . $routeKey . '.' . self::CONF_LABEL_INIT, array())
+        );
     }
-    public function getRouteConfSubset($driver,$routeKey,$subset){
-        return array_merge($this->getRouteConfInit($driver,$routeKey),$this->getConf($driver.'.'.$routeKey.'.'.$subset,array()));
+
+    public function getRouteConfSubset($driver, $routeKey, $subset) {
+        return array_merge(
+            $this->getRouteConfInit($driver, $routeKey),
+            $this->getConf($driver . '.' . $routeKey . '.' . $subset, array())
+        );
     }
-    public function getRouteConfSubtree($driver,$routeKey){
-        $result = $this->getConf($driver.'.'.$routeKey);
-        if(is_array($result)){
-            $initConf = $this->getRouteConfInit($driver,$routeKey);
-            foreach($result as $labelKey=>$labelRow){
-                $result[$labelKey] = array_merge($initConf,$labelRow);
+
+    public function getRouteConfSubtree($driver, $routeKey) {
+        $result = $this->getConf($driver . '.' . $routeKey);
+        if (is_array($result)) {
+            $initConf = $this->getRouteConfInit($driver, $routeKey);
+            foreach ($result as $labelKey => $labelRow) {
+                $result[$labelKey] = array_merge($initConf, $labelRow);
             }
         }
         return $result;
@@ -135,21 +143,21 @@ class DataRouteConf implements ArrayAccess {
         return $this->includePath = $includePath;
     }
 
-    public function setUserCacheObject(UsercacheInterface $userCacheObj,$option=array()) {
+    public function setUserCacheObject(UsercacheInterface $userCacheObj, $option = array()) {
         $this->userCacheObj = $userCacheObj;
-        $option+=array(
-            'ttl'=>self::USERCACHE_TTL_DEFAULT,
-            'encode'=>'serialize',
+        $option += array(
+            'ttl' => self::USERCACHE_TTL_DEFAULT,
+            'encode' => 'serialize',
         );
         $this->userCacheObj->setOption($option);
     }
 
-    public function cacheLoad($driver,$isScript=false) {
+    public function cacheLoad($driver, $isScript = false) {
         if (!is_null($this->userCacheObj)) {
             $path = $this->includePath;
-            if($isScript==true){
+            if ($isScript == true) {
                 $file = "{$path}/route/{$driver}.php";
-            }else{
+            } else {
                 $file = "{$path}/dsn/{$driver}.json";
             }
             return $this->userCacheObj->get($file);
@@ -158,12 +166,12 @@ class DataRouteConf implements ArrayAccess {
         }
     }
 
-    public function cacheDel($driver,$isScript=false) {
+    public function cacheDel($driver, $isScript = false) {
         if (!is_null($this->userCacheObj)) {
             $path = $this->includePath;
-            if($isScript==true){
+            if ($isScript == true) {
                 $file = "{$path}/route/{$driver}.php";
-            }else{
+            } else {
                 $file = "{$path}/dsn/{$driver}.json";
             }
             return $this->userCacheObj->del($file);
@@ -171,12 +179,12 @@ class DataRouteConf implements ArrayAccess {
         return null;
     }
 
-    public function cacheSave($driver, $items,$isScript=false) {
+    public function cacheSave($driver, $items, $isScript = false) {
         if (!is_null($this->userCacheObj)) {
             $path = $this->includePath;
-            if($isScript==true){
+            if ($isScript == true) {
                 $file = "{$path}/route/{$driver}.php";
-            }else{
+            } else {
                 $file = "{$path}/dsn/{$driver}.json";
             }
             return $this->userCacheObj->set($file, $items);
@@ -251,12 +259,12 @@ class DataRouteConf implements ArrayAccess {
             return;
         }
 
-        $items = $this->cacheLoad($driver,false);
+        $items = $this->cacheLoad($driver, false);
         if (!empty($items)) {
             $this->itemsConf[$driver] = $items;
         } else {
             $items = $this->fileLoadConf($driver);
-            $this->cacheSave($driver, $items,false);
+            $this->cacheSave($driver, $items, false);
             $this->itemsConf[$driver] = $items;
         }
     }
@@ -320,12 +328,12 @@ class DataRouteConf implements ArrayAccess {
             return;
         }
 
-        $items = $this->cacheLoad($driver,true);
+        $items = $this->cacheLoad($driver, true);
         if (!empty($items)) {
             $this->itemsScript[$driver] = $items;
         } else {
             $items = $this->fileLoadScript($driver);
-            $this->cacheSave($driver, $items,true);
+            $this->cacheSave($driver, $items, true);
             $this->itemsScript[$driver] = $items;
         }
     }
@@ -435,10 +443,10 @@ class DataRouteConf implements ArrayAccess {
 
         if (file_exists($file)) {
             $contents = $this->fileGetContent($file);
-            $items = json_decode($contents,TRUE);
+            $items = json_decode($contents, true);
             $lasterror = json_last_error();
-            if($lasterror!==JSON_ERROR_NONE){
-                throw new UnexpectedValueException(json_last_error_msg(),json_last_error());
+            if ($lasterror !== JSON_ERROR_NONE) {
+                throw new UnexpectedValueException(json_last_error_msg(), json_last_error());
             }
         }
         return $items;
@@ -476,8 +484,8 @@ class DataRouteConf implements ArrayAccess {
 
         if (file_exists($file)) {
             $scriptClosure = $this->fileGetRequire($file);
-            if(!is_callable($scriptClosure)){
-                throw new UnexpectedValueException('route script error:'.$driver);
+            if (!is_callable($scriptClosure)) {
+                throw new UnexpectedValueException('route script error:' . $driver);
             }
             $scriptClosure = new SerializableClosure($scriptClosure);
         }

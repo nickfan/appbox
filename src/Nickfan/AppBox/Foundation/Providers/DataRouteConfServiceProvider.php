@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,12 +12,12 @@
  */
 
 
-
 namespace Nickfan\AppBox\Foundation\Providers;
 
-use Nickfan\AppBox\Support\ServiceProvider;
 use Nickfan\AppBox\Common\Usercache\ApcUsercache;
 use Nickfan\AppBox\Config\DataRouteConf;
+use Nickfan\AppBox\Support\ServiceProvider;
+
 class DataRouteConfServiceProvider extends ServiceProvider {
 
     /**
@@ -32,12 +32,13 @@ class DataRouteConfServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register()
-    {
-        $this->app->bindShared('datarouteconf', function($app)
-            {
-                return new DataRouteConf(new ApcUsercache,$app['path.storage'].'/etc/local');
-            });
+    public function register() {
+        $this->app->bindShared(
+            'datarouteconf',
+            function ($app) {
+                return new DataRouteConf(new ApcUsercache, $app['path.storage'] . '/etc/local');
+            }
+        );
     }
 
     /**
@@ -45,8 +46,7 @@ class DataRouteConfServiceProvider extends ServiceProvider {
      *
      * @return array
      */
-    public function provides()
-    {
+    public function provides() {
         return array('datarouteconf');
     }
 

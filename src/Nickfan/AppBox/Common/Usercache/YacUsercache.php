@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,52 +12,51 @@
  */
 
 
-
 namespace Nickfan\AppBox\Common\Usercache;
 
 
-class YacUsercache extends BaseUsercache implements UsercacheInterface{
+class YacUsercache extends BaseUsercache implements UsercacheInterface {
 
-    protected function getInstance(){
-        if(is_null($this->instance)){
+    protected function getInstance() {
+        if (is_null($this->instance)) {
             $this->instance = new Yac();
         }
         return $this->instance;
     }
 
     public function get($key, $option = array()) {
-        $option+=array(
-            'ttl'=>$this->defaultOption['ttl'],
+        $option += array(
+            'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
 
         $getVal = $this->getInstance()->get($querykey);
-        if(!is_null($getVal)){
+        if (!is_null($getVal)) {
             return $this->decodeVal($getVal);
-        }else{
+        } else {
             return null;
         }
     }
 
     public function set($key, $val, $option = array()) {
-        $option+=array(
-            'ttl'=>$this->defaultOption['ttl'],
+        $option += array(
+            'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        return $this->getInstance()->set($querykey, $this->encodeVal($val),$option['ttl']);
+        return $this->getInstance()->set($querykey, $this->encodeVal($val), $option['ttl']);
     }
 
     public function del($key, $option = array()) {
-        $option+=array(
-            'ttl'=>$this->defaultOption['ttl'],
+        $option += array(
+            'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
         return $this->getInstance()->delete($querykey);
     }
 
     public function exits($key, $option = array()) {
-        $option+=array(
-            'ttl'=>$this->defaultOption['ttl'],
+        $option += array(
+            'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
         $getVal = $this->getInstance()->get($querykey);
@@ -65,8 +64,8 @@ class YacUsercache extends BaseUsercache implements UsercacheInterface{
     }
 
     public function flush($option = array()) {
-        $option+=array(
-            'ttl'=>$this->defaultOption['ttl'],
+        $option += array(
+            'ttl' => $this->defaultOption['ttl'],
         );
         return $this->getInstance()->flush();
     }

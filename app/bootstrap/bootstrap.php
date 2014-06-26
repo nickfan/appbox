@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -24,7 +24,7 @@
 |
 */
 
-require __DIR__.'/autoload.php';
+require __DIR__ . '/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +38,6 @@ require __DIR__.'/autoload.php';
 |
 */
 
-$app = require_once __DIR__.'/start.php';
+$app = require_once __DIR__ . '/start.php';
 
 

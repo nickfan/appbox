@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -25,7 +25,6 @@ return array(
     */
 
     'debug' => true,
-
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -38,7 +37,6 @@ return array(
     */
 
     'timezone' => 'Asia/Shanghai',
-
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -51,7 +49,6 @@ return array(
     */
 
     'locale' => 'zh-CN',
-
     /*
     |--------------------------------------------------------------------------
     | Application Fallback Locale
@@ -64,7 +61,6 @@ return array(
     */
 
     'fallback_locale' => 'en',
-
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -76,10 +72,8 @@ return array(
     |
     */
 
-    'providers' => array(
-        //'Nickfan\AppBox\Config\ConfigServiceProvider',
+    'providers' => array(//'Nickfan\AppBox\Config\ConfigServiceProvider',
     ),
-
     /*
     |--------------------------------------------------------------------------
     | Class Aliases
@@ -92,9 +86,9 @@ return array(
     */
 
     'aliases' => array(
-        'ClassLoader'     => 'Nickfan\AppBox\Support\ClassLoader',
-        'App'             => 'Nickfan\AppBox\Support\Facades\App',
-        'Config'          => 'Nickfan\AppBox\Support\Facades\Config',
+        'ClassLoader' => 'Nickfan\AppBox\Support\ClassLoader',
+        'App' => 'Nickfan\AppBox\Support\Facades\App',
+        'Config' => 'Nickfan\AppBox\Support\Facades\Config',
     ),
 
 );

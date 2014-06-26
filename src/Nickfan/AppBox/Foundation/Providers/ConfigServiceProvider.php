@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,12 +12,12 @@
  */
 
 
-
 namespace Nickfan\AppBox\Foundation\Providers;
 
-use Nickfan\AppBox\Support\ServiceProvider;
 use Nickfan\AppBox\Common\Usercache\ApcUsercache;
 use Nickfan\AppBox\Config\Repository;
+use Nickfan\AppBox\Support\ServiceProvider;
+
 class ConfigServiceProvider extends ServiceProvider {
 
     /**
@@ -32,12 +32,13 @@ class ConfigServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register()
-    {
-        $this->app->bindShared('config', function($app)
-            {
-                return new Repository(new ApcUsercache,$app['path.storage'].'/conf');
-            });
+    public function register() {
+        $this->app->bindShared(
+            'config',
+            function ($app) {
+                return new Repository(new ApcUsercache, $app['path.storage'] . '/conf');
+            }
+        );
     }
 
     /**
@@ -45,8 +46,7 @@ class ConfigServiceProvider extends ServiceProvider {
      *
      * @return array
      */
-    public function provides()
-    {
+    public function provides() {
         return array('config');
     }
 

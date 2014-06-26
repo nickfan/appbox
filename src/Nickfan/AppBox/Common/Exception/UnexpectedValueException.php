@@ -2,4 +2,5 @@
 
 namespace Nickfan\AppBox\Common\Exception;
 
-class UnexpectedValueException extends \UnexpectedValueException implements AppBoxExceptionInterface {}
+class UnexpectedValueException extends \UnexpectedValueException implements AppBoxExceptionInterface {
+}

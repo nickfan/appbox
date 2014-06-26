@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -11,12 +11,12 @@
  *
  */
 
-use Nickfan\AppBox\Support\Facades\Facade;
-use Nickfan\AppBox\Foundation\AliasLoader;
-use Nickfan\AppBox\Config\Repository as Config;
 use Nickfan\AppBox\Common\Usercache\ApcUsercache;
 use Nickfan\AppBox\Config\DataRouteConf;
+use Nickfan\AppBox\Config\Repository as Config;
+use Nickfan\AppBox\Foundation\AliasLoader;
 use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Support\Facades\Facade;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,8 +59,8 @@ Facade::setFacadeApplication($app);
 
 $app->registerCoreContainerAliases();
 
-$app->instance('config', $config = new Config(new ApcUsercache,$app['path.storage'].'/conf'));
-$app->instance('datarouteconf', $routeconf = new DataRouteConf(new ApcUsercache,$app['path.storage'].'/etc/local'));
+$app->instance('config', $config = new Config(new ApcUsercache, $app['path.storage'] . '/conf'));
+$app->instance('datarouteconf', $routeconf = new DataRouteConf(new ApcUsercache, $app['path.storage'] . '/etc/local'));
 $app->instance('datarouteinstance', $routeinstance = DataRouteInstance::getInstance($routeconf));
 
 /*

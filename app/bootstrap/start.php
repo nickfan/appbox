@@ -24,7 +24,7 @@ $app = new Nickfan\AppBox\Foundation\AppBox;
 |
 */
 
-$app->bindInstallPaths(require __DIR__.'/paths.php');
+$app->bindInstallPaths(require __DIR__ . '/paths.php');
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +37,10 @@ $app->bindInstallPaths(require __DIR__.'/paths.php');
 |
 */
 
-$framework = $app['path.base'].
-                 '/src';
+$framework = $app['path.base'] .
+    '/src';
 
-require $framework.'/Nickfan/AppBox/Foundation/start.php';
+require $framework . '/Nickfan/AppBox/Foundation/start.php';
 
 /*
 |--------------------------------------------------------------------------

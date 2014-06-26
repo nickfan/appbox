@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -25,8 +25,7 @@ return array(
     |
     */
 
-    'app' => __DIR__.'/../../app',
-
+    'app' => __DIR__ . '/../../app',
     /*
     |--------------------------------------------------------------------------
     | Public Path
@@ -38,8 +37,7 @@ return array(
     |
     */
 
-    'public' => __DIR__.'/../../app/webroot',
-
+    'public' => __DIR__ . '/../../app/webroot',
     /*
     |--------------------------------------------------------------------------
     | Base Path
@@ -51,8 +49,7 @@ return array(
     |
     */
 
-    'base' => __DIR__.'/../..',
-
+    'base' => __DIR__ . '/../..',
     /*
     |--------------------------------------------------------------------------
     | Storage Path
@@ -64,6 +61,6 @@ return array(
     |
     */
 
-    'storage' => __DIR__.'/../../app/data',
+    'storage' => __DIR__ . '/../../app/data',
 
 );

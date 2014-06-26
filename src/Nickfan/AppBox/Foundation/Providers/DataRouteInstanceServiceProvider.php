@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,11 +12,11 @@
  */
 
 
-
 namespace Nickfan\AppBox\Foundation\Providers;
 
-use Nickfan\AppBox\Support\ServiceProvider;
 use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Support\ServiceProvider;
+
 class DataRouteInstanceServiceProvider extends ServiceProvider {
 
     /**
@@ -31,12 +31,13 @@ class DataRouteInstanceServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register()
-    {
-        $this->app->bindShared('datarouteinstance', function($app)
-            {
+    public function register() {
+        $this->app->bindShared(
+            'datarouteinstance',
+            function ($app) {
                 return DataRouteInstance::getInstance($app['datarouteconf']);
-            });
+            }
+        );
     }
 
     /**
@@ -44,8 +45,7 @@ class DataRouteInstanceServiceProvider extends ServiceProvider {
      *
      * @return array
      */
-    public function provides()
-    {
+    public function provides() {
         return array('datarouteinstance');
     }
 

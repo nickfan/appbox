@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,15 +12,16 @@
  */
 
 
-
 namespace Nickfan\AppBox\Support\Facades;
 
 
-class App extends Facade{
+class App extends Facade {
     /**
      * Get the registered name of the component.
      *
      * @return string
      */
-    protected static function getFacadeAccessor() { return 'app'; }
+    protected static function getFacadeAccessor() {
+        return 'app';
+    }
 } 

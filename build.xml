@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="AppBox" basedir="." default="install">
+<project name="appbox" basedir="." default="install">
 
     <property name="package" value="${phing.project.name}" override="true" />
     <property name="installdir" value="install" override="true" />

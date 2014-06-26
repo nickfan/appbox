@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -13,6 +13,6 @@
 
 return array(
     'debug' => true,
-    'itemPerPage'=>15,
-    'itemPerPages'=>array(3,6,5,10,15,20,50,100),
+    'itemPerPage' => 15,
+    'itemPerPages' => array(3, 6, 5, 10, 15, 20, 50, 100),
 );
