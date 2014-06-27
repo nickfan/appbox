@@ -29,7 +29,7 @@ class RedisDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implement
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
 
-        $curInst = new Redis();
+        $curInst = new \Redis();
 
         $curHostInfo = explode(':', $settings['redisHost']);
         $host = $curHostInfo[0];

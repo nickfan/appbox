@@ -28,7 +28,7 @@ class GearmanWorkerDataRouteInstanceDriver extends BaseDataRouteInstanceDriver i
         if (empty($settings)) {
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
-        $curInst = new GearmanWorker();
+        $curInst = new \GearmanWorker();
         $curInst->addServers($settings['gearmanHosts']);
 
         $this->instance = $curInst;

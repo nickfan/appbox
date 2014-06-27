@@ -41,9 +41,9 @@ class MongoDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implement
             $curConnStr.= $settings['mongoConnSets'];
         }
         if(!empty($curOptions)){
-            $curInst = new Mongo($curConnStr,$curOptions);
+            $curInst = new \Mongo($curConnStr,$curOptions);
         }else{
-            $curInst = new Mongo($curConnStr);
+            $curInst = new \Mongo($curConnStr);
         }
         if(isset($settings['mongoSetSlaveOk']) && $settings['mongoSetSlaveOk']==1){
             /*

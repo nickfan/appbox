@@ -15,10 +15,20 @@ require_once '../bootstrap/bootstrap.php';
 
 use Nickfan\AppBox\Support\Facades\Config;
 use Nickfan\AppBox\Support\Facades\DataRouteConf;
+use Nickfan\AppBox\Support\Facades\DataRouteInstance;
 
 $confDict = Config::get('common.itemPerPages');
-var_dump($confDict);
+//var_dump($confDict);
 $clearResult = DataRouteConf::cacheFlush();
-var_dump($clearResult);
+//var_dump($clearResult);
 $routeConf = DataRouteConf::getRouteConfByScript('redis', 'mygroup', array('id' => 3));
-var_dump($routeConf);
+//var_dump($routeConf);
+
+$dataRouteInstance = DataRouteInstance::getRouteInstance('redis','mygroup',array('id'=>3));
+$serviceInstance = $dataRouteInstance->getInstance();
+//var_dump($dataRouteInstance);
+$serviceInstance->setex('abc',5,'123');
+$res = $serviceInstance->get('abc');
+var_dump($res);
+
+

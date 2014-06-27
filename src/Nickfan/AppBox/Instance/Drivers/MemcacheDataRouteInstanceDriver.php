@@ -30,7 +30,7 @@ class MemcacheDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implem
         }
         $memHostsArr=explode(',',rtrim($settings['memHosts'],','));
         if (class_exists('Memcached')) {
-            $curInst=new Memcached();
+            $curInst=new \Memcached();
         }else{
             //$curInst=new Memcache();
             throw new DataRouteInstanceException('Instance init failed:extension [memcached] required. ');

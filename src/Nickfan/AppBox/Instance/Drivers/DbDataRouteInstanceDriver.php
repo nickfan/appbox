@@ -31,38 +31,30 @@ class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements 
         if (empty($settings)) {
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
-        if(isset($settings['dbDriver']) && $settings['dbDriver']=='mssql'){
-            if(strtoupper(substr(PHP_OS,0,3))=='WIN'){ // sqldrv on windows
-                $curInst = new ezSQL_sqlsrv($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost'],TRUE);
-            }else{	// mssql(sybase) on linux
-                $curInst = new ezSQL_mssql($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost'],TRUE);
-            }
-            $curInst->cache_timeout = $settings['dbCacheTimeout'];
-            $curInst->cache_dir = $settings['dbDiskCachePath'];
-            $curInst->use_disk_cache = $settings['dbCache']==1;
-            $curInst->cache_queries = $settings['dbCache']==1;
-            if($settings['dbShowError']==1){
-                $curInst->show_errors();
-            }else{
-                $curInst->hide_errors();
-            }
-            //$curInst->set_charset('utf8');
-            //$curInst->quick_connect($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost']);
+        $curInst = null;
+        !isset($settings['dbDriver']) && $settings['dbDriver'] = 'mysql';
+        switch($settings['dbDriver']){
+            case 'mssql':
+                if(strtoupper(substr(PHP_OS,0,3))=='WIN'){ // sqldrv on windows
+                    $curInst = new ezSQL_sqlsrv($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost'],TRUE);
+                }else{	// mssql(sybase) on linux
+                    $curInst = new ezSQL_mssql($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost'],TRUE);
+                }
+                break;
+            case 'mysql':
+                $curInst = new ezSQL_mysql($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost'],$settings['dbCharset']);
+                default:
+                break;
+        }
+        //$curInst->quick_connect($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost']);
+        $curInst->cache_timeout = $settings['dbCacheTimeout'];
+        $curInst->cache_dir = $settings['dbDiskCachePath'];
+        $curInst->use_disk_cache = $settings['dbCache']==1;
+        $curInst->cache_queries = $settings['dbCache']==1;
+        if($settings['dbShowError']==1){
+            $curInst->show_errors();
         }else{
-            $curInst = new ezSQL_mysql($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost'],$settings['dbCharset']);
-            $curInst->cache_timeout = $settings['dbCacheTimeout'];
-            $curInst->cache_dir = $settings['dbDiskCachePath'];
-            $curInst->use_disk_cache = $settings['dbCache']==1;
-            $curInst->cache_queries = $settings['dbCache']==1;
-            if($settings['dbShowError']==1){
-                $curInst->show_errors();
-            }else{
-                $curInst->hide_errors();
-            }
-            //$curInst->set_charset($settings['dbCharset']);
-
-
-            //$curInst->quick_connect($settings['dbUser'], $settings['dbPasswd'], $settings['dbSchema'], $settings['dbHost']);
+            $curInst->hide_errors();
         }
         $this->instance = $curInst;
         //$this->isAvailable = $this->instance ? true : false;

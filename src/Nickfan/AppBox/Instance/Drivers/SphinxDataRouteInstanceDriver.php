@@ -28,7 +28,7 @@ class SphinxDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implemen
         if (empty($settings)) {
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
-        $curInst = new SphinxClient;
+        $curInst = new \SphinxClient;
         $curInst->setServer($settings['sphinxHost'],$settings['sphinxPort']);
         !empty($settings['sphinxConnectTimeout']) && $curInst->setConnectTimeout($settings['sphinxConnectTimeout']);
         $this->instance = $curInst;
