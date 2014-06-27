@@ -14,12 +14,11 @@
 
 namespace Nickfan\AppBox\Instance\Drivers;
 
-
 use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Instance\BaseDataRouteInstanceDriver;
 use Nickfan\AppBox\Instance\DataRouteInstanceDriverInterface;
 
-class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
+class MemcacheDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
 
     /**
      * do driver instance init
@@ -29,15 +28,30 @@ class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements 
         if (empty($settings)) {
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
-        $this->instance = (object)$settings;
+        $memHostsArr=explode(',',rtrim($settings['memHosts'],','));
+        if (class_exists('Memcached')) {
+            $curInst=new Memcached();
+        }else{
+            //$curInst=new Memcache();
+            throw new DataRouteInstanceException('Instance init failed:extension [memcached] required. ');
+        }
+        foreach($memHostsArr as $memHost){
+            $curMemHostInfo=explode(':',$memHost);
+            $curInst->addServer($curMemHostInfo[0],isset($curMemHostInfo[1])?$curMemHostInfo[1]:11211);
+        }
+        $this->instance = $curInst;
         $this->isAvailable = $this->instance ? true : false;
     }
 
     public function close() {
         try {
             if($this->instance){
-                unset($this->instance);
-                $this->instance = null;
+                $this->instance->quit();
+//                if (class_exists('Memcached')) {
+//                    $this->instance->quit();
+//                }else{
+//                    $this->instance->close();
+//                }
             }
         } catch (\Exception $ex) {
         }

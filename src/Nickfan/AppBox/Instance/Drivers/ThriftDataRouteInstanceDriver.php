@@ -19,7 +19,7 @@ use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Instance\BaseDataRouteInstanceDriver;
 use Nickfan\AppBox\Instance\DataRouteInstanceDriverInterface;
 
-class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
+class ThriftDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
 
     /**
      * do driver instance init

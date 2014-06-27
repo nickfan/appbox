@@ -14,12 +14,11 @@
 
 namespace Nickfan\AppBox\Instance\Drivers;
 
-
 use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Instance\BaseDataRouteInstanceDriver;
 use Nickfan\AppBox\Instance\DataRouteInstanceDriverInterface;
 
-class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
+class GearmanClientDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
 
     /**
      * do driver instance init
@@ -29,7 +28,10 @@ class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements 
         if (empty($settings)) {
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
-        $this->instance = (object)$settings;
+        $curInst = new GearmanClient();
+        $curInst->addServers($settings['gearmanHosts']);
+
+        $this->instance = $curInst;
         $this->isAvailable = $this->instance ? true : false;
     }
 

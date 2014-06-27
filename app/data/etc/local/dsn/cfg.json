@@ -26,5 +26,10 @@
         "init":{
             "dsn": "ftp://user:pass@127.0.0.1:21/mypath/motd.txt"
         }
+    },
+    "mytest": {
+        "init":{
+            "dsn": "http://localhost"
+        }
     }
 }

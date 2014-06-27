@@ -14,12 +14,11 @@
 
 namespace Nickfan\AppBox\Instance\Drivers;
 
-
 use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Instance\BaseDataRouteInstanceDriver;
 use Nickfan\AppBox\Instance\DataRouteInstanceDriverInterface;
 
-class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
+class SphinxDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInterface {
 
     /**
      * do driver instance init
@@ -29,15 +28,17 @@ class CfgDataRouteInstanceDriver extends BaseDataRouteInstanceDriver implements 
         if (empty($settings)) {
             throw new DataRouteInstanceException('init driver instance failed: empty settings');
         }
-        $this->instance = (object)$settings;
+        $curInst = new SphinxClient;
+        $curInst->setServer($settings['sphinxHost'],$settings['sphinxPort']);
+        !empty($settings['sphinxConnectTimeout']) && $curInst->setConnectTimeout($settings['sphinxConnectTimeout']);
+        $this->instance = $curInst;
         $this->isAvailable = $this->instance ? true : false;
     }
 
     public function close() {
         try {
             if($this->instance){
-                unset($this->instance);
-                $this->instance = null;
+                $this->instance->close();
             }
         } catch (\Exception $ex) {
         }

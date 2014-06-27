@@ -1,0 +1,24 @@
+{
+    "root": {
+        "init":{
+            "memHosts": "127.0.0.1:11211,localhost:11211",
+            "memProtocol": "TCP"
+        }
+    },
+    "my": {
+        "init":{
+            "mongoHost": "127.0.0.1:27017"
+        }
+    },
+    "mygroup": {
+        "init":{
+            "mongoHost": "127.0.0.1:27017"
+        },
+        "g0":{
+            "mongoHost": "127.0.0.1:27017"
+        },
+        "g1":{
+            "mongoHost": "127.0.0.1:27017"
+        }
+    }
+}

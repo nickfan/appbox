@@ -1,6 +1,7 @@
 {
     "root": {
         "init":{
+            "dbHost": "127.0.0.1:3306",
             "dbDriver": "mysql",
             "dbCharset": "utf8",
             "dbCharsetCollection": "utf8",
@@ -9,7 +10,6 @@
             "dbCacheTimeout": "0",
             "dbDiskCachePath": "\/tmp",
             "dbConn": "1",
-            "dbHost": "127.0.0.1:3306",
             "dbUser": "root",
             "dbPasswd": "",
             "dbSchema": "test"
