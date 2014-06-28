@@ -11,7 +11,7 @@
  *
  */
 
-require_once '../../bootstrap/bootstrap.php';
+require_once __DIR__.'/../../bootstrap/bootstrap.php';
 
 use Nickfan\AppBox\Support\Facades\Config;
 use Nickfan\AppBox\Support\Facades\DataRouteConf;

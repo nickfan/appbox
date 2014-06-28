@@ -18,4 +18,8 @@ use Nickfan\AppBox\Common\Usercache\ApcUsercache;
 
 $instRepository = new Repository(new ApcUsercache(),$app['path.storage'].'/conf');
 
-echo $instRepository->getVersion();
+$timezone = $instRepository->get('app.timezone');
+var_dump($timezone);
+
+$itemPerPages = $instRepository->get('common.itemPerPages');
+var_dump($itemPerPages);

@@ -13,6 +13,10 @@
 
 require_once __DIR__.'/../../../bootstrap/bootstrap.php';
 
-use Nickfan\AppBox\Support\Facades\Config;
+use Nickfan\AppBox\Support\Facades\DataRouteInstance;
 
-echo Config::getVersion();
+
+$routeInstance = DataRouteInstance::getRouteInstance('cfg','mygroup',array('id'=>3));
+var_dump($routeInstance);
+$instance = $routeInstance->getInstance();
+var_dump($instance);

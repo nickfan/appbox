@@ -15,4 +15,10 @@ require_once __DIR__.'/../../../bootstrap/bootstrap.php';
 
 use Nickfan\AppBox\Support\Facades\Config;
 
-echo Config::getVersion();
+
+
+$timezone = Config::get('app.timezone');
+var_dump($timezone);
+
+$itemPerPages = Config::get('common.itemPerPages');
+var_dump($itemPerPages);

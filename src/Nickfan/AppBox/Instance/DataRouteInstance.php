@@ -30,7 +30,7 @@ class DataRouteInstance {
      *
      * @return Singleton The *Singleton* instance.
      */
-    public static function getInstance(DataRouteConf $routeConf) {
+    public static function getInstance(DataRouteConf $routeConf=null) {
         static $instance = null;
         if (null === $instance) {
             $instance = new static($routeConf);
@@ -42,11 +42,17 @@ class DataRouteInstance {
      * Protected constructor to prevent creating a new instance of the
      * *Singleton* via the `new` operator from outside of this class.
      */
-    protected function __construct(DataRouteConf $routeConf) {
+    protected function __construct(DataRouteConf $routeConf=null) {
         self::$routeConf = $routeConf;
         self::setShutDownHandler();
     }
 
+    public static function setRouteConf(DataRouteConf $routeConf){
+        self::$routeConf = $routeConf;
+    }
+    public static function getRouteConf(){
+        return self::$routeConf;
+    }
     public static function setShutDownHandler() {
         if (self::$setShutdownHandler == true) {
             register_shutdown_function(array('\\Nickfan\\AppBox\\Instance\\DataRouteInstance', 'close'));
