@@ -18,6 +18,7 @@ use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Config\DataRouteConf;
 
 class DataRouteInstance {
+    const DRIVER_KEY_DEFAULT = 'cfg';
     private static $routeConf = null;
     private static $setShutdownHandler = true;
     private static $instancePools = array();
@@ -43,6 +44,7 @@ class DataRouteInstance {
      */
     protected function __construct(DataRouteConf $routeConf) {
         self::$routeConf = $routeConf;
+        self::setShutDownHandler();
     }
 
     public static function setShutDownHandler() {
@@ -51,7 +53,15 @@ class DataRouteInstance {
         }
     }
 
-    public function getRouteInstance($driverKey = 'cfg', $routeKey = 'root', $attributes = array()) {
+    /**
+     * get Data Routed Driver Instance By routeKey and id vector (data attributes)
+     * @param string $driverKey
+     * @param string $routeKey
+     * @param array $attributes
+     * @return bool
+     * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
+     */
+    public function getRouteInstance($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT, $attributes = array()) {
         $driverKey = lcfirst($driverKey);
         $driverName = ucfirst($driverKey);
         $routeIdSet = self::$routeConf->getRouteConfKeySetByScript($driverKey, $routeKey, $attributes);
@@ -63,14 +73,14 @@ class DataRouteInstance {
 
         if (class_exists($driverClassName)) {
             $settings = self::$routeConf->getRouteConfByRouteConfKeySet($driverKey, $routeIdSet);
-            $driverClassInstance = new $driverClassName($routeIdSet, $settings);
+            $driverClassInstance = new $driverClassName($settings,$routeIdSet);
             if ($driverClassInstance !== false) {
                 $driverClassInstance->isAvailable() or $driverClassInstance->setup();
                 if ($driverClassInstance->isAvailable() != true) {
                     throw new DataRouteInstanceException('Instance.getInstance Failed,Service Not Available.');
                 }
                 self::$instancePools[$driverKey][$routeIdSet['routeKey']][$routeIdSet['group']] = $driverClassInstance;
-                self::setShutDownHandler();
+                //self::setShutDownHandler();
                 return self::$instancePools[$driverKey][$routeIdSet['routeKey']][$routeIdSet['group']];
             }
             throw new DataRouteInstanceException('Instance.getInstance Failed,critical error');
@@ -79,7 +89,110 @@ class DataRouteInstance {
         }
     }
 
-    public static function getPoolInstanceRouteIdLabels($driverKey = null) {
+
+    /**
+     * get Data Routed Conf Subset Keys By routeKey
+     * @param string $driverKey
+     * @param string $routeKey
+     * @return array
+     */
+    public function getRouteConfKeysByRouteKey($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT){
+        $driverKey = lcfirst($driverKey);
+        $driverName = ucfirst($driverKey);
+        return self::$routeConf->getRouteConfSubKeys($driverKey, $routeKey);
+    }
+
+    /**
+     * get Data Routed Driver Instance By routeKey and subset(group name)
+     * @param string $driverKey
+     * @param string $routeKey
+     * @param string $subset
+     * @return bool
+     * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
+     */
+    public function getRouteInstanceByConfSubset($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT,$subset=DataRouteConf::CONF_LABEL_INIT){
+        $driverKey = lcfirst($driverKey);
+        $driverName = ucfirst($driverKey);
+        $routeIdSet = array(
+            'routeKey'=>$routeKey,
+            'group'=>$subset,
+        );
+        $dataRouteInstance = self::getPoolInstanceByRouteIdSet($driverKey, $routeIdSet);
+        if ($dataRouteInstance !== false) {
+            return $dataRouteInstance;
+        }
+        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'DataRouteInstanceDriver';
+
+        if (class_exists($driverClassName)) {
+            $settings = self::$routeConf->getRouteConfByRouteConfKeySet($driverKey, $routeIdSet);
+            $driverClassInstance = new $driverClassName($settings,$routeIdSet);
+            if ($driverClassInstance !== false) {
+                $driverClassInstance->isAvailable() or $driverClassInstance->setup();
+                if ($driverClassInstance->isAvailable() != true) {
+                    throw new DataRouteInstanceException('Instance.getInstance Failed,Service Not Available.');
+                }
+                self::$instancePools[$driverKey][$routeIdSet['routeKey']][$routeIdSet['group']] = $driverClassInstance;
+                //self::setShutDownHandler();
+                return self::$instancePools[$driverKey][$routeIdSet['routeKey']][$routeIdSet['group']];
+            }
+            throw new DataRouteInstanceException('Instance.getInstance Failed,critical error');
+        } else {
+            throw new DataRouteInstanceException('driver_not_supported:' . $driverName);
+        }
+    }
+
+    /**
+     * get Data Routed Conf Subset Settings By routeKey and subset
+     * @param string $driverKey
+     * @param string $routeKey
+     * @return array
+     */
+    public function getRouteConfSettings($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT,$subset=DataRouteConf::CONF_LABEL_INIT){
+        $driverKey = lcfirst($driverKey);
+        $driverName = ucfirst($driverKey);
+        $routeIdSet = array(
+            'routeKey'=>$routeKey,
+            'group'=>$subset,
+        );
+        return self::$routeConf->getRouteConfByRouteConfKeySet($driverKey, $routeIdSet);
+    }
+
+    /**
+     * get Single Driver Instance
+     * @param string $driverKey
+     * @param array $settings
+     * @param array $routeIdSet
+     * @return mixed
+     * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
+     */
+    public function getDriverInstance($driverKey=self::DRIVER_KEY_DEFAULT,$settings=array(),$routeIdSet = array()){
+        $driverKey = lcfirst($driverKey);
+        $driverName = ucfirst($driverKey);
+        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'DataRouteInstanceDriver';
+
+        if (class_exists($driverClassName)) {
+            $driverClassInstance = new $driverClassName($settings,$routeIdSet);
+            if ($driverClassInstance !== false) {
+                $driverClassInstance->isAvailable() or $driverClassInstance->setup();
+                if ($driverClassInstance->isAvailable() != true) {
+                    throw new DataRouteInstanceException('Instance.getInstance Failed,Service Not Available.');
+                }
+                register_shutdown_function(array($driverClassInstance, 'close'));
+                return $driverClassInstance;
+            }
+            throw new DataRouteInstanceException('Instance.getInstance Failed,critical error');
+        } else {
+            throw new DataRouteInstanceException('driver_not_supported:' . $driverName);
+        }
+    }
+
+
+    /**
+     * get connected poolInstanceRouteIdLabels
+     * @param string $driverKey
+     * @return array
+     */
+    protected static function getPoolInstanceRouteIdLabels($driverKey = self::DRIVER_KEY_DEFAULT) {
         $retKeys = array();
         if (!empty($driverKey) && isset(self::$instancePools[$driverKey])) {
             $retKeys = array_keys(self::$instancePools[$driverKey]);
@@ -87,7 +200,14 @@ class DataRouteInstance {
         return $retKeys;
     }
 
-    public static function getPoolInstanceByRouteIdSet($driverKey = null, $routeIdSet = array()) {
+
+    /**
+     * get connected poolInstance By routeIdSet
+     * @param string $driverKey
+     * @param array $routeIdSet
+     * @return bool
+     */
+    protected static function getPoolInstanceByRouteIdSet($driverKey = self::DRIVER_KEY_DEFAULT, $routeIdSet = array()) {
         if (!isset(self::$instancePools[$driverKey])) {
             self::$instancePools[$driverKey] = array();
             return false;
@@ -115,9 +235,11 @@ class DataRouteInstance {
         return false;
     }
 
+    /**
+     * close all instance connection
+     * @return void
+     */
     public static function close() {
-        //debug_print_backtrace();
-        //exit('serv close');
         if (!empty(self::$instancePools)) {
             foreach (self::$instancePools as $driverKey => $driverRouteInstancePools) {
                 if (!empty($driverRouteInstancePools)) {
@@ -132,7 +254,6 @@ class DataRouteInstance {
                     }
                 }
             }
-            //print(PHP_EOL.'<br/><pre>'.PHP_EOL.var_export( self::$instancePools,TRUE).PHP_EOL.'</pre><br/>'.PHP_EOL);exit;
         }
     }
 

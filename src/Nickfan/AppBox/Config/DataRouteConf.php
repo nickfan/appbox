@@ -134,6 +134,13 @@ class DataRouteConf implements ArrayAccess {
         }
         return $result;
     }
+    public function getRouteConfSubKeys($driver,$routeKey){
+        $result = $this->getConf($driver . '.' . $routeKey);
+        if (is_array($result)) {
+            return array_keys($result);
+        }
+        return array();
+    }
 
     public function getIncludePath() {
         return $this->includePath;

@@ -125,6 +125,11 @@ class MyDispatcher implements DispatcherInterface{
                 $params['pkg'] = trim($matches[1]);
                 $params['mod'] = isset($matches[2])?trim($matches[2]):'index';
                 $params['act'] = isset($matches[3])?trim($matches[3]):'index';
+            }elseif(preg_match('/^\/([a-z0-9\_]+)(?:\/([a-z0-9\_]+)(?:\/([a-z0-9\_]+)|)|)\/?$/i',$req_uri_path,$matches)){
+                $gotAction = true;
+                $params['pkg'] = trim($matches[1]);
+                $params['mod'] = isset($matches[2])?trim($matches[2]):'index';
+                $params['act'] = isset($matches[3])?trim($matches[3]):'index';
             }
         }
         /* try get method */

@@ -23,9 +23,9 @@ abstract class BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInt
     protected $routeIdSet = array();
     protected $settings = array();
 
-    public function __construct($routeIdSet = array(), $settings = array()) {
-        $this->routeIdSet = $routeIdSet;
+    public function __construct($settings = array(), $routeIdSet = array()) {
         $this->settings = $settings;
+        $this->routeIdSet = $routeIdSet;
         //$this->setup();
     }
 
@@ -45,12 +45,12 @@ abstract class BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInt
         return $this->isAvailable;
     }
 
-    public function getRouteIdSet() {
-        return $this->routeIdSet;
-    }
-
     public function getSettings() {
         return $this->settings;
+    }
+
+    public function getRouteIdSet() {
+        return $this->routeIdSet;
     }
 
     /**
