@@ -19,6 +19,10 @@ use Nickfan\AppBox\Config\DataRouteConf;
 
 class DataRouteInstance {
     const DRIVER_KEY_DEFAULT = 'cfg';
+    const DATAROUTE_MODE_ATTR = 0;      // dataroute mode by attributes
+    const DATAROUTE_MODE_IDSET = 1;      // dataroute mode by routeIdSet
+    const DATAROUTE_MODE_DIRECT = 3;     // dataroute mode by directsettings
+
     private static $routeConf = null;
     private static $setShutdownHandler = true;
     private static $instancePools = array();
@@ -97,6 +101,35 @@ class DataRouteInstance {
 
 
     /**
+     * get Data Routed Driver Instance RouteIdSet By routeKey and id vector (data attributes)
+     * @param string $driverKey
+     * @param string $routeKey
+     * @param array $attributes
+     * @return bool
+     * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
+     */
+    public function getRouteInstanceRouteIdSet($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT, $attributes = array()) {
+        $driverKey = lcfirst($driverKey);
+        $driverName = ucfirst($driverKey);
+        return self::$routeConf->getRouteConfKeySetByScript($driverKey, $routeKey, $attributes);
+    }
+
+    /**
+     * get Data Routed Driver Instance ConfIdSet By routeKey and id vector (data attributes)
+     * @param string $driverKey
+     * @param string $routeKey
+     * @param array $attributes
+     * @return bool
+     * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
+     */
+    public function getRouteInstanceSettings($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT, $attributes = array()) {
+        $driverKey = lcfirst($driverKey);
+        $driverName = ucfirst($driverKey);
+        return self::$routeConf->getRouteConfByScript($driverKey, $routeKey, $attributes);
+    }
+
+
+    /**
      * get Data Routed Conf Subset Keys By routeKey
      * @param string $driverKey
      * @param string $routeKey
@@ -153,7 +186,7 @@ class DataRouteInstance {
      * @param string $routeKey
      * @return array
      */
-    public function getRouteConfSettings($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT,$subset=DataRouteConf::CONF_LABEL_INIT){
+    public function getRouteConfSettingsByConfSubset($driverKey = self::DRIVER_KEY_DEFAULT, $routeKey = DataRouteConf::CONF_KEY_ROOT,$subset=DataRouteConf::CONF_LABEL_INIT){
         $driverKey = lcfirst($driverKey);
         $driverName = ucfirst($driverKey);
         $routeIdSet = array(
