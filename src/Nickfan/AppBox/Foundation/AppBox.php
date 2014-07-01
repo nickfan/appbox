@@ -18,6 +18,37 @@ use Nickfan\AppBox\Container\Container;
 use Nickfan\AppBox\Support\Util;
 
 class AppBox extends Container {
+    /**
+     * Quick debugging of any variable. Any number of parameters can be set.
+     *
+     * @return  string
+     */
+    public static function debug() {
+        if (func_num_args() === 0 || func_num_args() === 1) {
+            return null;
+        }
+        // Get params
+        $params = func_get_args();
+        $printBool = boolval(array_shift($params));
+        $output = array();
+        foreach ($params as $var) {
+            $output[] = '(' . gettype($var) . ') ' . var_export($var, true) . '';
+        }
+        if (php_sapi_name() == 'cli') {
+            if ($printBool == true) {
+                print(implode("\n", $output));
+            } else {
+                return implode("\n", $output);
+            }
+        } else {
+            if ($printBool == true) {
+                print('<pre>' . implode("</pre>\n<pre>", $output) . '</pre>');
+            } else {
+                return '<pre>' . implode("</pre>\n<pre>", $output) . '</pre>';
+            }
+        }
+        return null;
+    }
 
     /**
      * All of the registered service providers.

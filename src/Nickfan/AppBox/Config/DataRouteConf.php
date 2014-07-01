@@ -23,7 +23,6 @@ use Nickfan\AppBox\Support\Util;
 
 class DataRouteConf implements ArrayAccess {
     const VERSION = '1.0';
-
     const CONF_KEY_ROOT = 'root';
     const CONF_LABEL_INIT = 'init';
     const USERCACHE_TTL_DEFAULT = 300;

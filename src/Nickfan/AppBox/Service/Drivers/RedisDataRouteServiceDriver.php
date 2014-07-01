@@ -18,27 +18,28 @@ namespace Nickfan\AppBox\Service\Drivers;
 use Nickfan\AppBox\Service\BaseDataRouteServiceDriver;
 use Nickfan\AppBox\Service\DataRouteServiceDriverInterface;
 
-class CfgDataRouteServiceDriver extends BaseDataRouteServiceDriver implements DataRouteServiceDriverInterface {
+class RedisDataRouteServiceDriver extends BaseDataRouteServiceDriver implements DataRouteServiceDriverInterface {
 
-    //protected static $driverKey = 'cfg';
+    //protected static $driverKey = 'redis';
 
-    public function getByKey($key = 'dsn', $option = array(), $driverInstance = null) {
+    public function get($key, $option = array(), $driverInstance = null) {
         $option += array();
         list($driverInstance, $option) = $this->getVendorSerivceInstanceSet(
             $option,
             $driverInstance,
-            array('id' => crc32($key),)
+            array('key' => $key,)
         );
-        return isset($driverInstance->$key) ? $driverInstance->$key : null;
+        return $driverInstance->get($key);
     }
 
-    public function getDict($option = array(), $driverInstance = null) {
+    public function set($key, $val = '', $option = array(), $driverInstance = null) {
         $option += array();
         list($driverInstance, $option) = $this->getVendorSerivceInstanceSet(
             $option,
             $driverInstance,
-            array()
+            array('key' => $key,)
         );
-        return (array)$driverInstance;
+        return $driverInstance->set($key, $val);
     }
+
 } 
