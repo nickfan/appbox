@@ -17,6 +17,7 @@ namespace Nickfan\AppBox\Service;
 use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
 
 abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInterface {
 
@@ -47,7 +48,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
      * @return mixed
      */
     public static function factory(
-        DataRouteInstance $instDataRouteInstance,
+        DataRouteInstanceInterface $instDataRouteInstance,
         $driverKey = null
     ) {
 //        if (null === static::$instance) {
@@ -59,7 +60,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
     }
 
     protected function __construct(
-        DataRouteInstance $instDataRouteInstance,
+        DataRouteInstanceInterface $instDataRouteInstance,
         $driverKey = null
     ) {
         if (is_null($driverKey) && is_null($this->driverKey)) {
@@ -80,7 +81,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         return self::$routeInstance;
     }
 
-    public function setDataRouteInstance(DataRouteInstance $instDataRouteInstance) {
+    public function setDataRouteInstance(DataRouteInstanceInterface $instDataRouteInstance) {
         self::$routeInstance = $instDataRouteInstance;
     }
 

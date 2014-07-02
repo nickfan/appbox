@@ -18,7 +18,7 @@ use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Config\DataRouteConf;
 
-class DataRouteInstance {
+class DataRouteInstance implements DataRouteInstanceInterface {
 
 
     private static $instance = null;

@@ -16,7 +16,7 @@ namespace Nickfan\AppBox\Service;
 
 
 use Nickfan\AppBox\Common\AppConstants;
-use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
 
 interface DataRouteServiceDriverInterface {
 
@@ -24,7 +24,7 @@ interface DataRouteServiceDriverInterface {
 
     public function getDataRouteInstance();
 
-    public function setDataRouteInstance(DataRouteInstance $instDataRouteInstance);
+    public function setDataRouteInstance(DataRouteInstanceInterface $instDataRouteInstance);
 
     public function getDriverKey();
 

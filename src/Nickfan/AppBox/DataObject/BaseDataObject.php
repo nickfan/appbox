@@ -19,6 +19,7 @@ use ArrayAccess;
 use Traversable;
 use Serializable;
 use IteratorAggregate;
+use ArrayIterator;
 
 abstract class BaseDataObject implements ArrayAccess,Serializable,IteratorAggregate{
     //protected static $dataObjectUuidPropKey = '_id';
