@@ -27,71 +27,85 @@ class AppConstants {
     const DATAROUTE_MODE_IDSET = 1; // dataroute mode by routeIdSet
     const DATAROUTE_MODE_DIRECT = 3; // dataroute mode by directsettings
 
+
+    /**
+     * 实例类型
+     */
+
+    const INSTANCE_TYPE_CACHE = 'cache';        // 缓存
+    const INSTANCE_TYPE_SEQ = 'seq';            // 序列生成器
+    const INSTANCE_TYPE_DB = 'db';              // 数据库
+    const INSTANCE_TYPE_IDX = 'idx';            // 索引（全文检索）
+    const INSTANCE_TYPE_MQ = 'mq';              // 消息队列
+    const INSTANCE_TYPE_FS = 'fs';              // 文件存储
+    const INSTANCE_TYPE_RPC = 'rpc';            // 远程调用
+    const INSTANCE_TYPE_DC = 'dc';              // 分布式计算
+
     /**
      * 缓存实例类型
      */
-    const CACHEINSTANCE_TYPE_NONE = '';
-    const CACHEINSTANCE_TYPE_MEMCACHE = 'memcache';
-    const CACHEINSTANCE_TYPE_REDIS = 'redis';
+    const INSTANCE_CACHE_DRIVER_NONE = '';
+    const INSTANCE_CACHE_DRIVER_MEMCACHE = 'memcache';
+    const INSTANCE_CACHE_DRIVER_REDIS = 'redis';
 
     /**
      * 序列实例类型
      */
-    const SEQINSTANCE_TYPE_NONE = '';
-    const SEQINSTANCE_TYPE_MONGODB = 'mongo';
-    const SEQINSTANCE_TYPE_REDIS = 'redis';
-    const SEQINSTANCE_TYPE_MYSQL = 'mysql';
-    const SEQINSTANCE_TYPE_MSSQL = 'mssql';
+    const INSTANCE_SEQ_DRIVER_NONE = '';
+    const INSTANCE_SEQ_DRIVER_MONGODB = 'mongo';
+    const INSTANCE_SEQ_DRIVER_REDIS = 'redis';
+    const INSTANCE_SEQ_DRIVER_MYSQL = 'mysql';
+    const INSTANCE_SEQ_DRIVER_MSSQL = 'mssql';
 
     /**
      * 数据库实例类型
      */
-    const DBINSTANCE_TYPE_NONE = '';
-    const DBINSTANCE_TYPE_MONGODB = 'mongo';
-    const DBINSTANCE_TYPE_REDIS = 'redis';
-    const DBINSTANCE_TYPE_MYSQL = 'mysql';
-    const DBINSTANCE_TYPE_MSSQL = 'mssql';
+    const INSTANCE_DB_DRIVER_NONE = '';
+    const INSTANCE_DB_DRIVER_MONGODB = 'mongo';
+    const INSTANCE_DB_DRIVER_REDIS = 'redis';
+    const INSTANCE_DB_DRIVER_MYSQL = 'mysql';
+    const INSTANCE_DB_DRIVER_MSSQL = 'mssql';
 
     /**
      * 索引实例类型
      */
-    const IDXINSTANCE_TYPE_NONE = '';
-    const IDXINSTANCE_TYPE_SPHINX = 'sphinx';
-    const IDXINSTANCE_TYPE_XAPIAN = 'xapian';
-    const IDXINSTANCE_TYPE_LUCENE = 'lucene';
-    const IDXINSTANCE_TYPE_CUSTOM = 'custom';
+    const INSTANCE_IDX_DRIVER_NONE = '';
+    const INSTANCE_IDX_DRIVER_SPHINX = 'sphinx';
+    const INSTANCE_IDX_DRIVER_XAPIAN = 'xapian';
+    const INSTANCE_IDX_DRIVER_LUCENE = 'lucene';
+    const INSTANCE_IDX_DRIVER_CUSTOM = 'custom';
 
     /**
      * 消息/任务队列实例类型
      */
-    const MQINSTANCE_TYPE_NONE = '';
-    const MQINSTANCE_TYPE_BEANSTALK = 'beanstalk';
-    const MQINSTANCE_TYPE_GEARMAN = 'gearman';
-    const MQINSTANCE_TYPE_ZMQ = 'zmq';
-    const MQINSTANCE_TYPE_REDIS = 'redis';
-    const MQINSTANCE_TYPE_AMQP = 'amqp';
+    const INSTANCE_MQ_DRIVER_NONE = '';
+    const INSTANCE_MQ_DRIVER_BEANSTALK = 'beanstalk';
+    const INSTANCE_MQ_DRIVER_GEARMAN = 'gearman';
+    const INSTANCE_MQ_DRIVER_ZMQ = 'zmq';
+    const INSTANCE_MQ_DRIVER_REDIS = 'redis';
+    const INSTANCE_MQ_DRIVER_AMQP = 'amqp';
 
     /**
      * 文件系统实例类型
      */
-    const FSINSTANCE_TYPE_NONE = '';
-    const FSINSTANCE_TYPE_FUSE = 'fuse';
-    const FSINSTANCE_TYPE_GRIDFS = 'gridfs';
-    const FSINSTANCE_TYPE_FASTDFS = 'fastdfs';
+    const INSTANCE_FS_DRIVER_NONE = '';
+    const INSTANCE_FS_DRIVER_FUSE = 'fuse';
+    const INSTANCE_FS_DRIVER_GRIDFS = 'gridfs';
+    const INSTANCE_FS_DRIVER_FASTDFS = 'fastdfs';
 
     /**
      * 远程调用实例类型
      */
-    const RPCINSTANCE_TYPE_NONE = '';
-    const RPCINSTANCE_TYPE_THRIFT = 'thrift';
-    const RPCINSTANCE_TYPE_ICE = 'ice';
+    const INSTANCE_RPC_DRIVER_NONE = '';
+    const INSTANCE_RPC_DRIVER_THRIFT = 'thrift';
+    const INSTANCE_RPC_DRIVER_ICE = 'ice';
 
     /**
      * 分布式计算实例类型
      */
-    const DCINSTANCE_TYPE_NONE = '';
-    const DCINSTANCE_TYPE_HADOOP = 'hadoop';
-    const DCINSTANCE_TYPE_STORM = 'storm';
-    const DCINSTANCE_TYPE_SPARK = 'spark';
+    const INSTANCE_DC_DRIVER_NONE = '';
+    const INSTANCE_DC_DRIVER_HADOOP = 'hadoop';
+    const INSTANCE_DC_DRIVER_STORM = 'storm';
+    const INSTANCE_DC_DRIVER_SPARK = 'spark';
 
 } 
