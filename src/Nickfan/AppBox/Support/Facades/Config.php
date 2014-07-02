@@ -17,8 +17,6 @@ namespace Nickfan\AppBox\Support\Facades;
 
 class Config extends Facade {
 
-    const USERCACHE_TTL_DEFAULT = 300;
-
     /**
      * Get the registered name of the component.
      *

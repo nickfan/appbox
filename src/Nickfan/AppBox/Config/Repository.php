@@ -14,18 +14,17 @@
 namespace Nickfan\AppBox\Config;
 
 use ArrayAccess;
+use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\FileNotFoundException;
 use Nickfan\AppBox\Common\Usercache\UsercacheInterface;
 use Nickfan\AppBox\Support\Util;
 
 class Repository implements ArrayAccess {
-    const VERSION = '1.0';
 
-    const USERCACHE_TTL_DEFAULT = 300;
 
     protected $userCacheObj = null;
 
-    protected $userCacheTTL = self::USERCACHE_TTL_DEFAULT;
+    protected $userCacheTTL = AppConstants::USERCACHE_TTL_DEFAULT;
 
     // Include paths
     protected $includePath;
@@ -52,7 +51,7 @@ class Repository implements ArrayAccess {
     }
 
     public static function getVersion() {
-        return self::VERSION;
+        return AppConstants::VERSION;
     }
 
     public function getIncludePath() {
@@ -65,7 +64,7 @@ class Repository implements ArrayAccess {
 
     public function setUserCacheObject(UsercacheInterface $userCacheObj) {
         $this->userCacheObj = $userCacheObj;
-        $this->userCacheObj->setOption(array('ttl' => self::USERCACHE_TTL_DEFAULT,));
+        $this->userCacheObj->setOption(array('ttl' => AppConstants::USERCACHE_TTL_DEFAULT,));
     }
 
     public function cacheLoad($group) {

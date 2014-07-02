@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -12,12 +12,11 @@
  */
 
 
-
 namespace Nickfan\AppBox\Service;
 
 
+use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Instance\DataRouteInstance;
-use Nickfan\AppBox\Config\DataRouteConf;
 
 interface DataRouteServiceDriverInterface {
 
@@ -29,16 +28,23 @@ interface DataRouteServiceDriverInterface {
 
     public function getDriverKey();
 
-    public function setDriverKey($driverKey=DataRouteInstance::DRIVER_KEY_DEFAULT);
+    public function setDriverKey($driverKey = AppConstants::DRIVER_KEY_DEFAULT);
 
-    public function getRouteInstance($routeKey = DataRouteConf::CONF_KEY_ROOT, $attributes = array(),$driverKey = null);
+    public function getRouteInstance($routeKey = AppConstants::CONF_KEY_ROOT, $attributes = array(), $driverKey = null);
 
-    public function getRouteInstanceRouteIdSet($routeKey = DataRouteConf::CONF_KEY_ROOT, $attributes = array(),$driverKey = null);
+    public function getRouteInstanceRouteIdSet(
+        $routeKey = AppConstants::CONF_KEY_ROOT,
+        $attributes = array(),
+        $driverKey = null
+    );
 
-    public function getRouteConfKeysByRouteKey($routeKey = DataRouteConf::CONF_KEY_ROOT,$driverKey = null);
+    public function getRouteConfKeysByRouteKey($routeKey = AppConstants::CONF_KEY_ROOT, $driverKey = null);
 
-    public function getRouteInstanceByConfSubset($routeKey = DataRouteConf::CONF_KEY_ROOT,$subset=DataRouteConf::CONF_LABEL_INIT,$driverKey = null);
-
+    public function getRouteInstanceByConfSubset(
+        $routeKey = AppConstants::CONF_KEY_ROOT,
+        $subset = AppConstants::CONF_LABEL_INIT,
+        $driverKey = null
+    );
 
 
 }

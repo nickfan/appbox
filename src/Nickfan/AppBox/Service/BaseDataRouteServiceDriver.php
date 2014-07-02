@@ -14,8 +14,8 @@
 
 namespace Nickfan\AppBox\Service;
 
+use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
-use Nickfan\AppBox\Config\DataRouteConf;
 use Nickfan\AppBox\Instance\DataRouteInstance;
 
 abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInterface {
@@ -24,7 +24,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
     protected static $routeInstance = null;
 
     protected $driverKey = null;
-    protected $routeKey = DataRouteConf::CONF_KEY_ROOT;
+    protected $routeKey = AppConstants::CONF_KEY_ROOT;
 
     public static function parseClassNameDriverKey() {
         $className = get_called_class();
@@ -36,7 +36,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         if (!empty($shortClassName)) {
             $driverKey = lcfirst($shortClassName);
         } else {
-            $driverKey = DataRouteInstance::DRIVER_KEY_DEFAULT;
+            $driverKey = AppConstants::DRIVER_KEY_DEFAULT;
         }
         return array($className, $shortClassName, $driverKey);
     }
@@ -68,7 +68,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             if (!empty($className)) {
                 $driverKey = lcfirst($className);
             } else {
-                $driverKey = DataRouteInstance::DRIVER_KEY_DEFAULT;
+                $driverKey = AppConstants::DRIVER_KEY_DEFAULT;
             }
             $this->driverKey = $driverKey;
         }
@@ -88,7 +88,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         return $this->driverKey;
     }
 
-    public function setDriverKey($driverKey = DataRouteInstance::DRIVER_KEY_DEFAULT) {
+    public function setDriverKey($driverKey = AppConstants::DRIVER_KEY_DEFAULT) {
         $this->driverKey = $driverKey;
     }
 
@@ -96,7 +96,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         return $this->routeKey;
     }
 
-    public function setRouteKey($routeKey = DataRouteConf::CONF_KEY_ROOT) {
+    public function setRouteKey($routeKey = AppConstants::CONF_KEY_ROOT) {
         $this->routeKey = $routeKey;
     }
 
@@ -104,17 +104,17 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         if (is_null($vendorInstance)) {
             $option += array(
                 'driverKey' => $this->getDriverKey(),
-                'routeMode' => DataRouteInstance::DATAROUTE_MODE_ATTR,
+                'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
                 'routeKey' => $this->getRouteKey(),
             );
             switch ($option['routeMode']) {
-                case DataRouteInstance::DATAROUTE_MODE_IDSET:
+                case AppConstants::DATAROUTE_MODE_IDSET:
                     if (!isset($option['routeIdSet'])) {
                         throw new RuntimeException('idset route mode require [routeIdSet]');
                     }
                     $routeIdSet = array(
                         'routeKey' => isset($option['routeIdSet']['routeKey']) ? $option['routeIdSet']['routeKey'] : $option['routeKey'],
-                        'group' => isset($option['routeIdSet']['group']) ? $option['routeIdSet']['group'] : DataRouteConf::CONF_LABEL_INIT,
+                        'group' => isset($option['routeIdSet']['group']) ? $option['routeIdSet']['group'] : AppConstants::CONF_LABEL_INIT,
                     );
                     $driverInstance = self::$routeInstance->getRouteInstanceByConfSubset(
                         $option['driverKey'],
@@ -122,7 +122,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                         $routeIdSet['group']
                     );
                     break;
-                case DataRouteInstance::DATAROUTE_MODE_DIRECT:
+                case AppConstants::DATAROUTE_MODE_DIRECT:
                     if (!isset($option['routeSettings'])) {
                         throw new RuntimeException('direct route mode require [routeSettings]');
                     }
@@ -133,14 +133,14 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                         $routeIdSet
                     );
                     break;
-                case DataRouteInstance::DATAROUTE_MODE_ATTR:
+                case AppConstants::DATAROUTE_MODE_ATTR:
                 default:
                     if (!isset($option['routeAttr'])) {
                         if (is_callable($getAttrCallBack)) {
                             $option['routeAttr'] = call_user_func($getAttrCallBack);
                         } elseif (is_array($getAttrCallBack)) {
                             $option['routeAttr'] = $getAttrCallBack;
-                        } elseif(is_null($getAttrCallBack)){
+                        } elseif (is_null($getAttrCallBack)) {
                             $option['routeAttr'] = array();
                         } else {
                             throw new RuntimeException('direct route mode require [routeAttr]');
@@ -189,7 +189,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
     }
 
     public function getRouteInstance(
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
         $attributes = array(),
         $driverKey = null
     ) {
@@ -198,7 +198,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
     }
 
     public function getRouteInstanceRouteIdSet(
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
         $attributes = array(),
         $driverKey = null
     ) {
@@ -206,14 +206,14 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         return self::$routeInstance->getRouteInstanceRouteIdSet($driverKey, $routeKey, $attributes);
     }
 
-    public function getRouteConfKeysByRouteKey($routeKey = DataRouteConf::CONF_KEY_ROOT, $driverKey = null) {
+    public function getRouteConfKeysByRouteKey($routeKey = AppConstants::CONF_KEY_ROOT, $driverKey = null) {
         empty($driverKey) && $driverKey = $this->getDriverKey();
         return self::$routeInstance->getRouteConfKeysByRouteKey($driverKey, $routeKey);
     }
 
     public function getRouteInstanceByConfSubset(
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
-        $subset = DataRouteConf::CONF_LABEL_INIT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
+        $subset = AppConstants::CONF_LABEL_INIT,
         $driverKey = null
     ) {
         empty($driverKey) && $driverKey = $this->getDriverKey();

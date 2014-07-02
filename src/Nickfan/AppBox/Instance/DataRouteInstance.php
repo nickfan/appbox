@@ -14,14 +14,12 @@
 
 namespace Nickfan\AppBox\Instance;
 
+use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\DataRouteInstanceException;
 use Nickfan\AppBox\Config\DataRouteConf;
 
 class DataRouteInstance {
-    const DRIVER_KEY_DEFAULT = 'cfg';
-    const DATAROUTE_MODE_ATTR = 0; // dataroute mode by attributes
-    const DATAROUTE_MODE_IDSET = 1; // dataroute mode by routeIdSet
-    const DATAROUTE_MODE_DIRECT = 3; // dataroute mode by directsettings
+
 
     private static $instance = null;
     private static $routeConf = null;
@@ -90,8 +88,8 @@ class DataRouteInstance {
      * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
      */
     public function getRouteInstance(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
         $attributes = array()
     ) {
         $driverKey = lcfirst($driverKey);
@@ -131,8 +129,8 @@ class DataRouteInstance {
      * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
      */
     public function getRouteInstanceRouteIdSet(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
         $attributes = array()
     ) {
         $driverKey = lcfirst($driverKey);
@@ -149,8 +147,8 @@ class DataRouteInstance {
      * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
      */
     public function getRouteInstanceSettings(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
         $attributes = array()
     ) {
         $driverKey = lcfirst($driverKey);
@@ -166,8 +164,8 @@ class DataRouteInstance {
      * @return array
      */
     public function getRouteConfKeysByRouteKey(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
-        $routeKey = DataRouteConf::CONF_KEY_ROOT
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
+        $routeKey = AppConstants::CONF_KEY_ROOT
     ) {
         $driverKey = lcfirst($driverKey);
         $driverName = ucfirst($driverKey);
@@ -183,9 +181,9 @@ class DataRouteInstance {
      * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
      */
     public function getRouteInstanceByConfSubset(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
-        $subset = DataRouteConf::CONF_LABEL_INIT
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
+        $subset = AppConstants::CONF_LABEL_INIT
     ) {
         $driverKey = lcfirst($driverKey);
         $driverName = ucfirst($driverKey);
@@ -224,9 +222,9 @@ class DataRouteInstance {
      * @return array
      */
     public function getRouteConfSettingsByConfSubset(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
-        $routeKey = DataRouteConf::CONF_KEY_ROOT,
-        $subset = DataRouteConf::CONF_LABEL_INIT
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
+        $routeKey = AppConstants::CONF_KEY_ROOT,
+        $subset = AppConstants::CONF_LABEL_INIT
     ) {
         $driverKey = lcfirst($driverKey);
         $driverName = ucfirst($driverKey);
@@ -246,7 +244,7 @@ class DataRouteInstance {
      * @throws \Nickfan\AppBox\Common\Exception\DataRouteInstanceException
      */
     public function getDriverInstance(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
         $settings = array(),
         $routeIdSet = array()
     ) {
@@ -276,7 +274,7 @@ class DataRouteInstance {
      * @param string $driverKey
      * @return array
      */
-    protected static function getPoolInstanceRouteIdLabels($driverKey = self::DRIVER_KEY_DEFAULT) {
+    protected static function getPoolInstanceRouteIdLabels($driverKey = AppConstants::DRIVER_KEY_DEFAULT) {
         $retKeys = array();
         if (!empty($driverKey) && isset(self::$instancePools[$driverKey])) {
             $retKeys = array_keys(self::$instancePools[$driverKey]);
@@ -292,7 +290,7 @@ class DataRouteInstance {
      * @return bool
      */
     protected static function getPoolInstanceByRouteIdSet(
-        $driverKey = self::DRIVER_KEY_DEFAULT,
+        $driverKey = AppConstants::DRIVER_KEY_DEFAULT,
         $routeIdSet = array()
     ) {
         if (!isset(self::$instancePools[$driverKey])) {

@@ -15,6 +15,7 @@ namespace Nickfan\AppBox\Config;
 
 use ArrayAccess;
 use Jeremeamia\SuperClosure\SerializableClosure;
+use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\FileNotFoundException;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\Common\Exception\UnexpectedValueException;
@@ -22,14 +23,11 @@ use Nickfan\AppBox\Common\Usercache\UsercacheInterface;
 use Nickfan\AppBox\Support\Util;
 
 class DataRouteConf implements ArrayAccess {
-    const VERSION = '1.0';
-    const CONF_KEY_ROOT = 'root';
-    const CONF_LABEL_INIT = 'init';
-    const USERCACHE_TTL_DEFAULT = 300;
+
 
     protected $userCacheObj = null;
 
-    protected $userCacheTTL = self::USERCACHE_TTL_DEFAULT;
+    protected $userCacheTTL = AppConstants::USERCACHE_TTL_DEFAULT;
 
     // Include paths
     protected $includePath;
@@ -66,7 +64,7 @@ class DataRouteConf implements ArrayAccess {
     }
 
     public static function getVersion() {
-        return self::VERSION;
+        return AppConstants::VERSION;
     }
 
     public function getRouteConfByScript($driver, $routeKey, $attributes = array()) {
@@ -102,17 +100,20 @@ class DataRouteConf implements ArrayAccess {
     }
 
     public function getRootConfTree($driver) {
-        return $this->getConf($driver . '.' . self::CONF_KEY_ROOT, array());
+        return $this->getConf($driver . '.' . AppConstants::CONF_KEY_ROOT, array());
     }
 
     public function getRootInitConf($driver) {
-        return $this->getConf($driver . '.' . self::CONF_KEY_ROOT . '.' . self::CONF_LABEL_INIT, array());
+        return $this->getConf(
+            $driver . '.' . AppConstants::CONF_KEY_ROOT . '.' . AppConstants::CONF_LABEL_INIT,
+            array()
+        );
     }
 
     public function getRouteConfInit($driver, $routeKey) {
         return array_merge(
             $this->getRootInitConf($driver),
-            $this->getConf($driver . '.' . $routeKey . '.' . self::CONF_LABEL_INIT, array())
+            $this->getConf($driver . '.' . $routeKey . '.' . AppConstants::CONF_LABEL_INIT, array())
         );
     }
 
@@ -133,7 +134,8 @@ class DataRouteConf implements ArrayAccess {
         }
         return $result;
     }
-    public function getRouteConfSubKeys($driver,$routeKey){
+
+    public function getRouteConfSubKeys($driver, $routeKey) {
         $result = $this->getConf($driver . '.' . $routeKey);
         if (is_array($result)) {
             return array_keys($result);
@@ -152,7 +154,7 @@ class DataRouteConf implements ArrayAccess {
     public function setUserCacheObject(UsercacheInterface $userCacheObj, $option = array()) {
         $this->userCacheObj = $userCacheObj;
         $option += array(
-            'ttl' => self::USERCACHE_TTL_DEFAULT,
+            'ttl' => AppConstants::USERCACHE_TTL_DEFAULT,
             'encode' => 'serialize',
         );
         $this->userCacheObj->setOption($option);

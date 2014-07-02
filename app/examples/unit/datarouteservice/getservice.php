@@ -13,6 +13,7 @@
 
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
+use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Usercache\ApcUsercache;
 use Nickfan\AppBox\Config\DataRouteConf;
 use Nickfan\AppBox\Instance\DataRouteInstance;
@@ -25,21 +26,21 @@ $cfgService = CfgDataRouteServiceDriver::factory($instDataRouteInstance);
 $key = 'dsn';
 $optionEg1 = array(
     'routeKey' => 'root',
-    //'routeMode' => DataRouteInstance::DATAROUTE_MODE_ATTR,
+    //'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
 );
 $optionEg2 = array(
     'routeKey' => 'mygroup',
-    'routeMode' => DataRouteInstance::DATAROUTE_MODE_ATTR,
+    'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
     'routeAttr' => array('id'=>3),
 );
 
 $optionEg3 = array(
-    'routeMode' => DataRouteInstance::DATAROUTE_MODE_IDSET,
+    'routeMode' => AppConstants::DATAROUTE_MODE_IDSET,
     'routeIdSet' => array('routeKey'=>'mygroup','group'=>'g1'),
 );
 
 $optionEg4 = array(
-    'routeMode' => DataRouteInstance::DATAROUTE_MODE_DIRECT,
+    'routeMode' => AppConstants::DATAROUTE_MODE_DIRECT,
     'routeSettings' => array(
         'dsn'=>'ftp://myuser:mypass@myhost/mypath?arg1=v1&arg2=v2#anchor1=a1&anchor2=a2',
         'timeout'=>30,
