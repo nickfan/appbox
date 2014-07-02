@@ -76,6 +76,21 @@ abstract class BaseAppPackage {
     public function getObjectName(){
         return $this->objectName;
     }
+
+    public function getDataRouteInstance() {
+        return self::$routeInstance;
+    }
+
+    public function setDataRouteInstance(DataRouteInstance $instDataRouteInstance) {
+        self::$routeInstance = $instDataRouteInstance;
+    }
+
+    /**
+     * 获取实例类别下的对应驱动实例
+     * @param $instanceType
+     * @return mixed
+     * @throws \Nickfan\AppBox\Common\Exception\RuntimeException
+     */
     protected function getInstanceTypeDriverInstance($instanceType){
         if(isset($this->instanceTypeMap[$instanceType])){
             if($this->instanceTypeMap[$instanceType]==''){
@@ -88,6 +103,51 @@ abstract class BaseAppPackage {
         }
     }
 
+    /**
+     * 获取实例类别下的对应驱动实例 可选设定新驱动名称（比如cache换用redis/memcache）
+     * @param $instanceType
+     * @param string $instanceDriverName
+     * @return mixed
+     * @throws \Nickfan\AppBox\Common\Exception\RuntimeException
+     */
+    protected function getSetInstanceTypeDriverInstance($instanceType,$instanceDriverName=''){
+        if(isset($this->instanceTypeMap[$instanceType])){
+            if($this->instanceTypeMap[$instanceType]==''){
+                if($instanceDriverName==''){
+                    throw new RuntimeException('instance type driver none :'.$instanceType);
+                }else{
+                    $driverInstance = $this->getDriverInstance($instanceDriverName);
+                    if($driverInstance){
+                        $this->instanceTypeMap[$instanceType] = $instanceDriverName;
+                    }
+                    return $driverInstance;
+                }
+            }else{
+                if($instanceDriverName!=''){
+                    if($this->instanceTypeMap[$instanceType]!=$instanceDriverName){
+                        $driverInstance = $this->getDriverInstance($instanceDriverName);
+                        if($driverInstance){
+                            $this->instanceTypeMap[$instanceType] = $instanceDriverName;
+                        }
+                        return $driverInstance;
+                    }else{
+                        return $this->getDriverInstance($this->instanceTypeMap[$instanceType]);
+                    }
+                }else{
+                    return $this->getDriverInstance($this->instanceTypeMap[$instanceType]);
+                }
+
+            }
+        }else{
+            throw new RuntimeException('unknown instance type :'.$instanceType);
+        }
+    }
+
+    /**
+     * 设置实例类别下的对应驱动实例
+     * @param $instanceType
+     * @param string $instanceDriverName
+     */
     protected function setInstanceTypeDriver($instanceType,$instanceDriverName=''){
         if(isset($this->instanceTypeMap[$instanceType]) && $this->instanceTypeMap[$instanceType]!=$instanceDriverName){
             $instanceDriverName!='' && $this->setDriverInstance($instanceDriverName);
@@ -95,6 +155,11 @@ abstract class BaseAppPackage {
         }
     }
 
+    /**
+     * 设置驱动实例根据驱动名称
+     * @param $instanceDriverName
+     * @throws \Nickfan\AppBox\Common\Exception\RuntimeException
+     */
     protected function setDriverInstance($instanceDriverName){
         if(!isset($this->instanceMap[$instanceDriverName]) || is_null($this->instanceMap[$instanceDriverName])){
             $driverClassKey = ucfirst($instanceDriverName);
@@ -112,10 +177,36 @@ abstract class BaseAppPackage {
             }
         }
     }
-    protected function getDriverInstance($instanceDriverName){
+
+    /**
+     * 获取驱动实例根据驱动名称
+     * @param $instanceDriverName
+     * @return mixed
+     */
+    public function getDriverInstance($instanceDriverName){
         if(!isset($this->instanceMap[$instanceDriverName]) || is_null($this->instanceMap[$instanceDriverName])){
             $this->setDriverInstance($instanceDriverName);
         }
         return $this->instanceMap[$instanceDriverName];
+    }
+
+
+    /**
+     * 获取单体对象模板
+     * @param string $objectLabel
+     * @param array $defprops
+     * @param string $namespace
+     * @return array
+     */
+    protected function getDataObjectTemplateByLabel($objectLabel='',$defprops = array(),$namespace=''){
+        $retObject = array();
+        $objectClassName = $namespace.$objectLabel.'DataObject';
+        if(!empty($defprops)){
+            $poInstance = new $objectClassName($defprops);
+        }else{
+            $poInstance = new $objectClassName();
+        }
+        $retObject = $poInstance->toArray();
+        return $retObject;
     }
 } 
