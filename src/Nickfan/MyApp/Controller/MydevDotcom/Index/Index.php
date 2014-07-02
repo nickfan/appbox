@@ -35,8 +35,10 @@ class Index extends AbstractController{
         $getCurrentUri = $this->dispatcher->getCurrentUri();
         var_dump($getCurrentUri);
     }
-    public function Ping(){
-        echo 'pong';
+    public function Ping($myvar1=0,$myvar2='abc'){
+        echo 'pong'.'<br/>';
+        echo $myvar1.'<br/>';
+        echo $myvar2.'<br/>';
         return 9527;
     }
 }

@@ -100,8 +100,8 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         $this->routeKey = $routeKey;
     }
 
-    public function getVendorSerivceInstanceSet($option = array(), $serviceInstance = null, $getAttrCallBack = null) {
-        if (is_null($serviceInstance)) {
+    public function getVendorInstanceSet($option = array(), $vendorInstance = null, $getAttrCallBack = null) {
+        if (is_null($vendorInstance)) {
             $option += array(
                 'driverKey' => $this->getDriverKey(),
                 'routeMode' => DataRouteInstance::DATAROUTE_MODE_ATTR,
@@ -140,6 +140,8 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                             $option['routeAttr'] = call_user_func($getAttrCallBack);
                         } elseif (is_array($getAttrCallBack)) {
                             $option['routeAttr'] = $getAttrCallBack;
+                        } elseif(is_null($getAttrCallBack)){
+                            $option['routeAttr'] = array();
                         } else {
                             throw new RuntimeException('direct route mode require [routeAttr]');
                         }
@@ -151,39 +153,39 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                     );
                     break;
             }
-            $serviceInstance = $driverInstance->getInstance();
+            $vendorInstance = $driverInstance->getInstance();
         }
-        return array($serviceInstance, $option);
+        return array($vendorInstance, $option);
     }
 
-    public function callVendorServiceInstance(
+    public function callVendorInstance(
         $method,
         $paramsList = array(),
         $option = array(),
-        $serviceInstance = null,
+        $vendorInstance = null,
         $getAttrCallBack = null
     ) {
-        list($serviceInstance, $option) = $this->getVendorSerivceInstanceSet(
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
-            $serviceInstance,
+            $vendorInstance,
             $getAttrCallBack
         );
-        return call_user_func_array(array($serviceInstance, $method), $paramsList);
+        return call_user_func_array(array($vendorInstance, $method), $paramsList);
     }
 
-    public function callStaticVendorServiceInstance(
+    public function callStaticVendorInstance(
         $method,
         $paramsList = array(),
         $option = array(),
-        $serviceInstance = null,
+        $vendorInstance = null,
         $getAttrCallBack = null
     ) {
-        list($serviceInstance, $option) = $this->getVendorSerivceInstanceSet(
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
-            $serviceInstance,
+            $vendorInstance,
             $getAttrCallBack
         );
-        return call_user_func_array(array(get_class($serviceInstance), $method), $paramsList);
+        return call_user_func_array(array(get_class($vendorInstance), $method), $paramsList);
     }
 
     public function getRouteInstance(

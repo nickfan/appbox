@@ -86,6 +86,7 @@ class MyDispatcher implements DispatcherInterface{
     protected $pkg = null;
     protected $mod = null;
     protected $act = null;
+    protected $segments = array();
     protected static $app_root = '';
     protected static $data_root = '';
 
@@ -96,6 +97,7 @@ class MyDispatcher implements DispatcherInterface{
             'pkg' => 'index',
             'mod' => 'index',
             'act' => 'index',
+            'segments' => array(),
             'app_root' => isset(static::$app['path.app']) ? static::$app['path.app'] : '',
             'data_root' => isset(static::$app['path.storage']) ? static::$app['path.storage'] : '',
         );
@@ -120,16 +122,22 @@ class MyDispatcher implements DispatcherInterface{
         $gotAction = false;
         if(isset($_SERVER['REQUEST_URI'])){
             $req_uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if(preg_match('/^\/([a-z0-9\_]+)(?:\.([a-z0-9\_]+)(?:\.([a-z0-9\_]+)|)|)\/?$/i',$req_uri_path,$matches)){
+            if(preg_match('/^\/([a-z0-9\_]+)(?:\/([a-z0-9\_]+)(?:\/([a-z0-9\_]+)|)|)(?:\/(.*)|)$/i',$req_uri_path,$matches)){
                 $gotAction = true;
                 $params['pkg'] = trim($matches[1]);
                 $params['mod'] = isset($matches[2])?trim($matches[2]):'index';
                 $params['act'] = isset($matches[3])?trim($matches[3]):'index';
-            }elseif(preg_match('/^\/([a-z0-9\_]+)(?:\/([a-z0-9\_]+)(?:\/([a-z0-9\_]+)|)|)\/?$/i',$req_uri_path,$matches)){
+                if(isset($matches[4]) && strlen($matches[4])>0){
+                    $params['segments'] = explode('/',trim($matches[4],'/'));
+                }
+            }elseif(preg_match('/^\/([a-z0-9\_]+)(?:\.([a-z0-9\_]+)(?:\.([a-z0-9\_]+)|)|)(?:\/(.*)|)$/i',$req_uri_path,$matches)){
                 $gotAction = true;
                 $params['pkg'] = trim($matches[1]);
                 $params['mod'] = isset($matches[2])?trim($matches[2]):'index';
                 $params['act'] = isset($matches[3])?trim($matches[3]):'index';
+                if(isset($matches[4]) && strlen($matches[4])>0){
+                    $params['segments'] = explode('/',trim($matches[4],'/'));
+                }
             }
         }
         /* try get method */
@@ -137,11 +145,23 @@ class MyDispatcher implements DispatcherInterface{
             isset($_GET['pkg']) && $params['pkg'] = trim($_GET['pkg']);
             isset($_GET['mod']) && $params['mod'] = trim($_GET['mod']);
             isset($_GET['act']) && $params['act'] = trim($_GET['act']);
+            isset($_GET['seg']) && $params['segments'] = is_array($_GET['seg'])?array_map('trim',$_GET['seg']):array(trim($_GET['seg']));
         }
 
         $this->pkg = ucfirst(self::verifyLabel($params['pkg']) ? $params['pkg'] : 'index');
         $this->mod = ucfirst(self::verifyLabel($params['mod']) ? $params['mod'] : 'index');
         $this->act = lcfirst(self::verifyLabel($params['act']) ? $params['act'] : 'index');
+        if(isset($params['segments']) && !empty($params['segments'])){
+            $segments = array();
+            foreach($params['segments'] as $line=>$seg){
+                if(self::verifyLabel($seg)){
+                    $segments[$line] = $seg;
+                }else{
+                    $segments[$line] = '';
+                }
+            }
+            $this->segments = $segments;
+        }
         self::$app_root = $params['app_root'];
         self::$data_root = $params['data_root'];
     }
@@ -180,7 +200,11 @@ class MyDispatcher implements DispatcherInterface{
         if (class_exists($controllername)) {
             $controllerObj = new $controllername(self::getInstance());
             if(method_exists($controllerObj,$this->act)){
-                return call_user_func(array($controllerObj, $this->act));
+                if(empty($this->segments)){
+                    return call_user_func(array($controllerObj, $this->act));
+                }else{
+                    return call_user_func_array(array($controllerObj, $this->act),$this->segments);
+                }
             }else{
                 throw new \BadMethodCallException('undefined action:'.$controllername.' -> '.$this->act, 500);
             }

@@ -22,24 +22,128 @@ class RedisDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
 
     //protected static $driverKey = 'redis';
 
-    public function get($key, $option = array(), $driverInstance = null) {
+    public function get($key, $option = array(), $vendorInstance = null) {
         $option += array();
-        list($driverInstance, $option) = $this->getVendorSerivceInstanceSet(
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
-            $driverInstance,
+            $vendorInstance,
             array('key' => $key,)
         );
-        return $driverInstance->get($key);
+        return $vendorInstance->get($key);
     }
 
-    public function set($key, $val = '', $option = array(), $driverInstance = null) {
+    public function set($key, $val = '', $option = array(), $vendorInstance = null) {
         $option += array();
-        list($driverInstance, $option) = $this->getVendorSerivceInstanceSet(
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
-            $driverInstance,
+            $vendorInstance,
             array('key' => $key,)
         );
-        return $driverInstance->set($key, $val);
+        return $vendorInstance->set($key, $val);
     }
 
+
+    /**
+     * 生成序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function nextSeq($objectName = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 0,
+            'step' => 1,
+        );
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+
+        $respInfo = $vendorInstance->multi()
+            ->setnx($seqModLabel.'_'.$objectName, $option['init'])
+            ->incrBy($seqModLabel.'_'.$objectName,$option['step'])
+            ->get($seqModLabel.'_'.$objectName)
+            ->exec();
+
+        if(isset($respInfo[2]) && !empty($respInfo[2])){
+            return intval($respInfo[2]);
+        }else{
+            return $option['init'];
+        }
+    }
+
+    /**
+     * 获取当前序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function currentSeq($objectName = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 0,
+            //'step' => 1,
+        );
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+        $respInfo = $vendorInstance->multi()
+            ->setnx($seqModLabel.'_'.$objectName, $option['init'])
+            ->get($seqModLabel.'_'.$objectName)
+            ->exec();
+
+        if(isset($respInfo[1]) && !empty($respInfo[1])){
+            return intval($respInfo[1]);
+        }else{
+            return $option['init'];
+        }
+    }
+
+    /**
+     * 设定序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function setSeq($objectName = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 0,
+            'step' => 1,
+        );
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+
+        $respInfo = $vendorInstance->multi()
+            ->set($seqModLabel.'_'.$objectName, $option['init'])
+            ->get($seqModLabel.'_'.$objectName)
+            ->exec();
+
+        if(isset($respInfo[2]) && !empty($respInfo[2])){
+            return intval($respInfo[2]);
+        }else{
+            return $option['init'];
+        }
+    }
 } 

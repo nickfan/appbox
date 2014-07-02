@@ -22,23 +22,23 @@ class CfgDataRouteServiceDriver extends BaseDataRouteServiceDriver implements Da
 
     //protected static $driverKey = 'cfg';
 
-    public function getByKey($key = 'dsn', $option = array(), $driverInstance = null) {
+    public function getByKey($key = 'dsn', $option = array(), $vendorInstance = null) {
         $option += array();
-        list($driverInstance, $option) = $this->getVendorSerivceInstanceSet(
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
-            $driverInstance,
+            $vendorInstance,
             array('id' => crc32($key),)
         );
-        return isset($driverInstance->$key) ? $driverInstance->$key : null;
+        return isset($vendorInstance->$key) ? $vendorInstance->$key : null;
     }
 
-    public function getDict($option = array(), $driverInstance = null) {
+    public function getDict($option = array(), $vendorInstance = null) {
         $option += array();
-        list($driverInstance, $option) = $this->getVendorSerivceInstanceSet(
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
-            $driverInstance,
+            $vendorInstance,
             array()
         );
-        return (array)$driverInstance;
+        return (array)$vendorInstance;
     }
 } 
