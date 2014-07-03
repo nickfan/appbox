@@ -186,6 +186,8 @@ nosetests.xml
 coverage.xml
 tests/*.phar
 
+/*.phar
+
 # Translations
 *.mo
 *.pot

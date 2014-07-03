@@ -1,0 +1,79 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Description
+ *
+ * @project appbox
+ * @package 
+ * @author nickfan<nickfan81@gmail.com>
+ * @link http://www.axiong.me
+ * @version $Id$
+ * @lastmodified: 2014-07-03 10:09
+ *
+ */
+
+use Ulrichsg\Getopt\Getopt;
+use Ulrichsg\Getopt\Option;
+
+if(php_sapi_name()!='cli'){
+    require_once __DIR__ . '/app/webroot/index.php';
+}else{
+    require_once __DIR__ . '/app/bootstrap/initenv.php';
+    $getopt = new Getopt(array(
+        new Option('v', 'verbose'),
+        new Option('h', 'help'),
+        new Option(null, 'version'),
+        (new Option('s', 'service', Getopt::OPTIONAL_ARGUMENT))
+            ->setDescription('run appbox in service mode'),
+        (new Option('d', 'daemon', Getopt::OPTIONAL_ARGUMENT))
+            ->setDescription('run appbox as a daemon process'),
+        (new Option('r', 'rcbasepath', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('route config files base path contain dsn and route config files')
+        ->setDefaultValue('./app/data/etc/local')
+        ->setValidation(function($value) {
+                $realpath = realpath($value);
+                if(file_exists($realpath) && is_dir($realpath)){
+                    if(file_exists($realpath.'/dsn')
+                        && is_dir($realpath.'/dsn')
+                        && file_exists($realpath.'/route')
+                        && is_dir($realpath.'/route')
+                    ){
+                        return true;
+                    }
+                }
+                return false;
+            }),
+        (new Option('c', 'confpath', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('repository config files base path contain application config files')
+        ->setDefaultValue('./app/data/conf')
+        ->setValidation(function($value) {
+                $realpath = realpath($value);
+                if(file_exists($realpath) && is_dir($realpath)){
+                    return true;
+                }
+                return false;
+            }),
+    ));
+
+    try {
+        $getopt->parse();
+        $operands = $getopt->getOperands();
+        if ($getopt['version']) {
+            echo \Nickfan\AppBox\Common\AppConstants::VERSION.PHP_EOL;
+            exit(0);
+        }
+        if ($getopt['help']) {
+            echo $getopt->getHelpText();
+            exit(0);
+        }
+
+    } catch (UnexpectedValueException $e) {
+        echo "Error: ".$e->getMessage()."\n";
+        echo $getopt->getHelpText();
+        exit(1);
+    }
+}
+
+
+
+
