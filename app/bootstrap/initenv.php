@@ -13,7 +13,7 @@
 
 require_once __DIR__.'/autoload.php';
 
-!defined('APPBOX_PATH_BASE') && define('APPBOX_PATH_BASE',realpath(__DIR__.'/../../'));
+!defined('APPBOX_PATH_BASE') && define('APPBOX_PATH_BASE',dirname(dirname(__DIR__)));
 !defined('APPBOX_PATH_APP') && define('APPBOX_PATH_APP',APPBOX_PATH_BASE.'/app');
 !defined('APPBOX_PATH_DATA') && define('APPBOX_PATH_DATA',APPBOX_PATH_APP.'/data');
 !defined('APPBOX_PATH_WEB') && define('APPBOX_PATH_WEB',APPBOX_PATH_APP.'/webroot');
