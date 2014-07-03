@@ -12,6 +12,8 @@
  */
 
 use Nickfan\AppBox\Common\Usercache\ApcUsercache;
+use Nickfan\AppBox\Common\Usercache\YacUsercache;
+use Nickfan\AppBox\Common\Usercache\NullUsercache;
 use Nickfan\AppBox\Config\DataRouteConf;
 use Nickfan\AppBox\Config\Repository as Config;
 use Nickfan\AppBox\Foundation\AliasLoader;
@@ -58,9 +60,17 @@ Facade::setFacadeApplication($app);
 */
 
 $app->registerCoreContainerAliases();
-
-$app->instance('config', $config = new Config(new ApcUsercache, $app['path.storage'] . '/conf'));
-$app->instance('datarouteconf', $routeconf = new DataRouteConf(new ApcUsercache, $app['path.storage'] . '/etc/local'));
+$userCacheObject = null;
+if(extension_loaded('apc')){
+    $userCacheObject = new ApcUsercache;
+}elseif(extension_loaded('yac')){
+    $userCacheObject = new YacUsercache;
+}else{
+    $userCacheObject = new NullUsercache;
+}
+$app->instance('usercache', $userCacheObject);
+$app->instance('config', $config = new Config($userCacheObject, $app['path.storage'] . '/conf'));
+$app->instance('datarouteconf', $routeconf = new DataRouteConf($userCacheObject, $app['path.storage'] . '/etc/local'));
 $app->instance('datarouteinstance', $routeinstance = DataRouteInstance::getInstance($routeconf));
 
 /*

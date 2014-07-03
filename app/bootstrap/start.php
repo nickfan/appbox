@@ -11,36 +11,45 @@
 |
 */
 
-$app = new Nickfan\AppBox\Foundation\AppBox;
+if(!function_exists('appbox')){
+    function appbox(){
+        static $app;
+        if(empty($app)){
+            $app = new Nickfan\AppBox\Foundation\AppBox;
 
-/*
-|--------------------------------------------------------------------------
-| Bind Paths
-|--------------------------------------------------------------------------
-|
-| Here we are binding the paths configured in paths.php to the app. You
-| should not be changing these here. If you need to change these you
-| may do so within the paths.php file and they will be bound here.
-|
-*/
+            /*
+            |--------------------------------------------------------------------------
+            | Bind Paths
+            |--------------------------------------------------------------------------
+            |
+            | Here we are binding the paths configured in paths.php to the app. You
+            | should not be changing these here. If you need to change these you
+            | may do so within the paths.php file and they will be bound here.
+            |
+            */
 
-$app->bindInstallPaths(require __DIR__ . '/paths.php');
+            $app->bindInstallPaths(require __DIR__ . '/paths.php');
 
-/*
-|--------------------------------------------------------------------------
-| Load The Application
-|--------------------------------------------------------------------------
-|
-| Here we will load this Illuminate application. We will keep this in a
-| separate location so we can isolate the creation of an application
-| from the actual running of the application with a given request.
-|
-*/
+            /*
+            |--------------------------------------------------------------------------
+            | Load The Application
+            |--------------------------------------------------------------------------
+            |
+            | Here we will load this Illuminate application. We will keep this in a
+            | separate location so we can isolate the creation of an application
+            | from the actual running of the application with a given request.
+            |
+            */
 
-$framework = $app['path.base'] .
-    '/src';
+            $framework = $app['path.base'] .
+                '/src';
 
-require $framework . '/Nickfan/AppBox/Foundation/start.php';
+            require $framework . '/Nickfan/AppBox/Foundation/start.php';
+
+        }
+        return $app;
+    }
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -52,5 +61,5 @@ require $framework . '/Nickfan/AppBox/Foundation/start.php';
 | from the actual running of the application and sending responses.
 |
 */
-
+$app = appbox();
 return $app;
