@@ -53,6 +53,16 @@ if(php_sapi_name()!='cli'){
                 }
                 return false;
             }),
+        (new Option('a', 'appsrcpath', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('application programs source files base path')
+        ->setDefaultValue('./src')
+        ->setValidation(function($value) {
+                $realpath = realpath($value);
+                if(file_exists($realpath) && is_dir($realpath)){
+                    return true;
+                }
+                return false;
+            }),
     ));
 
     try {
