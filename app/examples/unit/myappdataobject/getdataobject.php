@@ -12,8 +12,8 @@
  */
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
-use Nickfan\MyApp\DataObject\UserDataObject;
-use Nickfan\MyApp\DataObject\AccountDataObject;
+use Nickfan\BoxApp\DataObject\UserDataObject;
+use Nickfan\BoxApp\DataObject\AccountDataObject;
 
 //$user = new UserDataObject();
 //$user->id=123;

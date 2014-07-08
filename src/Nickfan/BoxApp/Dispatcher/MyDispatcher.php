@@ -12,7 +12,7 @@
  */
 
 
-namespace Nickfan\MyApp\Dispatcher;
+namespace Nickfan\BoxApp\Dispatcher;
 
 class MyDispatcher implements DispatcherInterface{
 
@@ -196,7 +196,7 @@ class MyDispatcher implements DispatcherInterface{
         return $this->current_uri;
     }
     public function run() {
-        $controllername = '\\Nickfan\\MyApp\\Controller\\'. $this->domain . '\\' . $this->pkg . '\\' . $this->mod;
+        $controllername = '\\Nickfan\\BoxApp\\Controller\\'. $this->domain . '\\' . $this->pkg . '\\' . $this->mod;
         if (class_exists($controllername)) {
             $controllerObj = new $controllername(self::getInstance());
             if(method_exists($controllerObj,$this->act)){

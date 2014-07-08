@@ -12,9 +12,9 @@
  */
 
 
-namespace Nickfan\MyApp\Controller;
+namespace Nickfan\BoxApp\Controller;
 
-use Nickfan\MyApp\Dispatcher\DispatcherInterface;
+use Nickfan\BoxApp\Dispatcher\DispatcherInterface;
 
 abstract class AbstractController {
     protected $dispatcher;

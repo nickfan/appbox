@@ -49,6 +49,10 @@ abstract class BaseDataRouteInstanceDriver implements DataRouteInstanceDriverInt
         return $this->settings;
     }
 
+    public function getSettingByKey($key='') {
+        return isset($this->settings[$key])?$this->settings[$key]:null;
+    }
+
     public function getRouteIdSet() {
         return $this->routeIdSet;
     }

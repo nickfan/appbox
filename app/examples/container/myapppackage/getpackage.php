@@ -16,8 +16,8 @@ use Nickfan\AppBox\Support\Facades\DataRouteInstance;
 
 $instDataRouteInstance = DataRouteInstance::getStaticInstance();
 
-use Nickfan\MyApp\Package\UserPackage;
-use Nickfan\MyApp\Package\DummyPackage;
+use Nickfan\BoxApp\Package\UserPackage;
+use Nickfan\BoxApp\Package\DummyPackage;
 
 $instUserPackage = UserPackage::getInstance($instDataRouteInstance);
 $instDummyPackage = DummyPackage::getInstance($instDataRouteInstance);
@@ -28,7 +28,7 @@ var_dump($instUserPackage->getDefaultNamespace());
 var_dump($instDummyPackage->getObjectName());
 var_dump($instDummyPackage->getDefaultNamespace());
 
-$instUserPackage->setDefaultNamespace('Nickfan\\MyApp\\DataObject');
+$instUserPackage->setDefaultNamespace('Nickfan\\BoxApp\\DataObject');
 var_dump($instUserPackage->getDefaultNamespace());
 
 $userObject = $instUserPackage->getDataObjectTemplateByLabel('user',array('id'=>123,'screen_name'=>'abc'));

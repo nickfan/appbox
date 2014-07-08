@@ -30,7 +30,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Nickfan\\MyApp": "src/",
+            "Nickfan\\BoxApp": "src/",
             "Nickfan\\AppBox": "src/"
         },
         "files": [

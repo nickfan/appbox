@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\MyApp\Dispatcher;
+namespace Nickfan\BoxApp\Dispatcher;
 
 
 interface DispatcherInterface {

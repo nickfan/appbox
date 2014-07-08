@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\MyApp\DataObject;
+namespace Nickfan\BoxApp\DataObject;
 
 
 use Nickfan\AppBox\DataObject\BaseDataObject;

@@ -14,5 +14,5 @@
 $app = require_once '../bootstrap/bootstrap.php';
 
 
-$inst = \Nickfan\MyApp\Dispatcher\MyDispatcher::getInstance($app);
+$inst = \Nickfan\BoxApp\Dispatcher\MyDispatcher::getInstance($app);
 $inst->run();

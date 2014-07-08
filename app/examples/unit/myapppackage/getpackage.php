@@ -17,8 +17,8 @@ use Nickfan\AppBox\Common\Usercache\ApcUsercache;
 use Nickfan\AppBox\Config\DataRouteConf;
 use Nickfan\AppBox\Instance\DataRouteInstance;
 
-use Nickfan\MyApp\Package\UserPackage;
-use Nickfan\MyApp\Package\DummyPackage;
+use Nickfan\BoxApp\Package\UserPackage;
+use Nickfan\BoxApp\Package\DummyPackage;
 
 $instDataRouteInstance = DataRouteInstance::getInstance(new DataRouteConf(new ApcUsercache(), $app['path.storage'] . '/etc/local'));
 //var_dump($instDataRouteInstance);
@@ -32,7 +32,7 @@ var_dump($instUserPackage->getDefaultNamespace());
 var_dump($instDummyPackage->getObjectName());
 var_dump($instDummyPackage->getDefaultNamespace());
 
-$instUserPackage->setDefaultNamespace('Nickfan\\MyApp\\DataObject');
+$instUserPackage->setDefaultNamespace('Nickfan\\BoxApp\\DataObject');
 var_dump($instUserPackage->getDefaultNamespace());
 
 $userObject = $instUserPackage->getDataObjectTemplateByLabel('user',array('id'=>123,'screen_name'=>'abc'));
