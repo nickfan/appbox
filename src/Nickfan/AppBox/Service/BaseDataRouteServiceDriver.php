@@ -18,6 +18,7 @@ use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\Instance\DataRouteInstance;
 use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
+use Nickfan\AppBox\Support\Util;
 
 abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInterface {
 
@@ -101,6 +102,129 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         $this->routeKey = $routeKey;
     }
 
+    public function callMultiGetVendorInstance(array $keys,$method='',$params=array(),$option=array(),$vendorInstance = null){
+        $option += array(
+            'driverKey' => $this->getDriverKey(),
+            'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
+            'routeKey' => $this->getRouteKey(),
+        );
+        $resultDict = array();
+
+        if(is_null($vendorInstance)){
+            $routeAttr = array();
+            // 根据各个属性分配到的池子中不同的分组
+            $routeInstSetPool = array();
+            foreach ($keys as $key) {
+                $routeAttr = array(
+                    'id'=>$key,
+                );
+                $routeIdSet = self::$routeInstance->getRouteInstanceRouteIdSet(
+                    $option['driverKey'],
+                    $option['routeKey'],
+                    $routeAttr
+                );
+                !isset($routeInstSetPool[$routeIdSet['group']]) && $routeInstSetPool[$routeIdSet['group']] = array('keys'=>array(),'idset'=>$routeIdSet);
+                $keyHash = is_scalar($key)?$key:Util::getDataHashKey($key);
+                !isset($routeInstSetPool[$routeIdSet['group']]['keys'][$keyHash]) && $routeInstSetPool[$routeIdSet['group']]['keys'][$keyHash] = $key;
+            }
+            $tplParams = $params;
+            // 再分别根据各个分组将执行的结果返回
+            if(!empty($routeInstSetPool)){
+                foreach ($routeInstSetPool as $group => $groupSet) {
+                    $rowParams = $tplParams;
+                    $rowKeys = array_values($groupSet['keys']);
+                    $routeIdSet = $groupSet['idset'];
+                    $rowVendorInstance = self::$routeInstance->getRouteInstanceByConfSubset(
+                        $option['driverKey'],
+                        $routeIdSet['routeKey'],
+                        $routeIdSet['group']
+                    )->getInstance();
+                    if(!empty($rowParams)){
+                        array_unshift($rowParams,$rowKeys);
+                    }else{
+                        $rowParams = array($rowKeys);
+                    }
+                    $result = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                    if(!empty($result)){
+                        $resultDict = array_merge($resultDict,$result);
+                    }
+                }
+            }
+        }else{
+            if(!empty($params)){
+                array_unshift($params,$keys);
+            }else{
+                $params = array($keys);
+            }
+            $resultDict = call_user_func_array(array($vendorInstance,$method),$params);
+        }
+        return $resultDict;
+    }
+
+    public function callMultiSetVendorInstance(array $items,$method='',$params=array(),$option=array(),$vendorInstance = null){
+        $option += array(
+            'driverKey' => $this->getDriverKey(),
+            'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
+            'routeKey' => $this->getRouteKey(),
+            'simplifyResult'=>true,
+            'defaultStatus'=>true,
+        );
+        $resultDict = array();
+        if(is_null($vendorInstance)){
+            $keys = array_keys($items);
+            $routeAttr = array();
+            // 根据各个属性分配到的池子中不同的分组
+            $routeInstSetPool = array();
+            foreach ($keys as $key) {
+                $routeAttr = array(
+                    'id'=>$key,
+                );
+                $routeIdSet = self::$routeInstance->getRouteInstanceRouteIdSet(
+                    $option['driverKey'],
+                    $option['routeKey'],
+                    $routeAttr
+                );
+                !isset($routeInstSetPool[$routeIdSet['group']]) && $routeInstSetPool[$routeIdSet['group']] = array('items'=>array(),'idset'=>$routeIdSet);
+                !isset($routeInstSetPool[$routeIdSet['group']]['items'][$key]) && $routeInstSetPool[$routeIdSet['group']]['items'][$key] = $items[$key];
+            }
+            $tplParams = $params;
+            // 再分别根据各个分组将执行的结果返回
+            if(!empty($routeInstSetPool)){
+                foreach ($routeInstSetPool as $group => $groupSet) {
+                    $rowParams = $tplParams;
+                    $rowItems = $groupSet['items'];
+                    $rowKeys = array_keys($groupSet['items']);
+                    $routeIdSet = $groupSet['idset'];
+                    $rowVendorInstance = self::$routeInstance->getRouteInstanceByConfSubset(
+                        $option['driverKey'],
+                        $routeIdSet['routeKey'],
+                        $routeIdSet['group']
+                    )->getInstance();
+                    if(!empty($rowParams)){
+                        array_unshift($rowParams,$rowItems);
+                    }else{
+                        $rowParams = array($rowItems);
+                    }
+                    $result = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                    if(!empty($result)){
+                        $rowResult = array_fill_keys($rowKeys,$result);
+                        $resultDict = array_merge($resultDict,$rowResult);
+                    }
+                }
+            }
+            if($option['simplifyResult']==true){
+                $resultDict = array_reduce($resultDict,function($carry,$item){ return $carry && $item;},$option['defaultStatus']);
+            }
+        }else{
+            if(!empty($params)){
+                array_unshift($params,$items);
+            }else{
+                $params = array($items);
+            }
+            $resultDict = call_user_func_array(array($vendorInstance,$method),$params);
+        }
+        return $resultDict;
+    }
     public function getDriverInstanceSet($option=array(),$getAttrCallBack = null){
         $driverInstance = null;
         $option += array(

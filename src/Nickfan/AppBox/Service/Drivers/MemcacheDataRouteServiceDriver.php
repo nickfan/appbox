@@ -85,4 +85,12 @@ class MemcacheDataRouteServiceDriver extends BaseDataRouteServiceDriver implemen
         return $vendorInstance->decrement($key,$step);
     }
 
+    public function getMulti(array $keys=array(),$option=array(), $vendorInstance=NULL){
+        return $this->callMultiGetVendorInstance($keys,'getMulti',array(),$option,$vendorInstance);
+    }
+
+    public function setMulti(array $items=array(),$ttl=0,$option=array(), $vendorInstance=NULL){
+        return $this->callMultiGetVendorInstance($items,'setMulti',array($ttl),$option,$vendorInstance);
+    }
+
 }
