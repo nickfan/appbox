@@ -18,14 +18,17 @@
         "jeremeamia/superclosure": "~1.0",
         "phpseclib/phpseclib": "0.3.*",
         "nesbot/carbon": "1.*",
+        "guzzle/http": "~3.7",
         "pimple/pimple": "~2.1",
         "patchwork/utf8": "~1.1",
         "monolog/monolog": "1.*",
+        "psr/log" : "~1.0",
         "filp/whoops": "1.0.10",
         "d11wtq/boris": "1.0.*",
         "jv2222/ezsql":"dev-master",
         "pda/pheanstalk":"dev-master",
         "swiftmailer/swiftmailer": "~5.2",
+        "elasticsearch/elasticsearch": "~1.0",
         "predis/predis":"dev-master"
     },
     "autoload": {
