@@ -75,9 +75,16 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             $this->driverKey = $driverKey;
         }
         self::$routeInstance = $instDataRouteInstance;
+        $this->__init();
         return $this;
     }
 
+    public function __init($params=array()){
+        $params+=array(
+            'routeKey'=>AppConstants::CONF_KEY_ROOT,
+        );
+        $this->setRouteKey($params['routeKey']);
+    }
     public function getDataRouteInstance() {
         return self::$routeInstance;
     }
@@ -107,6 +114,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             'driverKey' => $this->getDriverKey(),
             'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
             'routeKey' => $this->getRouteKey(),
+            'routeAttrIdLabel'=>'id',
         );
         $resultDict = array();
 
@@ -116,7 +124,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             $routeInstSetPool = array();
             foreach ($keys as $key) {
                 $routeAttr = array(
-                    'id'=>$key,
+                    $option['routeAttrIdLabel']=>$key,
                 );
                 $routeIdSet = self::$routeInstance->getRouteInstanceRouteIdSet(
                     $option['driverKey'],
@@ -166,6 +174,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             'driverKey' => $this->getDriverKey(),
             'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
             'routeKey' => $this->getRouteKey(),
+            'routeAttrIdLabel'=>'id',
             'simplifyResult'=>true,
             'defaultStatus'=>true,
         );
@@ -177,7 +186,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             $routeInstSetPool = array();
             foreach ($keys as $key) {
                 $routeAttr = array(
-                    'id'=>$key,
+                    $option['routeAttrIdLabel']=>$key,
                 );
                 $routeIdSet = self::$routeInstance->getRouteInstanceRouteIdSet(
                     $option['driverKey'],

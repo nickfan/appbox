@@ -434,7 +434,7 @@ class DbDataRouteServiceDriver extends BaseDataRouteServiceDriver implements Dat
                 $value = sprintf('%F', $value);
                 break;
             default:
-                $value = ($value === NULL) ? 'NULL' : $value;
+                $value = ($value === null) ? 'NULL' : $value;
                 break;
         }
         return (string) $value;

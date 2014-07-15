@@ -34,7 +34,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
     }
 
 
-    public function watchTube($tubeName='default', $option = array(), $vendorInstance = null) {
+    public function watchOnly($tubeName='default', $option = array(), $vendorInstance = null) {
         $option += array();
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
@@ -102,7 +102,6 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      */
     public function putJob($jobData=null,$tubeName='default', $option = array(), $vendorInstance = null){
         $option += array(
-            'objectName'=> $this->objectName,
             'encode'=> TRUE,
         );
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
@@ -153,6 +152,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      */
     public function getJob($tubeName='default',$option=array(), $vendorInstance=NULL){
         $option += array(
+            'ignore'=>'default',
         );
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
@@ -161,7 +161,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
         );
 
         if($tubeName!='default'){
-            $job = $vendorInstance->watch($tubeName)->ignore('default')->reserve();
+            $job = $vendorInstance->watch($tubeName)->ignore($option['ignore'])->reserve();
         }else{
             $job = $vendorInstance->watch($tubeName)->reserve();
         }
