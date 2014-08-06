@@ -72,7 +72,7 @@ class RedisDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
             ->get($seqModLabel.'_'.$objectName)
             ->exec();
 
-        if(isset($respInfo[2]) && !empty($respInfo[2])){
+        if(isset($respInfo[2])){
             return intval($respInfo[2]);
         }else{
             return $option['init'];
@@ -140,10 +140,112 @@ class RedisDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
             ->get($seqModLabel.'_'.$objectName)
             ->exec();
 
-        if(isset($respInfo[2]) && !empty($respInfo[2])){
+        if(isset($respInfo[2])){
             return intval($respInfo[2]);
         }else{
             return $option['init'];
         }
     }
+
+
+
+    /**
+     * 生成字典下标序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function nextDictSeq($objectName = '',$key = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 0,
+            'step' => 1,
+        );
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+        $respInfo = $vendorInstance->multi()
+            ->hSetNx($seqModLabel.'_'.$objectName, $key, $option['init'])
+            ->hIncrBy($seqModLabel.'_'.$objectName, $key, $option['step'])
+            ->exec();
+        if(isset($respInfo[1])){
+            return intval($respInfo[1]);
+        }else{
+            return $option['init'];
+        }
+    }
+
+
+    /**
+     * 读取当前字典下标序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function currentDictSeq($objectName = '',$key = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 0,
+        );
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+        $respInfo = $vendorInstance->multi()
+            ->hSetNx($seqModLabel.'_'.$objectName, $key, $option['init'])
+            ->hGet($seqModLabel.'_'.$objectName, $key)
+            ->exec();
+        if(isset($respInfo[1])){
+            return intval($respInfo[1]);
+        }else{
+            return $option['init'];
+        }
+    }
+
+
+    /**
+     * 读取当前字典下标序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function setDictSeq($objectName = '',$key = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 0,
+        );
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+        $respInfo = $vendorInstance->multi()
+            ->hSet($seqModLabel.'_'.$objectName, $key, $option['init'])
+            ->exec();
+        if(isset($respInfo[1])){
+            return intval($respInfo[1]);
+        }else{
+            return $option['init'];
+        }
+    }
+
+
 } 
