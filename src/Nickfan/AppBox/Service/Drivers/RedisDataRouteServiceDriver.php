@@ -810,4 +810,138 @@ class RedisDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
         return $vendorInstance->migrate($host,$port,$key,$dstdb,$timeout);
     }
 
+
+    public function hSet($key,$hashKey,$value,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hSet($key,$hashKey,$value);
+    }
+
+    public function hSetNx($key,$hashKey,$value,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hSetNx($key,$hashKey,$value);
+    }
+
+    public function hGet($key,$hashKey,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hGet($key,$hashKey);
+    }
+
+    public function hLen($key,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hLen($key);
+    }
+
+    public function hDel($key,$hashKey,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hDel($key,$hashKey);
+    }
+
+    public function hKeys($key,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hKeys($key);
+    }
+
+    public function hVals($key,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hVals($key);
+    }
+
+    public function hGetAll($key,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hGetAll($key);
+    }
+
+    public function hExists($key,$hashKey,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hExists($key,$hashKey);
+    }
+
+    public function hIncrBy($key,$hashKey,$value,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hIncrBy($key,$hashKey,$value);
+    }
+
+    public function hIncrByFloat($key,$hashKey,$value,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hIncrByFloat($key,$hashKey,$value);
+    }
+
+
+    public function hMSet($key,$hashMap,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hMSet($key,$hashMap);
+    }
+
+
+    public function hMGet($key,$hashKeys,$option = array(), $vendorInstance = null) {
+        $option += array();
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key'=>$key,)
+        );
+        return $vendorInstance->hMGet($key,$hashKeys);
+    }
+
+
 }
