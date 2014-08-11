@@ -99,4 +99,163 @@ class MongoDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
         return $dbObj->getGridFS($prefix);
     }
 
+
+    /**
+     * 生成序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function nextSeq($objectName = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 1,
+            'step' => 1,
+            'dbName'=>null,
+        );
+        $option['init'] = intval($option['init']);
+        $option['step'] = intval($option['step']);
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+        $seqCollectionName = $seqModLabel;
+
+        if(empty($option['dbName'])){
+            $seqDbName = '_'.$seqModLabel;
+        }else{
+            $seqDbName = $option['dbName'];
+        }
+        $instance = $vendorInstance->selectCollection($seqDbName,$seqCollectionName);
+
+        $seq = $instance->db->command(array(
+                'findAndModify' => 'seq',
+                'query' => array('_id' => $objectName),
+                'update' => array('$inc' => array('id' => $option['step'])),
+                'new' => true,
+            ),array('safe'=>TRUE,));
+        if (isset($seq['value']['id'])) {
+            return $seq['value']['id'];
+        }else{
+            if(is_null($seq['value']['id'])){
+                $seq = $instance->db->command(array(
+                        'findAndModify' => 'seq',
+                        'query' => array('_id' => $objectName),
+                        'update' => array('$set' => array('id' => $option['init'])),
+                        'new' => true,
+                    ),array('safe'=>TRUE,));
+            }else{
+                $instance->insert(array('_id' => $objectName,'id' => $option['init'],),array('safe'=>TRUE,));
+            }
+            return $option['init'];
+        }
+    }
+
+    /**
+     * 获取当前序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function currentSeq($objectName = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 1,
+            //'step' => 1,
+            'dbName'=>null,
+        );
+        $option['init'] = intval($option['init']);
+        $option['step'] = intval($option['step']);
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+        $seqCollectionName = $seqModLabel;
+
+        if(empty($option['dbName'])){
+            $seqDbName = '_'.$seqModLabel;
+        }else{
+            $seqDbName = $option['dbName'];
+        }
+        $instance = $vendorInstance->selectCollection($seqDbName,$seqCollectionName);
+
+        $getData = $instance->findOne(array('_id' => $objectName));
+        if(!empty($getData)){
+            return $getData['id'];
+        }else{
+            return $option['init'];
+        }
+    }
+
+
+    /**
+     * 设置序列id
+     * @param string $objectName
+     * @param array $option
+     * @param null $vendorInstance
+     * @return int
+     */
+    public function setSeq($objectName = '',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'Seq',
+            'init' => 1,
+            //'step' => 1,
+            'dbName'=>null,
+        );
+        $option['init'] = intval($option['init']);
+        $option['step'] = intval($option['step']);
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $seqModLabel = lcfirst($option['routeKey']);
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+
+        $seqCollectionName = $seqModLabel;
+
+        if(empty($option['dbName'])){
+            $seqDbName = '_'.$seqModLabel;
+        }else{
+            $seqDbName = $option['dbName'];
+        }
+        $instance = $vendorInstance->selectCollection($seqDbName,$seqCollectionName);
+
+        $seq = $instance->db->command(array(
+                'findAndModify' => 'seq',
+                'query' => array('_id' => $objectName),
+                'update' => array('$set' => array('id' => $option['init'])),
+                'new' => true,
+            ),array('safe'=>TRUE,));
+        //print(PHP_EOL.'<pre>'.PHP_EOL.Lemon::debug(__FUNCTION__,$option,$objectName,$seq).PHP_EOL.'</pre>'.PHP_EOL);  exit; // [DEV-DEBUG]---
+        if (isset($seq['value']['id'])) {
+            return $seq['value']['id'];
+        }else{
+            if(is_null($seq['value']['id'])){
+                $seq = $instance->db->command(array(
+                        'findAndModify' => 'seq',
+                        'query' => array('_id' => $objectName),
+                        'update' => array('$set' => array('id' => $option['init'])),
+                        'new' => true,
+                    ),array('safe'=>TRUE,));
+            }else{
+                $instance->insert(array('_id' => $objectName,'id' => $option['init'],),array('safe'=>TRUE,));
+            }
+            return $option['init'];
+        }
+    }
+
 }
