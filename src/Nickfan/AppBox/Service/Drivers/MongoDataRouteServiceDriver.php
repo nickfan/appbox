@@ -258,4 +258,126 @@ class MongoDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
         }
     }
 
+
+    /**
+     * 设定查询统计数缓存
+     * @param   string  $objectName 对象名称
+     * @param   array   $option     可选设定，下标init 初始值，默认1，下标step 步长，默认1
+     * @return int
+     */
+    public function setQueryCount($objectName = '', $conditionHash='', $init=0, $option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'QueryCount',
+            'step' => 1,
+            'timeout' => 300,
+            'curts'=>time(),
+        );
+        $option['step'] = intval($option['step']);
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $qcountDbName = '_qcount';
+        $qcountCollectionName = 'qc_'.$objectName;
+        $qcountId = $conditionHash;
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+        $instance = $vendorInstance->selectCollection($qcountDbName,$qcountCollectionName);
+
+        $qcount = $instance->db->command(array(
+                'findAndModify' => $qcountCollectionName,
+                'query' => array('_id' => $qcountId),
+                'update' => array('$set' => array('id' => $init,'exp'=>$option['curts']+$option['timeout'],)),
+                'new' => true,
+            ),array('safe'=>true,));
+        if (isset($qcount['value']['id'])) {
+            return $qcount['value']['id'];
+        }else{
+            $instance->insert(array('_id' => $qcountId,'id' => $init,'exp'=>$option['curts']+$option['timeout'],),array('safe'=>true,));
+            return $init;
+        }
+    }
+
+    /**
+     * 设定查询统计数缓存
+     * @param   string  $objectName 对象名称
+     * @param   array   $option     可选设定，下标init 初始值，默认1，下标step 步长，默认1
+     * @return int
+     */
+    public function nextQueryCount($objectName = '', $conditionHash='',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'QueryCount',
+            'init' => 0,
+            'step' => 1,
+            'timeout' => 300,
+            'curts'=>time(),
+        );
+        $option['step'] = intval($option['step']);
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $qcountDbName = '_qcount';
+        $qcountCollectionName = 'qc_'.$objectName;
+        $qcountId = $conditionHash;
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+        $instance = $vendorInstance->selectCollection($qcountDbName,$qcountCollectionName);
+
+        $qcount = $instance->db->command(array(
+                'findAndModify' => $qcountCollectionName,
+                'query' => array('_id' => $qcountId),
+                'update' => array('$inc' => array('id' => $option['step']),'$set'=>array('exp'=>$option['curts']+$option['timeout'],)),
+                'new' => true,
+            ),array('safe'=>TRUE,));
+        if (isset($qcount['value']['id'])) {
+            return $qcount['value']['id'];
+        }else{
+
+            $instance->insert(array('_id' => $qcountId,'id' => $option['init'],'exp'=>$option['curts']+$option['timeout'],),array('safe'=>TRUE,));
+            return $option['init'];
+        }
+    }
+
+    /**
+     * 设定查询统计数缓存
+     * @param   string  $objectName 对象名称
+     * @param   array   $option     可选设定，下标init 初始值，默认1，下标step 步长，默认1
+     * @return int
+     */
+    public function currentQueryCount($objectName = '', $conditionHash='',$option = array(), $vendorInstance = null){
+        $option += array(
+            'routeKey'=>'QueryCount',
+            //'init' => 0,
+            //'step' => 1,
+            'timeout' => 300,
+            'curts'=>time(),
+        );
+        $option['step'] = intval($option['step']);
+        empty($objectName) && $objectName = $this->getRouteKey();
+        $qcountDbName = '_qcount';
+        $qcountCollectionName = 'qc_'.$objectName;
+        $qcountId = $conditionHash;
+
+        list($vendorInstance, $option) = $this->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $objectName,)
+        );
+        $instance = $vendorInstance->selectCollection($qcountDbName,$qcountCollectionName);
+
+        $getData = $instance->findOne(array('_id' => $qcountId));
+        if(!empty($getData)){
+            if($getData['exp']>$option['curts']){
+                return $getData['id'];
+            }else{
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
+
 }
