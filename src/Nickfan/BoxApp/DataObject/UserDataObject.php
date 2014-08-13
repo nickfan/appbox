@@ -30,25 +30,91 @@ class UserDataObject extends BaseDataObject {
     const USER_STATUS_DISABLED = 4;     // 已禁用
     const USER_STATUS_DELETED = 5;      // 已删除
 
-    protected static $dataObjectUuidPropKey = '';
-    protected static $dataObjectIdPropKey = 'id';
-    protected static $dataObjectIdStrPropKey = '';
-    //protected static $dataObjectVersionPropKey = '_version';
-    protected static $dataObjectVersionPropValue = 20140702;
-    protected $data = array(
-        'id'=>0,                                            // 用户编号id
-        'status'=>self::USER_STATUS_INACTIVE,               // 用户状态
-        'screen_name'=>'',                                  // 用户屏幕名(站内唯一)
-        'gender'=>self::USER_GENDER_UNKNOWN,                // 用户性别
-        'avatar_image_url'=>'',                             // 用户头像地址
-        'birthday'=>'',                                     // 用户生日数字 2013-03-29
-        'real_name'=>'',                                    // 用户真实姓名
-        'url'=>'',                                          // 用户个人网址（博客）
-        'description'=>'',                                  // 用户个人简介
-        'geo_long' => 0.0,									// geo信息 经度
-        'geo_lat' => 0.0,									// geo信息 维度
-        'upts_screen_name'=>0,                              // 最后更新屏幕名称时间戳
-        'upts'=>0,                                          // 更新时间戳
-        'crts'=>0,                                          // 创建时间戳
+
+    protected $props = array(
+        'id'=>array(                            // 用户编号id
+            'key'=>self::KEYTYPE_ID,            // keytype
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+            'length'=>null,                     // data length limit
+            'enabled'=>true,                    // enable this field
+        ),
+        'idstr'=>array(
+            'key'=>self::KEYTYPE_IDSTR,         // keytype
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+            'length'=>null,                     // data length limit
+            'enabled'=>false,                   // enable this field
+        ),
+//        '_id'=>array(
+//            'key'=>self::KEYTYPE_UUID,          // keytype
+//            'type'=>self::TYPE_STRING,          // prop var type
+//            'default'=>'',                      // default value
+//            'length'=>null,                     // data length limit
+//            'enabled'=>false,                   // enable this field
+//        ),
+        '_version'=>array(
+            'key'=>self::KEYTYPE_NONE,          // keytype
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'20140702',              // default value
+            'length'=>null,                     // data length limit
+            'enabled'=>false,                   // enable this field
+        ),
+        'status'=>array(                        // 用户状态
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::USER_STATUS_INACTIVE,    // default value
+        ),
+        'screen_name'=>array(                     // 用户屏幕名(站内唯一)
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'gender'=>array(                      // 用户性别
+            'type'=>self::TYPE_INT,          // prop var type
+            'default'=>self::USER_GENDER_UNKNOWN,                      // default value
+        ),
+
+        'avatar_image_url'=>array(              // 用户头像地址
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+
+        'birthday'=>array(                      // 用户生日数字 2013-03-29
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+
+        'real_name'=>array(                      // 用户真实姓名
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+
+        'url'=>array(                           // 用户个人网址（博客）
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+
+        'description'=>array(                   // 用户个人简介
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+
+        'geo'=>array(                           // geo信息 经纬度 lat,lng
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+
+        'upts_screen_name'=>array(                // 最后更新时间戳 屏幕名称
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
+        'upts'=>array(                // 更新时间戳
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
+        'crts'=>array(                // 创建时间戳
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
     );
+
 } 
