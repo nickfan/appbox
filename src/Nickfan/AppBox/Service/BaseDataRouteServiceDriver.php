@@ -109,7 +109,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         $this->routeKey = $routeKey;
     }
 
-    public function callMultiGetVendorInstance(array $keys,$method='',$params=array(),$option=array(),$vendorInstance = null){
+    public function callMultiGetVendorInstance(array $keys,$method='',$params=array(),$rowPostCallback = null,$option=array(),$vendorInstance = null){
         $option += array(
             'driverKey' => $this->getDriverKey(),
             'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
@@ -152,7 +152,12 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                     }else{
                         $rowParams = array($rowKeys);
                     }
-                    $result = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                    if(!is_null($rowPostCallback)){
+                        $midResult = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                        $result = call_user_func($rowPostCallback,$midResult);
+                    }else{
+                        $result = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                    }
                     if(!empty($result)){
                         $resultDict = array_merge($resultDict,$result);
                     }
@@ -164,12 +169,17 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             }else{
                 $params = array($keys);
             }
-            $resultDict = call_user_func_array(array($vendorInstance,$method),$params);
+            if(!is_null($rowPostCallback)){
+                $midResult = call_user_func_array(array($vendorInstance,$method),$params);
+                $resultDict = call_user_func($rowPostCallback,$midResult);
+            }else{
+                $resultDict = call_user_func_array(array($vendorInstance,$method),$params);
+            }
         }
         return $resultDict;
     }
 
-    public function callMultiSetVendorInstance(array $items,$method='',$params=array(),$option=array(),$vendorInstance = null){
+    public function callMultiSetVendorInstance(array $items,$method='',$params=array(),$rowPostCallback = null,$option=array(),$vendorInstance = null){
         $option += array(
             'driverKey' => $this->getDriverKey(),
             'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
@@ -214,7 +224,15 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                     }else{
                         $rowParams = array($rowItems);
                     }
-                    $result = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+
+
+                    if(!is_null($rowPostCallback)){
+                        $midResult = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                        $result = call_user_func($rowPostCallback,$midResult);
+                    }else{
+                        $result = call_user_func_array(array($rowVendorInstance,$method),$rowParams);
+                    }
+
                     if(!empty($result)){
                         $rowResult = array_fill_keys($rowKeys,$result);
                         $resultDict = array_merge($resultDict,$rowResult);
@@ -230,7 +248,12 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
             }else{
                 $params = array($items);
             }
-            $resultDict = call_user_func_array(array($vendorInstance,$method),$params);
+            if(!is_null($rowPostCallback)){
+                $midResult = call_user_func_array(array($vendorInstance,$method),$params);
+                $resultDict = call_user_func($rowPostCallback,$midResult);
+            }else{
+                $resultDict = call_user_func_array(array($vendorInstance,$method),$params);
+            }
         }
         return $resultDict;
     }
@@ -289,6 +312,79 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
         }
         return array($driverInstance,$option);
     }
+
+    protected function buildRouteAttrCallbackByQueryStruct($queryStruct = array(),$option=array()){
+        $routeSetVector = array();
+        $option += array(
+            'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
+        );
+        switch ($option['routeMode']) {
+            case AppConstants::DATAROUTE_MODE_IDSET:
+                break;
+            case AppConstants::DATAROUTE_MODE_DIRECT:
+                break;
+            case AppConstants::DATAROUTE_MODE_ATTR:
+            default:
+                if (!isset($option['routeAttr'])) {
+                    if(!empty($queryStruct) && isset($queryStruct['conditionKey'])){
+                        if(isset($queryStruct['conditionKey']['id'])){
+                            $routeSetVector['id']=$queryStruct['conditionKey']['id'];
+                        }
+                        if(isset($queryStruct['conditionKey']['_id'])){
+                            $routeSetVector['_id']=$queryStruct['conditionKey']['_id'];
+                        }
+                        if(isset($queryStruct['conditionKey']['idstr'])){
+                            $routeSetVector['idstr']=$queryStruct['conditionKey']['idstr'];
+                        }
+                        if(isset($queryStruct['conditionKey']['key'])){
+                            $routeSetVector['key']=$queryStruct['conditionKey']['key'];
+                        }
+                        if(isset($queryStruct['conditionKey']['pid'])){
+                            $routeSetVector['pid']=$queryStruct['conditionKey']['pid'];
+                        }
+                    }
+                }
+                break;
+        }
+        return $routeSetVector;
+    }
+    
+    protected function buildRouteAttrCallbackByDict($dict = array(),$option=array()){
+        $routeSetVector = array();
+        $option += array(
+            'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
+        );
+        switch ($option['routeMode']) {
+            case AppConstants::DATAROUTE_MODE_IDSET:
+                break;
+            case AppConstants::DATAROUTE_MODE_DIRECT:
+                break;
+            case AppConstants::DATAROUTE_MODE_ATTR:
+            default:
+                if (!isset($option['routeAttr'])) {
+                    if(!empty($dict)){
+                        if(isset($dict['id'])){
+                            $routeSetVector['id']=$dict['id'];
+                        }
+                        if(isset($dict['_id'])){
+                            $routeSetVector['_id']=$dict['_id'];
+                        }
+                        if(isset($dict['idstr'])){
+                            $routeSetVector['idstr']=$dict['idstr'];
+                        }
+                        if(isset($dict['key'])){
+                            $routeSetVector['key']=$dict['key'];
+                        }
+                        if(isset($dict['pid'])){
+                            $routeSetVector['pid']=$dict['pid'];
+                        }
+                    }
+                }
+                break;
+        }
+        return $routeSetVector;
+    }
+
     public function getVendorInstanceSet($option = array(), $vendorInstance = null, $getAttrCallBack = null) {
         if (is_null($vendorInstance)) {
             $option += array(
@@ -332,7 +428,7 @@ abstract class BaseDataRouteServiceDriver implements DataRouteServiceDriverInter
                         } elseif (is_null($getAttrCallBack)) {
                             $option['routeAttr'] = array();
                         } else {
-                            throw new RuntimeException('direct route mode require [routeAttr]');
+                            throw new RuntimeException('attr route mode require [routeAttr]');
                         }
                     }
                     $driverInstance = self::$routeInstance->getRouteInstance(
