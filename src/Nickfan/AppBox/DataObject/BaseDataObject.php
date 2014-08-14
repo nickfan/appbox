@@ -389,6 +389,16 @@ abstract class BaseDataObject implements ArrayAccess,Serializable,IteratorAggreg
     public function toArray() {
         return $this->data;
     }
+    public function extraStruct(){
+        $data = $this->data;
+        foreach ($data as $propKey=>$propVal) {
+            if(isset($this->props[$propKey]) && isset($this->props[$propKey]['type']) && $this->props[$propKey]['type']==self::TYPE_OBJECT){
+                $data[$propKey] = !empty($propVal)?$this->packData($propVal,false):$propVal;
+            }
+        }
+        return $data;
+    }
+
     public function __toString() {
         return $this->packData($this->data,true);
     }

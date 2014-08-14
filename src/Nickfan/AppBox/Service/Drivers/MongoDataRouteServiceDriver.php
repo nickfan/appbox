@@ -854,7 +854,7 @@ class MongoDataRouteServiceDriver extends BaseDataRouteServiceDriver implements 
             $gotStatus = true;
             $setData = array();
             foreach ($requestData as $key=>$val) {
-                $key!=$option['idLabel'] && array_key_exists($key,$getData) && $getData[$key]!==$val && $setData[$key] = $val;
+                $key!= '_id' && $key!=$option['idLabel'] && array_key_exists($key,$getData) && $getData[$key]!==$val && $setData[$key] = $val;
             }
             if(!empty($setData)){
                 $updateStatus = $collection->update(array($option['idLabel'] => $requestData[$option['idLabel']]), array('$set' => $setData),$option['options']);

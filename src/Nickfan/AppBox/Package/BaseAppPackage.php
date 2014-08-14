@@ -236,8 +236,6 @@ abstract class BaseAppPackage implements PackageInterface {
     public function getDataObjectTemplateByLabel($objectLabel = '', $defprops = array(), $namespace = '') {
         $retObject = array();
         $namespace == '' && $namespace = $this->getDefaultNamespace();
-        echo $namespace.' ---- '.PHP_EOL;
-
         if(!empty($namespace)){
             if(strlen($namespace)!=(strrpos($namespace,'\\')+1)){
                 $namespace.='\\';
