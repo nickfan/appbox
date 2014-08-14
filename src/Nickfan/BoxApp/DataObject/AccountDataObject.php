@@ -41,33 +41,119 @@ class AccountDataObject extends BaseDataObject {
     const ACCOUNT_IDLABEL_MOBILE = 2; // 账户唯一标识 手机地址
     const ACCOUNT_IDLABEL_ACCOUNTID = 3; // 账户唯一标识 登录ID名
 
-    protected static $dataObjectUuidPropKey = '';
-    protected static $dataObjectIdPropKey = 'id';
-    protected static $dataObjectIdStrPropKey = '';
-    //protected static $dataObjectVersionPropKey = '_version';
-    protected static $dataObjectVersionPropValue = 20140702;
-    protected $data = array(
-        'id'=>0,                                                        // 用户编号id
-        'accountid'=>'',                                                // 登陆名
-        'mailaddr'=>'',                                                 // 登陆邮箱
-        'mobilenum'=>'',                                                // 登陆手机号
-        'authsecret'=>'',                                               // 验证密钥
-        'passstatus'=>self::ACCOUNT_PASSSTATUS_SET,                     // 本地登陆密码状态
-        'passhash'=>'',                                                 // 账户密码hash
-        'passsalt'=>'',                                                 // 账户密码随机种子
-        'secques'=>'',                                                  // 账户安全问题
-        'verify_mail'=> self::ACCOUNT_VERIFYMAIL_STATUS_NO,             // 账户邮箱验证状态
-        'verify_mobile'=> self::ACCOUNT_VERIFYMOBILE_STATUS_NO,         // 账户手机验证状态
-        'verify_credential'=> self::ACCOUNT_VERIFYCREDENTIAL_STATUS_NO, // 账户证件验证状态
-        'regfromtype'=> self::ACCOUNT_REGFROMTYPE_SITE,                 // 账户注册来源类型
-        'regip'=> '',                                                   // 账户注册来源ip
-        'credentialid'=> '',                                            // 账户证件ID
-        'credentialtype'=> self::ACCOUNT_CREDENTIAL_TYPE_ID,            // 账户证件类型
-        'openbind'=>'',                                                 // 第三方绑定列表
-        'upts_accountid'=>0,                                            // 最后更新时间 登录名
-        'upts_mailaddr'=>0,                                             // 最后更新时间 邮件地址
-        'upts_mobilenum'=>0,                                            // 最后更新时间 手机号码
-        'upts'=>0,                                                      // 更新时间戳
-        'crts'=>0,                                                      // 创建时间戳
+    protected $props = array(
+        'id'=>array(                            // 用户编号id
+            'key'=>self::KEYTYPE_ID,            // keytype
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+            'length'=>null,                     // data length limit
+            'enabled'=>true,                    // enable this field
+        ),
+        'idstr'=>array(
+            'key'=>self::KEYTYPE_IDSTR,         // keytype
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+            'length'=>null,                     // data length limit
+            'enabled'=>false,                   // enable this field
+        ),
+//        '_id'=>array(
+//            'key'=>self::KEYTYPE_UUID,          // keytype
+//            'type'=>self::TYPE_STRING,          // prop var type
+//            'default'=>'',                      // default value
+//            'length'=>null,                     // data length limit
+//            'enabled'=>false,                   // enable this field
+//        ),
+        '_version'=>array(
+            'key'=>self::KEYTYPE_NONE,          // keytype
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'20140702',              // default value
+            'length'=>null,                     // data length limit
+            'enabled'=>false,                   // enable this field
+        ),
+        'accountid'=>array(                     // 登陆名
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'mailaddr'=>array(                      // 登陆邮箱
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'mobilenum'=>array(                     // 登陆手机号
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'authsecret'=>array(                    // 验证密钥
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'passstatus'=>array(                    // 本地登陆密码状态
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::ACCOUNT_PASSSTATUS_SET,    // default value
+        ),
+        'passhash'=>array(                      // 账户密码hash
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'passsalt'=>array(                      // 账户密码随机种子
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'secques'=>array(                      // 账户安全问题
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'verify_mail'=>array(                    // 账户邮箱验证状态
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::ACCOUNT_VERIFYMAIL_STATUS_NO,    // default value
+        ),
+        'verify_mobile'=>array(                    // 账户手机验证状态
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::ACCOUNT_VERIFYMOBILE_STATUS_NO,    // default value
+        ),
+        'verify_credential'=>array(                    // 账户证件验证状态
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::ACCOUNT_VERIFYCREDENTIAL_STATUS_NO,    // default value
+        ),
+        'regfromtype'=>array(                    // 账户注册来源类型
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::ACCOUNT_REGFROMTYPE_SITE,    // default value
+        ),
+        'regip'=>array(                      // 账户注册来源ip
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'credentialid'=>array(                  // 账户证件ID
+            'type'=>self::TYPE_STRING,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'credentialtype'=>array(                    // 账户证件类型
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>self::ACCOUNT_CREDENTIAL_TYPE_ID,    // default value
+        ),
+        'openbind'=>array(                      // 第三方绑定列表
+            'type'=>self::TYPE_OBJECT,          // prop var type
+            'default'=>'',                      // default value
+        ),
+        'upts_accountid'=>array(                // 最后更新时间 登录名
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
+        'upts_mailaddr'=>array(                // 最后更新时间 邮件地址
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
+        'upts_mobilenum'=>array(                // 最后更新时间 手机号码
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
+        'upts'=>array(                // 更新时间戳
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
+        'crts'=>array(                // 创建时间戳
+            'type'=>self::TYPE_INT,             // prop var type
+            'default'=>0,                       // default value
+        ),
     );
+
 } 

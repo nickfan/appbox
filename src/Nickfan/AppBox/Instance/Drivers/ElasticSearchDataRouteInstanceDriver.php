@@ -30,9 +30,24 @@ class ElasticSearchDataRouteInstanceDriver extends BaseDataRouteInstanceDriver i
         }
         $esHostsList = explode(',', rtrim($settings['esHosts'], ','));
 
-        $params = array();
-        $params['hosts'] = $esHostsList;
-        $curInst = new \Elasticsearch\Client($params);
+        $hostsInfo = array();
+        foreach ($esHostsList as $rowEsHostStr) {
+            $rowEsHostArr = explode(':',$rowEsHostStr);
+            $rowEsHostDomain = $rowEsHostArr[0];
+            $rowEsHostPort = isset($rowEsHostArr[1])?$rowEsHostArr[1]:9200;
+            $hostsInfo[] = array(
+                'host'=>$rowEsHostDomain,
+                'port'=>$rowEsHostPort,
+            );
+        }
+        if(count($hostsInfo)>1){
+            $curInst = new \Elastica\Client(array('servers'=>$hostsInfo));
+        }else{
+            $curInst =  new \Elastica\Client($hostsInfo);
+        }
+//        $params = array();
+//        $params['hosts'] = $esHostsList;
+//        $curInst = new \Elasticsearch\Client($params);
         $this->instance = $curInst;
         $this->isAvailable = $this->instance ? true : false;
     }

@@ -23,6 +23,13 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
 
     //protected static $driverKey = 'beanstalk';
 
+    protected static function encodeData($srcData){
+        return msgpack_pack($srcData);
+
+    }
+    protected static function decodeData($encodedData=''){
+        return msgpack_unpack($encodedData);
+    }
     public function statsTube($tubeName='default', $option = array(), $vendorInstance = null) {
         $option += array();
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
@@ -69,7 +76,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
             //var_dump($job);
             if($job){
                 if($option['decode']==TRUE){
-                    $arg= msgpack_unpack($job->getData());
+                    $arg= self::decodeData($job->getData());
                 }else{
                     $arg= $job->getData();
                 }
@@ -110,7 +117,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
             array('key' => $tubeName,)
         );
         $vendorInstance->useTube($tubeName)
-            ->put($option['encode']==TRUE?msgpack_pack($jobData):$jobData);
+            ->put($option['encode']==TRUE?self::encodeData($jobData):$jobData);
     }
 
 
@@ -136,7 +143,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
         }
         if($job){
             if($option['decode']==TRUE){
-                return msgpack_unpack($job->getData());
+                return self::decodeData($job->getData());
             }else{
                 return $job->getData();
             }
