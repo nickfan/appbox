@@ -126,7 +126,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      * @param string $tubeName
      * @param array $option
      */
-    public function getJobData($tubeName='default',$option=array(), $vendorInstance=NULL){
+    public function getJobData($tubeName='default',$option=array(), $vendorInstance=null){
         $option += array(
             'decode'=> TRUE,
         );
@@ -157,7 +157,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      * @param string $tubeName
      * @param array $option
      */
-    public function getJob($tubeName='default',$option=array(), $vendorInstance=NULL){
+    public function getJob($tubeName='default',$option=array(), $vendorInstance=null){
         $option += array(
             'ignore'=>'default',
         );
@@ -181,7 +181,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      * @param string $tubeName
      * @param array $option
      */
-    public function delJob($job,$tubeName='default',$option=array(), $vendorInstance=NULL){
+    public function delJob($job,$tubeName='default',$option=array(), $vendorInstance=null){
         $option += array(
         );
         list($vendorInstance, $option) = $this->getVendorInstanceSet(

@@ -17,6 +17,7 @@ namespace Nickfan\AppBox\Package;
 use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
+use Nickfan\AppBox\Support\Util;
 
 abstract class BaseAppPackage implements PackageInterface {
 
@@ -42,6 +43,10 @@ abstract class BaseAppPackage implements PackageInterface {
          * 'cache' =>  instance of \Nickfan\AppBox\Service\Drivers\RedisDataRouteServiceDriver
          */
     );
+
+    protected static $prefixCache = 'apch_';        // 缓存前缀
+    protected static $prefixDb = 'apdt_';           // 数据库表前缀
+    protected static $prefixMq = '';           // 队列前缀
 
     public static function parseClassNameObjectName() {
         $className = get_called_class();
@@ -138,6 +143,13 @@ abstract class BaseAppPackage implements PackageInterface {
         }
     }
 
+    protected function getInstanceTypeDriverName($instanceType){
+        if (isset($this->instanceTypeMap[$instanceType])) {
+            return $this->instanceTypeMap[$instanceType];
+        } else {
+            throw new RuntimeException('unknown instance type :' . $instanceType);
+        }
+    }
     /**
      * 获取实例类别下的对应驱动实例 可选设定新驱动名称（比如cache换用redis/memcache）
      * @param $instanceType
@@ -250,4 +262,48 @@ abstract class BaseAppPackage implements PackageInterface {
         $retObject = $doInstance->toArray();
         return $retObject;
     }
-} 
+
+
+
+    /**
+     * 消息队列发布任务
+     * @param array $data
+     * @param string $taskLabel
+     * @param array $option
+     * @return mixed|null|void
+     */
+    public function mqTaskPush($data=array(),$taskLabel='_default_',$option=array(),$vendorInstance=null){
+        $option+=array(
+            'mqInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_MQ), //队列服务实例
+            'mqPrefix'=>static::$prefixMq,
+            'options'=>array(),
+            'encode'=>true,
+            'dataRouteInstance'=>$this->getDataRouteInstance(),
+        );
+        $retStatus = null;
+        $message = $option['encode']==true?Util::datapack($data):$data;
+        $driverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_MQ);
+        list($vendorInstance, $option) = $driverInstance->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $taskLabel,)
+        );
+
+        switch($option['mqInstance']){
+            case AppConstants::INSTANCE_MQ_DRIVER_REDIS:
+                !isset($option['options']['type']) && $option['options']['type'] = 'list';
+                if($option['options']['type']!='list'){
+                    $retStatus = $vendorInstance->publish($option['mqPrefix'].$taskLabel,$message);
+                }else{
+                    $retStatus = $vendorInstance->lPush($option['mqPrefix'].$taskLabel,$message);
+                }
+                break;
+            case AppConstants::INSTANCE_MQ_DRIVER_BEANSTALK:
+            default:
+                $retStatus = $vendorInstance->useTube($option['mqPrefix'].$taskLabel)->put($message);
+                break;
+        }
+
+        return $retStatus;
+    }
+}
