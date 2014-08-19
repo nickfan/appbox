@@ -31,8 +31,7 @@
         "swiftmailer/swiftmailer": "~5.2",
         "packaged/thrift":"~0.9",
         "ruflin/Elastica": "dev-master",
-        "munkie/elasticsearch-thrift-php" : "dev-master",
-        "predis/predis":"dev-master"
+        "munkie/elasticsearch-thrift-php" : "dev-master"
     },
     "autoload": {
         "psr-0": {

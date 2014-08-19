@@ -17,6 +17,7 @@ namespace Nickfan\AppBox\Package;
 use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
+use Nickfan\AppBox\Support\Util;
 
 abstract class BaseAppPackage implements PackageInterface {
 
@@ -42,6 +43,10 @@ abstract class BaseAppPackage implements PackageInterface {
          * 'cache' =>  instance of \Nickfan\AppBox\Service\Drivers\RedisDataRouteServiceDriver
          */
     );
+
+    protected static $prefixCache = 'apch_';        // 缓存前缀
+    protected static $prefixDb = 'apdt_';           // 数据库表前缀
+    protected static $prefixMq = '';           // 队列前缀
 
     public static function parseClassNameObjectName() {
         $className = get_called_class();
@@ -138,6 +143,13 @@ abstract class BaseAppPackage implements PackageInterface {
         }
     }
 
+    protected function getInstanceTypeDriverName($instanceType){
+        if (isset($this->instanceTypeMap[$instanceType])) {
+            return $this->instanceTypeMap[$instanceType];
+        } else {
+            throw new RuntimeException('unknown instance type :' . $instanceType);
+        }
+    }
     /**
      * 获取实例类别下的对应驱动实例 可选设定新驱动名称（比如cache换用redis/memcache）
      * @param $instanceType
@@ -197,19 +209,25 @@ abstract class BaseAppPackage implements PackageInterface {
      */
     protected function setDriverInstance($instanceDriverName) {
         if (!isset($this->instanceMap[$instanceDriverName]) || is_null($this->instanceMap[$instanceDriverName])) {
-            $driverClassKey = ucfirst($instanceDriverName);
-            $driverClassName = '\\Nickfan\\AppBox\\Service\\Drivers\\' . $driverClassKey . 'DataRouteServiceDriver';
-            if (class_exists($driverClassName)) {
-                $driverInstance = call_user_func_array(array($driverClassName, 'factory'), array(self::$routeInstance));
-                if ($driverInstance) {
-                    $driverInstance->setRouteKey($this->getObjectName());
-                    $this->instanceMap[$instanceDriverName] = $driverInstance;
-                } else {
-                    throw new RuntimeException(' driver instance init failed :' . $driverClassName);
-                }
+            $driverInstance = self::initDriverInstanceByName($instanceDriverName);
+            $driverInstance->setRouteKey($this->getObjectName());
+            $this->instanceMap[$instanceDriverName] = $driverInstance;
+        }
+    }
+
+
+    protected static function initDriverInstanceByName($instanceDriverName){
+        $driverClassKey = ucfirst($instanceDriverName);
+        $driverClassName = '\\Nickfan\\AppBox\\Service\\Drivers\\' . $driverClassKey . 'DataRouteServiceDriver';
+        if (class_exists($driverClassName)) {
+            $driverInstance = call_user_func_array(array($driverClassName, 'factory'), array(self::$routeInstance));
+            if ($driverInstance) {
+                return $driverInstance;
             } else {
-                throw new RuntimeException('request Driver not found :' . $driverClassName);
+                throw new RuntimeException(' driver instance init failed :' . $driverClassName);
             }
+        } else {
+            throw new RuntimeException('request Driver not found :' . $driverClassName);
         }
     }
 
@@ -250,4 +268,147 @@ abstract class BaseAppPackage implements PackageInterface {
         $retObject = $doInstance->toArray();
         return $retObject;
     }
-} 
+
+
+
+    /**
+     * 消息队列发布任务
+     * @param array $data
+     * @param string $taskLabel
+     * @param array $option
+     * @return mixed|null|void
+     */
+    public function mqTaskPush($data=array(),$taskLabel='_default_',$option=array(),$vendorInstance=null){
+        $option+=array(
+            'mqInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_MQ), //队列服务实例
+            'mqPrefix'=>static::$prefixMq,
+            'options'=>array(),
+            'encode'=>true,
+            'dataRouteInstance'=>$this->getDataRouteInstance(),
+        );
+        $retStatus = null;
+        $message = $option['encode']==true?Util::datapack($data):$data;
+        $driverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_MQ);
+        list($vendorInstance, $option) = $driverInstance->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $taskLabel,)
+        );
+
+        switch($option['mqInstance']){
+            case AppConstants::INSTANCE_MQ_DRIVER_REDIS:
+                !isset($option['options']['type']) && $option['options']['type'] = 'list';
+                if($option['options']['type']!='list'){
+                    $retStatus = $vendorInstance->publish($option['mqPrefix'].$taskLabel,$message);
+                }else{
+                    $retStatus = $vendorInstance->lPush($option['mqPrefix'].$taskLabel,$message);
+                }
+                break;
+            case AppConstants::INSTANCE_MQ_DRIVER_BEANSTALK:
+            default:
+                $retStatus = $vendorInstance->useTube($option['mqPrefix'].$taskLabel)->put($message);
+                break;
+        }
+
+        return $retStatus;
+    }
+
+
+    /**
+     * 消息队列处理任务
+     * @param $callback
+     * @param $routeInstance
+     * @param array $option
+     * @return mixed|null
+     * @throws Exception
+     */
+    public static function mqProcessTaskData($callback,$taskLabel='_default_',$option=array(),$vendorInstance=NULL){
+        $option+=array(
+            'mqInstance'=>AppConstants::INSTANCE_MQ_DRIVER_BEANSTALK, //队列服务实例
+            'mqPrefix'=>static::$prefixMq,
+            'decode'=>true,
+            'delete'=>true,
+            'release'=>false,
+            'delay'=>10,
+            'sleep'=>1,
+            'priority'=>1024,
+            'timeout'=>3,
+            'dataRouteInstance'=>null,
+        );
+
+
+        if(!is_callable($callback)){
+            throw new RuntimeException('callback error: is not callable');
+        }
+
+        if(is_null($vendorInstance)){
+            if(is_null($option['dataRouteInstance'])){
+                $option['dataRouteInstance'] = static::$routeInstance;
+            }
+        }
+
+        $retData = null;
+
+        $driverInstance = self::initDriverInstanceByName($option['mqInstance']);
+        list($vendorInstance, $option) = $driverInstance->getVendorInstanceSet(
+            $option,
+            $vendorInstance,
+            array('key' => $taskLabel,)
+        );
+
+        switch($option['mqInstance']){
+            case AppConstants::INSTANCE_MQ_DRIVER_REDIS:
+                // redis 这边需要默认socket 超时不限
+                //@ini_set('default_socket_timeout', -1);
+                !isset($option['options']['type']) && $option['options']['type'] = 'list';
+                if($option['options']['type']!='list'){
+                    $retData = $vendorInstance->subscribe($option['mqPrefix'].$taskLabel,$callback);
+                }else{
+                    $job = $vendorInstance->blPop($option['mqPrefix'].$taskLabel,$option['timeout']);
+                    if($option['decode']==true){
+                        $arg= Util::dataunpack($job);
+                    }else{
+                        $arg= $job;
+                    }
+                    $retData = call_user_func($callback, $arg);
+                    //sleep($option['sleep']);
+                }
+                break;
+            case AppConstants::INSTANCE_MQ_DRIVER_BEANSTALK:
+            default:
+                try {
+                    //$tubeStats = $vendorInstance->statsTube($option['mqPrefix'].$taskLabel);
+                    //if($tubeStats){
+                    $vendorInstance->watchOnly($option['mqPrefix'].$taskLabel);
+                    $job = $vendorInstance->reserve($option['timeout']);
+                    //var_dump($job);
+                    if($job){
+                        if($option['decode']==TRUE){
+                            $arg= Util::dataunpack($job->getData());
+                        }else{
+                            $arg= $job->getData();
+                        }
+                        $retData = call_user_func($callback, $arg);
+                        if(!$retData){
+                            if($option['release']==TRUE){
+                                $vendorInstance->release($job,$option['priority'],$option['delay']);
+                            }
+                            throw new RuntimeException('process data error');
+                        }
+                        if($option['delete']==TRUE){
+                            $vendorInstance->delete($job);
+                        }
+                    }else{
+                        $arg = $job;
+                    }
+                    //}
+                } catch (\Exception $ex) {
+                    throw $ex;
+                }
+                //sleep($option['sleep']);
+                break;
+        }
+        return $retData;
+    }
+
+}
