@@ -43,7 +43,7 @@ class ElasticSearchDataRouteInstanceDriver extends BaseDataRouteInstanceDriver i
         if(count($hostsInfo)>1){
             $curInst = new \Elastica\Client(array('servers'=>$hostsInfo));
         }else{
-            $curInst =  new \Elastica\Client($hostsInfo);
+            $curInst =  new \Elastica\Client($hostsInfo[0]);
         }
 //        $params = array();
 //        $params['hosts'] = $esHostsList;
