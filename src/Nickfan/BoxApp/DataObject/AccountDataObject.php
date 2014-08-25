@@ -19,6 +19,8 @@ namespace Nickfan\BoxApp\DataObject;
 use Nickfan\AppBox\DataObject\BaseDataObject;
 
 class AccountDataObject extends BaseDataObject {
+    const DO_VERSION = '20140702';            // 版本号
+
     const ACCOUNT_PASSSTATUS_NOTSET = 0;     //  本地密码状态,未激活/未启用
     const ACCOUNT_PASSSTATUS_SET = 1;        //  本地密码状态,已激活/已启用
     const ACCOUNT_PASSSTATUS_IMPORTED = 2;   //  本地密码状态,被导入的（需要做后续的更新）
@@ -66,7 +68,7 @@ class AccountDataObject extends BaseDataObject {
         '_version'=>array(
             'key'=>self::KEYTYPE_NONE,          // keytype
             'type'=>self::TYPE_STRING,          // prop var type
-            'default'=>'20140702',              // default value
+            'default'=>self::DO_VERSION,              // default value
             'length'=>null,                     // data length limit
             'enabled'=>false,                   // enable this field
         ),

@@ -16,6 +16,7 @@ namespace Nickfan\AppBox\Package;
 
 use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
+use Nickfan\AppBox\DataObject\BaseDataObject;
 use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
 use Nickfan\AppBox\Support\Util;
 
@@ -45,6 +46,7 @@ abstract class BaseAppPackage implements PackageInterface {
     );
 
     protected static $prefixCache = 'apch_';        // 缓存前缀
+    protected static $ttlCache = 0;        // 缓存ttl
     protected static $prefixDb = 'apdt_';           // 数据库表前缀
     protected static $prefixMq = '';           // 队列前缀
 
@@ -215,7 +217,12 @@ abstract class BaseAppPackage implements PackageInterface {
         }
     }
 
-
+    /**
+     * 根据驱动名称初始化service驱动实例
+     * @param $instanceDriverName
+     * @return mixed
+     * @throws \Nickfan\AppBox\Common\Exception\RuntimeException
+     */
     protected static function initDriverInstanceByName($instanceDriverName){
         $driverClassKey = ucfirst($instanceDriverName);
         $driverClassName = '\\Nickfan\\AppBox\\Service\\Drivers\\' . $driverClassKey . 'DataRouteServiceDriver';
@@ -270,6 +277,31 @@ abstract class BaseAppPackage implements PackageInterface {
     }
 
 
+    /**
+     * 检测是否需要升级数据结构
+     * @param $reqData
+     * @param string $objectLabel
+     * @param string $namespace
+     * @return bool
+     */
+    protected function _checkNeedUpgradeObjectByLabel($reqData,$objectLabel='', $namespace = ''){
+        $retObject = false;
+        //数据对象需要升级
+
+        $namespace == '' && $namespace = $this->getDefaultNamespace();
+        if(!empty($namespace)){
+            if(strlen($namespace)!=(strrpos($namespace,'\\')+1)){
+                $namespace.='\\';
+            }
+        }
+        $objectClassName = $namespace . ucfirst($objectLabel) . 'DataObject';
+
+        if(array_key_exists(BaseDataObject::DO_VERSION_PROP, $reqData) && $reqData[BaseDataObject::DO_VERSION_PROP]!=$objectClassName::DO_VERSION){
+            $retObject=true;
+        }
+        return $retObject;
+    }
+
 
     /**
      * 消息队列发布任务
@@ -322,7 +354,7 @@ abstract class BaseAppPackage implements PackageInterface {
      * @return mixed|null
      * @throws Exception
      */
-    public static function mqProcessTaskData($callback,$taskLabel='_default_',$option=array(),$vendorInstance=NULL){
+    public static function mqProcessTaskData($callback,$taskLabel='_default_',$option=array(),$vendorInstance=null){
         $option+=array(
             'mqInstance'=>AppConstants::INSTANCE_MQ_DRIVER_BEANSTALK, //队列服务实例
             'mqPrefix'=>static::$prefixMq,
@@ -383,19 +415,19 @@ abstract class BaseAppPackage implements PackageInterface {
                     $job = $vendorInstance->reserve($option['timeout']);
                     //var_dump($job);
                     if($job){
-                        if($option['decode']==TRUE){
+                        if($option['decode']==true){
                             $arg= Util::dataunpack($job->getData());
                         }else{
                             $arg= $job->getData();
                         }
                         $retData = call_user_func($callback, $arg);
                         if(!$retData){
-                            if($option['release']==TRUE){
+                            if($option['release']==true){
                                 $vendorInstance->release($job,$option['priority'],$option['delay']);
                             }
                             throw new RuntimeException('process data error');
                         }
-                        if($option['delete']==TRUE){
+                        if($option['delete']==true){
                             $vendorInstance->delete($job);
                         }
                     }else{
@@ -409,6 +441,204 @@ abstract class BaseAppPackage implements PackageInterface {
                 break;
         }
         return $retData;
+    }
+
+
+
+    /**
+     * 根据数据类型标识、对象ID获取对应对象数据
+     * @param @param string $objectLabel
+     * @param int $requestId
+     * @param array $option
+     * @throws MyRuntimeException
+     * @return array|null
+     */
+    public function _getStructDataById($objectLabel='',$requestId=0,$option=array()){
+        $returnData = null;
+        $option+=array(
+            'idLabel'=>'id',    // 自定义idlabel （字段名）
+            'dbInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),	// 数据库实例
+            'dbPrefix'=>static::$prefixDb,
+            'dbOption'=>array(
+//                'collectionName' => null,  //指定特定的集合
+//                'dbName' => null,  //指定特定的库名
+//                'options'=>array(),
+            ),// 数据库选项
+            'cacheInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE),	// cache实例类型
+            'useCache'=>true,		// 从cache读取
+            'setCache'=>true,		// 写回cache
+            'delCache'=>false,		// 清除cache
+            'cacheOption'=>array(),// 缓存路由选项
+            'cachePrefix'=>static::$prefixCache,
+            'cacheTtl'=>static::$ttlCache,
+
+        );
+        // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
+        is_numeric($requestId) && $requestId = intval($requestId);
+
+
+        if(empty($requestId)){
+            return $this->getDataObjectTemplateByLabel($objectLabel);
+        }
+
+
+        $needUpgrade = true;
+        $dataFromCache = false;
+        $optionCache = array(
+            'routeKey'=>$objectLabel,
+        );
+        !empty($option['cacheOption']) && $optionCache = array_merge($optionCache,$option['cacheOption']);
+
+        if($option['useCache']==true){
+            // 读取缓存
+            switch($option['cacheInstance']){
+                case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData = $cacheDriverInstance->get($objectCacheKey,$optionCache);
+                    break;
+                case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                default:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData = $cacheDriverInstance->get($objectCacheKey,$optionCache);
+                    break;
+            }
+            $returnData !== false && $returnData = Util::dataunpack($returnData);
+            if(!empty($returnData)){
+                $needUpgrade = $this->_checkNeedUpgradeObjectByLabel($returnData,$objectLabel);
+                if($needUpgrade==false){
+                    $dataFromCache = true;
+                }
+            }
+        }
+        if(empty($returnData) || $needUpgrade==true){
+            $dataFromCache = false;
+            $optionDb = array(
+                'routeKey'=>$objectLabel,
+            );
+            !empty($option['dbOption']) && $optionDb = array_merge($optionDb,$option['dbOption']);
+
+            switch($option['dbInstance']){
+                case AppConstants::INSTANCE_DB_DRIVER_MYSQL:
+                case AppConstants::INSTANCE_DB_DRIVER_MSSQL:
+                    if(in_array($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),array(AppConstants::INSTANCE_DB_DRIVER_MYSQL,AppConstants::INSTANCE_DB_DRIVER_MSSQL))){
+                        !isset($cacheDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                    }else{
+                        !isset($cacheDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName($option['dbInstance']);
+                        //$dbDriverInstance->setRouteKey($this->getObjectName());
+                        $dbDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $queryStruct=array(
+                        'querySchema'=>array($objectLabel, ),
+                        'conditionKey'=>array(
+                            'id'=>$requestId,
+                        ),
+                    );
+                    $returnData = $dbDriverInstance->queryRow($queryStruct,$optionDb);
+                    break;
+                case AppConstants::INSTANCE_DB_DRIVER_REDIS:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_REDIS){
+                        !isset($cacheDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                    }else{
+                        !isset($cacheDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_REDIS);
+                        //$dbDriverInstance->setRouteKey($this->getObjectName());
+                        $dbDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectDbKey = $option['dbPrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData = $dbDriverInstance->get($objectDbKey,$optionDb);
+                    $returnData !== false && $returnData = Util::dataunpack($returnData);
+                    break;
+                case AppConstants::INSTANCE_DB_DRIVER_MONGODB:
+                default:
+                    $dbName = (isset($optionDb['dbName']) && !empty($optionDb['dbName']))?$optionDb['dbName']:lcfirst($objectLabel);
+                    $collectionName = (isset($optionDb['collectionName']) && !empty($optionDb['collectionName']))?$optionDb['collectionName']:lcfirst($objectLabel);
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_MONGODB){
+                        $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                    }else{
+                        $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_MONGODB);
+                        $dbDriverInstance->__init(array('routeKey'=>$objectLabel,'dbName'=>$dbName));
+                    }
+                    $optionReq = $optionDb;
+                    $optionReq['idLabel'] = $option['idLabel'];
+                    $returnData = $dbDriverInstance->read(array($option['idLabel']=>$requestId),$optionReq);
+                    break;
+            }
+
+            if(!empty($returnData)){
+                //如果获取的数据对象需要升级
+                //$returnData =  $this->_checkUpgradeObjectByLabel($returnData,$objectLabel,$optionData);
+                if($option['setCache']==true){
+                    // 写入缓存
+                    switch($option['cacheInstance']){
+                        case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                            if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                                !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                            }else{
+                                !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                                //$driverInstance->setRouteKey($this->getObjectName());
+                                $cacheDriverInstance->setRouteKey($objectLabel);
+                            }
+                            $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                            $cacheDriverInstance->set($objectCacheKey,Util::datapack($returnData),$option['cacheTtl'],$optionCache);
+                            break;
+                        case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                        default:
+                            if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                                !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                            }else{
+                                !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                                //$driverInstance->setRouteKey($this->getObjectName());
+                                $cacheDriverInstance->setRouteKey($objectLabel);
+                            }
+                            $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                            $cacheDriverInstance->setex($objectCacheKey,$option['cacheTtl'],Util::datapack($returnData),$optionCache);
+                            break;
+                    }
+                }
+            }
+        }
+        if($option['delCache']!==false){
+            //删除cache
+            switch($option['cacheInstance']){
+                case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $cacheDriverInstance->delete($objectCacheKey,0,$optionCache);
+                    break;
+                case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                default:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $cacheDriverInstance->delete($objectCacheKey,$optionCache);
+                    break;
+            }
+        }
+        return $returnData;
     }
 
 }
