@@ -18,6 +18,8 @@ use Nickfan\AppBox\Common\AppConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
 use Nickfan\AppBox\DataObject\BaseDataObject;
 use Nickfan\AppBox\Instance\DataRouteInstanceInterface;
+use Nickfan\AppBox\Service\Drivers\DbDataRouteServiceDriver;
+use Nickfan\AppBox\Service\Drivers\MongoDataRouteServiceDriver;
 use Nickfan\AppBox\Support\Util;
 
 abstract class BaseAppPackage implements PackageInterface {
@@ -535,25 +537,25 @@ abstract class BaseAppPackage implements PackageInterface {
                 case AppConstants::INSTANCE_DB_DRIVER_MYSQL:
                 case AppConstants::INSTANCE_DB_DRIVER_MSSQL:
                     if(in_array($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),array(AppConstants::INSTANCE_DB_DRIVER_MYSQL,AppConstants::INSTANCE_DB_DRIVER_MSSQL))){
-                        !isset($cacheDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                        !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
                     }else{
-                        !isset($cacheDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName($option['dbInstance']);
+                        !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName($option['dbInstance']);
                         //$dbDriverInstance->setRouteKey($this->getObjectName());
                         $dbDriverInstance->setRouteKey($objectLabel);
                     }
                     $queryStruct=array(
                         'querySchema'=>array($objectLabel, ),
                         'conditionKey'=>array(
-                            'id'=>$requestId,
+                            $option['idLabel']=>$requestId,
                         ),
                     );
                     $returnData = $dbDriverInstance->queryRow($queryStruct,$optionDb);
                     break;
                 case AppConstants::INSTANCE_DB_DRIVER_REDIS:
                     if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_REDIS){
-                        !isset($cacheDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                        !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
                     }else{
-                        !isset($cacheDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_REDIS);
+                        !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_REDIS);
                         //$dbDriverInstance->setRouteKey($this->getObjectName());
                         $dbDriverInstance->setRouteKey($objectLabel);
                     }
@@ -566,9 +568,9 @@ abstract class BaseAppPackage implements PackageInterface {
                     $dbName = (isset($optionDb['dbName']) && !empty($optionDb['dbName']))?$optionDb['dbName']:lcfirst($objectLabel);
                     $collectionName = (isset($optionDb['collectionName']) && !empty($optionDb['collectionName']))?$optionDb['collectionName']:lcfirst($objectLabel);
                     if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_MONGODB){
-                        $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                        !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
                     }else{
-                        $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_MONGODB);
+                        !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_MONGODB);
                         $dbDriverInstance->__init(array('routeKey'=>$objectLabel,'dbName'=>$dbName));
                     }
                     $optionReq = $optionDb;
@@ -635,6 +637,401 @@ abstract class BaseAppPackage implements PackageInterface {
                     }
                     $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
                     $cacheDriverInstance->delete($objectCacheKey,$optionCache);
+                    break;
+            }
+        }
+        return $returnData;
+    }
+
+
+    /**
+     * 根据数据类型标识、对象ID更新对应对象数据
+     * @param string $objectLabel
+     * @param int $requestId
+     * @param array $reqData
+     * @param array $option
+     * @return array|mixed|null
+     */
+    public function _setStructDataById($objectLabel='',$requestId=0,$reqData=array(),$option=array()){
+        $returnData = null;
+        $option+=array(
+            'idLabel'=>'id',    // 自定义idlabel （字段名）
+            'dbInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),	// 数据库实例
+            'dbPrefix'=>static::$prefixDb,
+            'dbOption'=>array(
+//                'collectionName' => null,  //指定特定的集合
+//                'dbName' => null,  //指定特定的库名
+//                'options'=>array(),
+            ),// 数据库选项
+            'cacheInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE),	// cache实例类型
+            'setCache'=>null,		// NULL 清空cache | TRUE 写入cache | FALSE 不设定、使用cache
+            'cacheOption'=>array(),// 缓存路由选项
+            'cachePrefix'=>static::$prefixCache,
+            'cacheTtl'=>static::$ttlCache,
+
+        );
+        // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
+        is_numeric($requestId) && $requestId = intval($requestId);
+
+        $storeData = $tplRowData = $this->getDataObjectTemplateByLabel($objectLabel);
+        $upData = array();
+        $gotServiceSyntax = false;
+        foreach ($reqData as $reqKey => $reqValue){
+            if($option['dbInstance']==AppConstants::INSTANCE_DB_DRIVER_MONGODB && MongoDataRouteServiceDriver::isServiceSyntax($reqKey)){
+                $gotServiceSyntax = true;
+                break;
+            }elseif(in_array($option['dbInstance'],array(AppConstants::INSTANCE_DB_DRIVER_MYSQL,AppConstants::INSTANCE_DB_DRIVER_MSSQL)) && DbDataRouteServiceDriver::hasOperator($reqKey)){
+                $gotServiceSyntax = true;
+                break;
+            }
+            else{
+                if(array_key_exists($reqKey, $tplRowData)){
+                    $upData[$reqKey] = $reqValue;
+                }
+            }
+        }
+        if($gotServiceSyntax==true){
+            $upData = $reqData;
+        }else{
+            $storeData = array_merge($storeData,$upData);
+        }
+        $optionDb = array(
+            'routeKey'=>$objectLabel,
+        );
+        !empty($option['dbOption']) && $optionDb = array_merge($optionDb,$option['dbOption']);
+
+        switch($option['dbInstance']){
+            case AppConstants::INSTANCE_DB_DRIVER_MYSQL:
+            case AppConstants::INSTANCE_DB_DRIVER_MSSQL:
+                if(in_array($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),array(AppConstants::INSTANCE_DB_DRIVER_MYSQL,AppConstants::INSTANCE_DB_DRIVER_MSSQL))){
+                    !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                }else{
+                    !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName($option['dbInstance']);
+                    //$dbDriverInstance->setRouteKey($this->getObjectName());
+                    $dbDriverInstance->setRouteKey($objectLabel);
+                }
+                if($option['dbInstance']==AppConstants::INSTANCE_DB_DRIVER_MSSQL){
+                    $dbType = DbDataRouteServiceDriver::DBTYPE_MSSQL;
+                }elseif($option['dbInstance']==AppConstants::INSTANCE_DB_DRIVER_MYSQL){
+                    $dbType = DbDataRouteServiceDriver::DBTYPE_MYSQL;
+                }
+
+                if($gotServiceSyntax==TRUE){
+                    $queryFieldStruct = array();
+                    foreach ($upData as $key=>$val){
+                        if(DbDataRouteServiceDriver::hasOperator($key)){
+                            $queryFieldStruct[] = $key . $val;
+                        }else{
+                            $queryFieldStruct[] = $key . ' = '. DbDataRouteServiceDriver::dbEscape($val,$dbType);
+                        }
+                    }
+                }else{
+                    $queryFieldStruct = array();
+                    foreach ($upData as $key=>$val){
+                        $queryFieldStruct[] = $key . ' = '. DbDataRouteServiceDriver::dbEscape($val,$dbType);
+                    }
+                }
+                $queryStruct=array(
+                    'queryField'=>$queryFieldStruct,
+                    'querySchema'=>array($objectLabel, ),
+                    'conditionKey'=>array(
+                        //'id'=>$requestId,
+                    ),
+                );
+                $queryStruct['conditionKey'][$option['idLabel']] = $requestId;
+                $returnData = $dbDriverInstance->queryUpdate($queryStruct,$optionDb);
+                break;
+            case AppConstants::INSTANCE_DB_DRIVER_REDIS:
+                if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_REDIS){
+                    !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                }else{
+                    !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_REDIS);
+                    //$dbDriverInstance->setRouteKey($this->getObjectName());
+                    $dbDriverInstance->setRouteKey($objectLabel);
+                }
+                $objectDbKey = $option['dbPrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                $returnData = $dbDriverInstance->set($objectDbKey,Util::datapack($reqData),$optionDb);
+                break;
+            case AppConstants::INSTANCE_DB_DRIVER_MONGODB:
+            default:
+                $dbName = (isset($optionDb['dbName']) && !empty($optionDb['dbName']))?$optionDb['dbName']:lcfirst($objectLabel);
+                $collectionName = (isset($optionDb['collectionName']) && !empty($optionDb['collectionName']))?$optionDb['collectionName']:lcfirst($objectLabel);
+                if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_MONGODB){
+                    !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                }else{
+                    !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_MONGODB);
+                    $dbDriverInstance->__init(array('routeKey'=>$objectLabel,'dbName'=>$dbName));
+                }
+                $dbOptions = isset($optionDb['options']) && !empty($optionDb['options']) ? $optionDb['options']:array();
+                empty($dbOptions) && $dbOptions = array('safe'=>true,);
+
+                $optionReq = $optionDb;
+                $optionReq['idLabel'] = $option['idLabel'];
+
+                $queryIdCond = array($option['idLabel'] => $requestId);
+                $dbData = $dbDriverInstance->read($queryIdCond,$optionReq);
+                if(empty($dbData)){
+                    // 如果未找到数据时直接返回
+                    return false;
+                }
+                $storeData = array_merge($storeData,$dbData);
+                $setData = array();
+                $gotServiceSyntax = false;
+                foreach ($reqData as $reqKey => $reqValue){
+                    if(MongoDataRouteServiceDriver::isServiceSyntax($reqKey)){
+                        $gotServiceSyntax = true;
+                        break;
+                    }else{
+                        $reqKey!=$option['idLabel'] && array_key_exists($reqKey,$dbData) && $dbData[$reqKey]!==$reqValue && $setData[$reqKey] = $reqValue;
+                    }
+                }
+                $collectionData = $dbDriverInstance->selectCollection($dbName,$collectionName,$optionDb);
+                if($gotServiceSyntax==true){
+                    $setData = $reqData;
+                    $collectionData->update($queryIdCond, $setData,$dbOptions);
+                }else{
+                    if (empty($setData)) {
+                        return FALSE;
+                    }
+                    $collectionData->update($queryIdCond, array('$set' => $setData),$dbOptions);
+                }
+                if($gotServiceSyntax==false){
+                    $storeData = array_merge($storeData,$upData);
+                }
+                break;
+        }
+
+        if($option['setCache']!==false){
+            $optionCache = array(
+                'routeKey'=>$objectLabel,
+            );
+            !empty($option['cacheOption']) && $optionCache = array_merge($optionCache,$option['cacheOption']);
+            if($option['setCache']===true){
+                // 写入缓存
+                switch($option['cacheInstance']){
+                    case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                        if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                        }else{
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                            //$driverInstance->setRouteKey($this->getObjectName());
+                            $cacheDriverInstance->setRouteKey($objectLabel);
+                        }
+                        $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                        $cacheDriverInstance->set($objectCacheKey,Util::datapack($storeData),$option['cacheTtl'],$optionCache);
+                        break;
+                    case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                    default:
+                        if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                        }else{
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                            //$driverInstance->setRouteKey($this->getObjectName());
+                            $cacheDriverInstance->setRouteKey($objectLabel);
+                        }
+                        $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                        $cacheDriverInstance->setex($objectCacheKey,$option['cacheTtl'],Util::datapack($storeData),$optionCache);
+                        break;
+                }
+            }else{
+                //删除cache
+                switch($option['cacheInstance']){
+                    case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                        if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                        }else{
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                            //$driverInstance->setRouteKey($this->getObjectName());
+                            $cacheDriverInstance->setRouteKey($objectLabel);
+                        }
+                        $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                        $cacheDriverInstance->delete($objectCacheKey,0,$optionCache);
+                        break;
+                    case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                    default:
+                        if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                        }else{
+                            !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                            //$driverInstance->setRouteKey($this->getObjectName());
+                            $cacheDriverInstance->setRouteKey($objectLabel);
+                        }
+                        $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                        $cacheDriverInstance->delete($objectCacheKey,$optionCache);
+                        break;
+                }
+            }
+        }
+        return $returnData;
+    }
+
+    /**
+     * 根据数据类型标识、对象ID删除对应对象数据
+     * @param @param string $objectLabel
+     * @param int $requestId
+     * @param array $option
+     * @throws MyRuntimeException
+     * @return array|null
+     */
+    public function _delStructDataById($objectLabel='',$requestId=0,$option=array()){
+        $returnData = array(
+            'db'=>false,
+            'cache'=>false,
+        );
+        $option+=array(
+            'idLabel'=>'id',    // 自定义idlabel （字段名）
+            'dbInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),	// 数据库实例
+            'dbPrefix'=>static::$prefixDb,
+            'dbOption'=>array(
+//                'collectionName' => null,  //指定特定的集合
+//                'dbName' => null,  //指定特定的库名
+//                'options'=>array(),
+            ),// 数据库选项
+            'cacheInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE),	// cache实例类型
+            'setCache'=>null,		// NULL 清空cache | TRUE 写入cache | FALSE 不设定、使用cache
+            'cacheOption'=>array(),// 缓存路由选项
+            'cachePrefix'=>static::$prefixCache,
+            'cacheTtl'=>static::$ttlCache,
+
+        );
+        // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
+        is_numeric($requestId) && $requestId = intval($requestId);
+
+        $optionDb = array(
+            'routeKey'=>$objectLabel,
+        );
+        !empty($option['dbOption']) && $optionDb = array_merge($optionDb,$option['dbOption']);
+
+        switch($option['dbInstance']){
+            case AppConstants::INSTANCE_DB_DRIVER_MYSQL:
+            case AppConstants::INSTANCE_DB_DRIVER_MSSQL:
+                if(in_array($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB),array(AppConstants::INSTANCE_DB_DRIVER_MYSQL,AppConstants::INSTANCE_DB_DRIVER_MSSQL))){
+                    !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                }else{
+                    !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName($option['dbInstance']);
+                    //$dbDriverInstance->setRouteKey($this->getObjectName());
+                    $dbDriverInstance->setRouteKey($objectLabel);
+                }
+                $queryStruct=array(
+                    'querySchema'=>array($objectLabel, ),
+                    'conditionKey'=>array(
+                        $option['idlabel']=>$requestId,
+                    ),
+                );
+                $returnData['db'] = $dbDriverInstance->queryDelete($queryStruct,$optionDb);
+                break;
+            case AppConstants::INSTANCE_DB_DRIVER_REDIS:
+                if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_REDIS){
+                    !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                }else{
+                    !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_REDIS);
+                    //$dbDriverInstance->setRouteKey($this->getObjectName());
+                    $dbDriverInstance->setRouteKey($objectLabel);
+                }
+                $objectDbKey = $option['dbPrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                $returnData['db'] = $dbDriverInstance->delete($objectDbKey,$optionDb);
+                break;
+            case AppConstants::INSTANCE_DB_DRIVER_MONGODB:
+            default:
+                $dbName = (isset($optionDb['dbName']) && !empty($optionDb['dbName']))?$optionDb['dbName']:lcfirst($objectLabel);
+                $collectionName = (isset($optionDb['collectionName']) && !empty($optionDb['collectionName']))?$optionDb['collectionName']:lcfirst($objectLabel);
+                if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_DB)==AppConstants::INSTANCE_DB_DRIVER_MONGODB){
+                    !isset($dbDriverInstance) && $dbDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_DB);
+                }else{
+                    !isset($dbDriverInstance) && $dbDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_DB_DRIVER_MONGODB);
+                    $dbDriverInstance->__init(array('routeKey'=>$objectLabel,'dbName'=>$dbName));
+                }
+                $optionReq = $optionDb;
+                $optionReq['idLabel'] = $option['idLabel'];
+                $returnData['db'] = $dbDriverInstance->delete(array($option['idLabel']=>$requestId),$optionReq);
+                break;
+        }
+
+        if($option['setCache']!==false){
+            $optionCache = array(
+                'routeKey'=>$objectLabel,
+            );
+            switch($option['cacheInstance']){
+                case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData['cache'] = $cacheDriverInstance->delete($objectCacheKey,$optionCache);
+                    break;
+                case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                default:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData['cache'] = $cacheDriverInstance->delete($objectCacheKey,$optionCache);
+                    break;
+            }
+        }
+        return $returnData;
+    }
+
+
+    /**
+     * 根据数据类型标识、对象ID清除对应对象数据缓存
+     * @param @param string $objectLabel
+     * @param int $requestId
+     * @param array $option
+     * @throws MyRuntimeException
+     * @return array|null
+     */
+    public function _clearCacheStructDataById($objectLabel='',$requestId=0,$option=array()){
+        $returnData = array(
+            'cache'=>false,
+        );
+        $option+=array(
+            'idLabel'=>'id',    // 自定义idlabel （字段名）
+            'cacheInstance'=>$this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE),	// cache实例类型
+            'setCache'=>null,		// NULL 清空cache | TRUE 写入cache | FALSE 不设定、使用cache
+            'cacheOption'=>array(),// 缓存路由选项
+            'cachePrefix'=>static::$prefixCache,
+            'cacheTtl'=>static::$ttlCache,
+
+        );
+        // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
+        is_numeric($requestId) && $requestId = intval($requestId);
+
+        if($option['setCache']!==false){
+            $optionCache = array(
+                'routeKey'=>$objectLabel,
+            );
+            switch($option['cacheInstance']){
+                case AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_MEMCACHE);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData['cache'] = $cacheDriverInstance->delete($objectCacheKey,$optionCache);
+                    break;
+                case AppConstants::INSTANCE_CACHE_DRIVER_REDIS:
+                default:
+                    if($this->getInstanceTypeDriverName(AppConstants::INSTANCE_TYPE_CACHE)==AppConstants::INSTANCE_CACHE_DRIVER_REDIS){
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = $this->getSetInstanceTypeDriverInstance(AppConstants::INSTANCE_TYPE_CACHE);
+                    }else{
+                        !isset($cacheDriverInstance) && $cacheDriverInstance = self::initDriverInstanceByName(AppConstants::INSTANCE_CACHE_DRIVER_REDIS);
+                        //$driverInstance->setRouteKey($this->getObjectName());
+                        $cacheDriverInstance->setRouteKey($objectLabel);
+                    }
+                    $objectCacheKey = $option['cachePrefix'].$objectLabel.AppConstants::KEYSEP.$requestId;
+                    $returnData['cache'] = $cacheDriverInstance->delete($objectCacheKey,$optionCache);
                     break;
             }
         }
