@@ -448,6 +448,148 @@ abstract class BaseAppPackage implements PackageInterface {
 
 
     /**
+     * 根据ID列表批量获取数据
+     * @param string $objectLabel
+     * @param array $requestIds
+     * @param array $option
+     * @throws MyRuntimeException
+     * @return Ambigous <NULL, mixed, multitype:, array>
+     */
+    protected function _getMultiDataByIds($objectLabel='',$requestIds=array(),$option=array()){
+        $retDataStruct = array();
+        $returnData = NULL;
+        $option+=array(
+            'collectionName' => NULL,  //指定特定的集合
+            'dbName' => NULL,  //指定特定的库名
+            'dbInstance'=>static::$dbInstanceType,	// 数据库实例
+            'logObject'=>FALSE,		// 记录对象状态
+            'useCache'=>TRUE,		// 从cache读取
+            'setCache'=>TRUE,		// 写回cache
+            'cacheInstance'=>static::$cacheInstanceType,	// cache实例类型(mem: memcache服务| redis: redis服务)
+            'cachePrefix'=>static::$cachePrefix,
+            'dbPrefix'=>static::$dbPrefix,
+            'options'=>array(),
+            'rowRouteDict'=>NULL,           // 行级路由字典
+            'trimEmpty'=>TRUE,
+            'noshards'=>FALSE,
+        );
+
+        $optionCache = array(
+            'objectName'=>$objectLabel,
+            'modLabel'=>$objectLabel,
+        );
+        $optionData = array(
+            'objectName'=>$objectLabel,
+            //'dbName'=>$objectLabel,
+        );
+
+        !empty($option['dbName']) && $optionData['dbName'] = $option['dbName'];
+        $collectionName = !empty($option['collectionName']) ? $option['collectionName'] : $objectLabel;
+        !empty($option['collectionName']) && $optionData['collectionName'] = $option['collectionName'];
+        !empty($option['collectionName']) && $optionData['collection'] = $option['collectionName'];
+
+
+        // @FIXME 暂时只支持固定类型
+        // @notice 功能有限制
+        // @TODO 需要跟进实现各个instance模式的实现
+
+        // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
+        if(empty($requestIds)){
+            return array($this->getDataObjectTemplateByLabel($objectLabel));
+        }
+        $requestIds = array_map('intval', $requestIds);
+        $requestIds = array_unique($requestIds,SORT_NUMERIC);
+        $gotIdMap = array();
+        $missIdMap = array();
+
+
+        if($option['trimEmpty']==FALSE){
+            foreach ($requestIds as $requestId){
+                $retDataStruct[$requestId] = NULL;
+            }
+        }
+
+        if($option['useCache']==TRUE){
+            $cachekeys = array();
+            foreach ($requestIds as $requestId){
+                $cachekeys [$requestId]= $option['cachePrefix'].$objectLabel.KEYSEP.$requestId;
+            }
+            foreach ($requestIds as $requestId){
+                if(!isset($gotIdMap[$requestId])){
+                    $routeSetCache = array(
+                        'key'=>$requestId,
+                    );
+                    $cacheDataStruct = $this->redisService->getMultiData($cachekeys,$optionCache);
+                    if(!empty($cacheDataStruct)){
+                        foreach ($cacheDataStruct as $cachekeyId=>$resRow){
+                            $rowid = substr($cachekeyId, strlen($option['cachePrefix'].$objectLabel.KEYSEP));
+                            $resRow !== FALSE && $resRow = util::dataunpack($resRow);
+                            if(!empty($resRow)){
+                                $retDataStruct[$rowid] = $resRow;
+                                $gotIdMap[$rowid] = $rowid;
+                                unset($cachekeys[$rowid]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($requestIds as $requestId){
+            if(!isset($gotIdMap[$requestId])){
+                $missIdMap[$requestId] = $requestId;
+            }
+        }
+        if(!empty($missIdMap)){
+            asort($missIdMap);
+            if ($option['noshards']) {
+                $rowOptionData = $optionData;
+                $queryStruct=array(
+                    'querySchema'=>array($objectLabel, ),
+                    'conditionIn'=>array(
+                        'id'=>array_values($missIdMap),
+                    ),
+                );
+                $resAssoc = $this->mongoService->queryAssoc($queryStruct,$rowOptionData);
+                if(!empty($resAssoc)){
+                    foreach($resAssoc as $line=>$resRow){
+                        if(!empty($resRow)){
+                            if(isset($missIdMap[$resRow['id']])){
+                                $retDataStruct[$resRow['id']] = $resRow;
+                            }
+                        }
+                    }
+                }
+            } else {
+                foreach($missIdMap as $requestId){
+                    $routeSetData = array(
+                        'id'=>$requestId,
+                    );
+                    $rowOptionData = $optionData;
+                    $rowOptionData['routeSet'] = $routeSetData;
+                    $queryStruct=array(
+                        'querySchema'=>array($objectLabel, ),
+                        'conditionIn'=>array(
+                            'id'=>array_values($missIdMap),
+                        ),
+                    );
+                    $resAssoc = $this->mongoService->queryAssoc($queryStruct,$rowOptionData);
+                    if(!empty($resAssoc)){
+                        foreach($resAssoc as $line=>$resRow){
+                            if(!empty($resRow)){
+                                if(isset($missIdMap[$resRow['id']])){
+                                    $retDataStruct[$resRow['id']] = $resRow;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $retDataStruct;
+    }
+
+    /**
      * 根据数据类型标识、对象ID获取对应对象数据
      * @param @param string $objectLabel
      * @param int $requestId
