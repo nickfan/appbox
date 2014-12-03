@@ -39,6 +39,10 @@ abstract class BaseDataObject implements ArrayAccess,Serializable,IteratorAggreg
     const ENCODER_MSGPACK = 'msgpack';
     const ENCODER_SERIALIZE = 'serialize';
 
+    const DO_VERSION_PROP = '_version';
+
+    const DO_VERSION = '0';
+
     protected static $dataEncoder = self::ENCODER_SERIALIZE;
     protected static $strictMode = true;
 
@@ -74,7 +78,7 @@ abstract class BaseDataObject implements ArrayAccess,Serializable,IteratorAggreg
         '_version'=>array(
             'key'=>self::KEYTYPE_NONE,          // keytype
             'type'=>self::TYPE_STRING,          // prop var type
-            'default'=>'0',                      // default value
+            'default'=>self::DO_VERSION,                      // default value
             'length'=>null,                     // data length limit
             'enabled'=>false,                   // enable this field
         ),

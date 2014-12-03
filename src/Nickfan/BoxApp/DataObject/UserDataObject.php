@@ -19,6 +19,8 @@ namespace Nickfan\BoxApp\DataObject;
 use Nickfan\AppBox\DataObject\BaseDataObject;
 
 class UserDataObject extends BaseDataObject {
+    const DO_VERSION = '20140702';            // 版本号
+
     const USER_GENDER_UNKNOWN = 0; //用户性别 未知/保密
     const USER_GENDER_MALE = 1; //用户性别 男
     const USER_GENDER_FEMALE = 2; //用户性别 女
@@ -56,7 +58,7 @@ class UserDataObject extends BaseDataObject {
         '_version'=>array(
             'key'=>self::KEYTYPE_NONE,          // keytype
             'type'=>self::TYPE_STRING,          // prop var type
-            'default'=>'20140702',              // default value
+            'default'=>self::DO_VERSION,              // default value
             'length'=>null,                     // data length limit
             'enabled'=>false,                   // enable this field
         ),
