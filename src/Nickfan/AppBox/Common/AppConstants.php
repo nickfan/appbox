@@ -27,6 +27,13 @@ class AppConstants {
     const DATAROUTE_MODE_IDSET = 1; // dataroute mode by routeIdSet
     const DATAROUTE_MODE_DIRECT = 3; // dataroute mode by directsettings
 
+    /**
+     * 分隔符
+     */
+    const KEYSEP = ':';         // 键分隔符
+    const VALSEP = ',';         // 值分隔符
+    const DATASEP = '|';         // 数据分隔符
+    const NAMESEP = '_';         // 名称分隔符
 
     /**
      * 实例类型

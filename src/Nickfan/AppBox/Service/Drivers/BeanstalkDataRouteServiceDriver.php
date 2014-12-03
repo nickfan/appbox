@@ -23,6 +23,13 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
 
     //protected static $driverKey = 'beanstalk';
 
+    protected static function encodeData($srcData){
+        return msgpack_pack($srcData);
+
+    }
+    protected static function decodeData($encodedData=''){
+        return msgpack_unpack($encodedData);
+    }
     public function statsTube($tubeName='default', $option = array(), $vendorInstance = null) {
         $option += array();
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
@@ -34,7 +41,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
     }
 
 
-    public function watchTube($tubeName='default', $option = array(), $vendorInstance = null) {
+    public function watchOnly($tubeName='default', $option = array(), $vendorInstance = null) {
         $option += array();
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
@@ -69,7 +76,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
             //var_dump($job);
             if($job){
                 if($option['decode']==TRUE){
-                    $arg= msgpack_unpack($job->getData());
+                    $arg= self::decodeData($job->getData());
                 }else{
                     $arg= $job->getData();
                 }
@@ -102,7 +109,6 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      */
     public function putJob($jobData=null,$tubeName='default', $option = array(), $vendorInstance = null){
         $option += array(
-            'objectName'=> $this->objectName,
             'encode'=> TRUE,
         );
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
@@ -111,7 +117,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
             array('key' => $tubeName,)
         );
         $vendorInstance->useTube($tubeName)
-            ->put($option['encode']==TRUE?msgpack_pack($jobData):$jobData);
+            ->put($option['encode']==TRUE?self::encodeData($jobData):$jobData);
     }
 
 
@@ -120,7 +126,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      * @param string $tubeName
      * @param array $option
      */
-    public function getJobData($tubeName='default',$option=array(), $vendorInstance=NULL){
+    public function getJobData($tubeName='default',$option=array(), $vendorInstance=null){
         $option += array(
             'decode'=> TRUE,
         );
@@ -137,7 +143,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
         }
         if($job){
             if($option['decode']==TRUE){
-                return msgpack_unpack($job->getData());
+                return self::decodeData($job->getData());
             }else{
                 return $job->getData();
             }
@@ -151,8 +157,9 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      * @param string $tubeName
      * @param array $option
      */
-    public function getJob($tubeName='default',$option=array(), $vendorInstance=NULL){
+    public function getJob($tubeName='default',$option=array(), $vendorInstance=null){
         $option += array(
+            'ignore'=>'default',
         );
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
             $option,
@@ -161,7 +168,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
         );
 
         if($tubeName!='default'){
-            $job = $vendorInstance->watch($tubeName)->ignore('default')->reserve();
+            $job = $vendorInstance->watch($tubeName)->ignore($option['ignore'])->reserve();
         }else{
             $job = $vendorInstance->watch($tubeName)->reserve();
         }
@@ -174,7 +181,7 @@ class BeanstalkDataRouteServiceDriver extends BaseDataRouteServiceDriver impleme
      * @param string $tubeName
      * @param array $option
      */
-    public function delJob($job,$tubeName='default',$option=array(), $vendorInstance=NULL){
+    public function delJob($job,$tubeName='default',$option=array(), $vendorInstance=null){
         $option += array(
         );
         list($vendorInstance, $option) = $this->getVendorInstanceSet(
