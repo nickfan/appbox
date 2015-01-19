@@ -11,7 +11,7 @@
  *
  */
 
-$app = require_once '../bootstrap/bootstrap.php';
+require_once '../bootstrap/initenv.php';
 
 
 $inst = \Nickfan\BoxApp\Dispatcher\MyDispatcher::getInstance($app);
