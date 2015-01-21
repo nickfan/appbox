@@ -44,24 +44,24 @@ abstract class BoxBaseRouteServiceDriver implements BoxRouteServiceDriverInterfa
     }
 
     /**
-     * @param BoxRouteInstance $instDataRouteInstance
+     * @param BoxRouteInstance $instBoxRouteInstance
      * @param null $driverKey
      * @return mixed
      */
     public static function factory(
-        BoxRouteInstanceInterface $instDataRouteInstance,
+        BoxRouteInstanceInterface $instBoxRouteInstance,
         $driverKey = null
     ) {
 //        if (null === static::$instance) {
-//            static::$instance = new static($instDataRouteInstance,$driverKey);
+//            static::$instance = new static($instBoxRouteInstance,$driverKey);
 //        }
 //        return static::$instance;
         $className = get_called_class();
-        return new $className($instDataRouteInstance, $driverKey);
+        return new $className($instBoxRouteInstance, $driverKey);
     }
 
     protected function __construct(
-        BoxRouteInstanceInterface $instDataRouteInstance,
+        BoxRouteInstanceInterface $instBoxRouteInstance,
         $driverKey = null
     ) {
         if (is_null($driverKey) && is_null($this->driverKey)) {
@@ -74,7 +74,7 @@ abstract class BoxBaseRouteServiceDriver implements BoxRouteServiceDriverInterfa
             }
             $this->driverKey = $driverKey;
         }
-        self::$routeInstance = $instDataRouteInstance;
+        self::$routeInstance = $instBoxRouteInstance;
         $this->__init();
         return $this;
     }
@@ -85,12 +85,12 @@ abstract class BoxBaseRouteServiceDriver implements BoxRouteServiceDriverInterfa
         );
         $this->setRouteKey($params['routeKey']);
     }
-    public function getDataRouteInstance() {
+    public function getBoxRouteInstance() {
         return self::$routeInstance;
     }
 
-    public function setDataRouteInstance(BoxRouteInstanceInterface $instDataRouteInstance) {
-        self::$routeInstance = $instDataRouteInstance;
+    public function setBoxRouteInstance(BoxRouteInstanceInterface $instBoxRouteInstance) {
+        self::$routeInstance = $instBoxRouteInstance;
     }
 
     public function getDriverKey() {

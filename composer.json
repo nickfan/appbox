@@ -38,6 +38,13 @@
             "Nickfan\\BoxApp": "src/",
             "Nickfan\\AppBox": "src/"
         },
+        "classmap": [
+            "app/boxcommands",
+            "app/boxcontrollers",
+            "app/boxdispatchers",
+            "app/boxobjects",
+            "app/boxpackages"
+        ],
         "files": [
         ]
     }

@@ -99,7 +99,7 @@ class BoxRouteInstance implements BoxRouteInstanceInterface {
         if ($dataRouteInstance !== false) {
             return $dataRouteInstance;
         }
-        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'DataRouteInstanceDriver';
+        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'BoxRouteInstanceDriver';
 
         if (class_exists($driverClassName)) {
             $settings = self::$routeConf->getRouteConfByRouteConfKeySet($driverKey, $routeIdSet);
@@ -195,7 +195,7 @@ class BoxRouteInstance implements BoxRouteInstanceInterface {
         if ($dataRouteInstance !== false) {
             return $dataRouteInstance;
         }
-        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'DataRouteInstanceDriver';
+        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'BoxRouteInstanceDriver';
 
         if (class_exists($driverClassName)) {
             $settings = self::$routeConf->getRouteConfByRouteConfKeySet($driverKey, $routeIdSet);
@@ -250,7 +250,7 @@ class BoxRouteInstance implements BoxRouteInstanceInterface {
     ) {
         $driverKey = lcfirst($driverKey);
         $driverName = ucfirst($driverKey);
-        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'DataRouteInstanceDriver';
+        $driverClassName = '\\Nickfan\\AppBox\\Instance\\Drivers\\' . $driverName . 'BoxRouteInstanceDriver';
 
         if (class_exists($driverClassName)) {
             $driverClassInstance = new $driverClassName($settings, $routeIdSet);
@@ -328,9 +328,9 @@ class BoxRouteInstance implements BoxRouteInstanceInterface {
         if (!empty(self::$instancePools)) {
             foreach (self::$instancePools as $driverKey => $driverRouteInstancePools) {
                 if (!empty($driverRouteInstancePools)) {
-                    foreach ($driverRouteInstancePools as $routeKey => $groupDataRouteInstances) {
-                        if (!empty($groupDataRouteInstances)) {
-                            foreach ($groupDataRouteInstances as $group => $dataRouteInstance) {
+                    foreach ($driverRouteInstancePools as $routeKey => $groupBoxRouteInstances) {
+                        if (!empty($groupBoxRouteInstances)) {
+                            foreach ($groupBoxRouteInstances as $group => $dataRouteInstance) {
                                 if ($dataRouteInstance) {
                                     $dataRouteInstance->close();
                                 }

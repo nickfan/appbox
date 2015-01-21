@@ -1,0 +1,88 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Description
+ *
+ * @project appbox
+ * @package 
+ * @author nickfan<nickfan81@gmail.com>
+ * @link http://www.axiong.me
+ * @version $Id$
+ * @lastmodified: 2015-01-21 15:18
+ *
+ */
+
+if(!function_exists('getPathDataIteratorObject')){
+    /**
+     * 获取路径数据的迭代对象
+     * @param string $dataDirPath
+     * @param string $filterRegx
+     * @return RegexIterator
+     *
+     * @example
+     * 帖子附件
+     * $filterRegx = '/^.+\/d('.$queryDataId.')\.([0-9]+)\.(.+)\.bin$/i';
+     * 用户头像
+     * $filterRegx = '/^.+\/u('.$queryDataId.')\.(photo(?:_s|_m|_l|))\.pic\.bin$/i';
+     * 用户签名
+     * $filterRegx = '/^.+\/u('.$queryDataId.')\.(sign(?:[0-9a-z_]+|))\.pic\.bin$/i';
+     * 用户附件
+     * $filterRegx = '/^.+\/u('.$queryDataId.')_(.+)\.up$/i';
+     */
+    function getPathDataIteratorObject($dataDirPath = '', $filterRegx = ''){
+        return new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dataDirPath,FilesystemIterator::SKIP_DOTS)),$filterRegx, RecursiveRegexIterator::GET_MATCH);
+    }
+}
+
+if(!function_exists('genArrayFile')){
+    /**
+     * 函数说明: 把数组数据转化为实体代码存储的文件
+     * @author      樊振兴(nick)<nickfan81@gmail.com>
+     * @history
+     *              2006-08-25 樊振兴 添加了本方法
+     * @param       array array 数组数据
+     * @param       string $filePath 新数组文件的路径
+     * @return      bool(true)
+     */
+    function genArrayFile($array,$filePath){
+        return @file_put_contents($filePath, "<?php\n" . 'return '  . var_export($array, true) . ";\n")>0;
+    }
+
+}
+
+
+$mode=isset($argv[1])?$argv[1]:'fromjson';
+
+$dsnbasepath = isset($argv[2])?$argv[2]:'';
+if(empty($dsnbasepath)){
+    $confbasepath = dirname(dirname(__DIR__)).'app/data/etc/local';
+    $dsnbasepath = $confbasepath.'/dsn';
+}
+
+
+
+if($mode=='tojson'){
+    $suffix = '.php';
+    $filterRegx = '/^.+\/(.+)'.$suffix.'/i';
+    $srcFileObjects = getPathDataIteratorObject($dsnbasepath,$filterRegx);
+    if(!empty($srcFileObjects)){
+        foreach ($srcFileObjects as $srcFilePath =>$srcFileObjectRow) {
+            $rowbasename = basename($srcFilePath,$suffix);
+            $data = include($srcFilePath);
+            file_put_contents($dsnbasepath.'/'.$rowbasename.'.json',json_encode($data,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+        echo 'done.'.PHP_EOL;
+    }
+}else{
+    $suffix = '.json';
+    $filterRegx = '/^.+\/(.+)'.$suffix.'/i';
+    $srcFileObjects = getPathDataIteratorObject($dsnbasepath,$filterRegx);
+    if(!empty($srcFileObjects)){
+        foreach ($srcFileObjects as $srcFilePath =>$srcFileObjectRow) {
+            $rowbasename = basename($srcFilePath,$suffix);
+            $data = json_decode(file_get_contents($srcFilePath),true);
+            genArrayFile($data,$dsnbasepath.'/'.$rowbasename.'.php');
+        }
+        echo 'done.'.PHP_EOL;
+    }
+}

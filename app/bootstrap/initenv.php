@@ -13,15 +13,8 @@
 
 require_once __DIR__.'/autoload.php';
 
-!defined('APPBOX_PATH_BASE') && define('APPBOX_PATH_BASE',dirname(dirname(__DIR__)));
-!defined('APPBOX_PATH_APP') && define('APPBOX_PATH_APP',APPBOX_PATH_BASE.'/app');
-!defined('APPBOX_PATH_DATA') && define('APPBOX_PATH_DATA',APPBOX_PATH_APP.'/data');
-!defined('APPBOX_PATH_WEB') && define('APPBOX_PATH_WEB',APPBOX_PATH_APP.'/webroot');
-
-use Pimple\Container;
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
-use Nickfan\AppBox\Common\Usercache\YacBoxBaseUsercache;
-use Nickfan\AppBox\Common\Usercache\NullBoxBaseUsercache;
+use Nickfan\AppBox\Foundation\AppBox;
+use Nickfan\AppBox\Foundation\BoxSettings;
 use Nickfan\AppBox\Config\BoxRepository;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
@@ -30,38 +23,25 @@ if(!function_exists('appbox')){
     function appbox(){
         static $app;
         if(empty($app)){
-            $app = new Container();
-
-            $app['path'] = array(
-                'base'=>APPBOX_PATH_BASE,
-                'app'=>APPBOX_PATH_APP,
-                'storage'=>APPBOX_PATH_DATA,
-                'public'=>APPBOX_PATH_WEB,
-            );
-
-            $app['path.base']= $app['path']['base'];
-            $app['path.app']= $app['path']['app'];
-            $app['path.storage']= $app['path']['storage'];
-            $app['path.public']= $app['path']['public'];
-            $userCacheObject = null;
-            if(extension_loaded('apc')){
-                $userCacheObject = new ApcBoxBaseUsercache;
-            }elseif(extension_loaded('yac')){
-                $userCacheObject = new YacBoxBaseUsercache;
-            }else{
-                $userCacheObject = new NullBoxBaseUsercache;
-            }
-            $app['usercache'] = $userCacheObject;
-
-            $app['config'] = function ($app) {
-                return new BoxRepository($app['usercache'],$app['path.storage'].'/conf');
-            };
-            $app['datarouteconf'] = function ($app) {
-                return new BoxRouteConf($app['usercache'],$app['path.storage'].'/etc/local');
-            };
-            $app['datarouteinstance'] = function ($app) {
-                return BoxRouteInstance::getInstance($app['datarouteconf']);
-            };
+            AppBox::instSettings(BoxSettings::factory(array(
+                'path' => AppBox::buildRealPaths(require( __DIR__ . '/paths.php')),
+            )));
+            AppBox::init(function(){
+                $paths = AppBox::getInstSetVar('path');
+                $app = AppBox::app();
+                $app['usercache'] = AppBox::makeUserCacheInstance();
+                $app['conf'] = function ($app,$paths) {
+                    return new BoxRepository($paths['conf'],$app['usercache']);
+                };
+                $app['routeconf'] = function ($app,$paths) {
+                    return new BoxRouteConf($paths['routeconf'],$app['usercache']);
+                };
+                $app['routeinst'] = function ($app) {
+                    return BoxRouteInstance::getInstance($app['routeconf']);
+                };
+                return $app;
+            });
+            $app = AppBox::box();
         }
         return $app;
     }

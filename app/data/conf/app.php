@@ -89,8 +89,8 @@ return array(
         'ClassLoader' => 'Nickfan\AppBox\Support\ClassLoader',
         'App' => 'Nickfan\AppBox\Support\Facades\App',
         'Config' => 'Nickfan\AppBox\Support\Facades\Config',
-        'DataRouteConf' => 'Nickfan\AppBox\Support\Facades\DataRouteConf',
-        'DataRouteInstance' => 'Nickfan\AppBox\Support\Facades\DataRouteInstance',
+        'BoxRouteConf' => 'Nickfan\AppBox\Support\Facades\BoxRouteConf',
+        'BoxRouteInstance' => 'Nickfan\AppBox\Support\Facades\BoxRouteInstance',
     ),
 
 );

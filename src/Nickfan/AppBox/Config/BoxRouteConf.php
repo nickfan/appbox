@@ -54,13 +54,13 @@ class BoxRouteConf implements ArrayAccess {
     /**
      * Create a new configuration repository.
      *
-     * @param  \Nickfan\AppBox\Common\Usercache\BoxUsercacheInterface $userCacheObj
      * @param  string $includePath
+     * @param  \Nickfan\AppBox\Common\Usercache\BoxUsercacheInterface $userCacheObj
      * @return void
      */
-    public function __construct(BoxUsercacheInterface $userCacheObj = null, $includePath = '') {
-        $this->userCacheObj = $userCacheObj;
+    public function __construct($includePath = '',BoxUsercacheInterface $userCacheObj = null) {
         $this->includePath = $includePath;
+        $this->userCacheObj = $userCacheObj;
     }
 
     public static function getVersion() {
@@ -431,9 +431,39 @@ class BoxRouteConf implements ArrayAccess {
     public function fileLoadConf($driver, $includePath = '') {
         $items = array();
 
-        // First we'll get the root configuration path for the environment which is
-        // where all of the configuration files live for that namespace, as well
-        // as any environment folders with their specific configuration items.
+        if (!empty($includePath)) {
+            $this->includePath = $includePath;
+        }
+        $path = $this->includePath;
+
+
+        if (is_null($path)) {
+            return $items;
+        }
+
+        // First we'll get the main configuration file for the groups. Once we have
+        // that we can check for any environment specific files, which will get
+        // merged on top of the main arrays to make the environments cascade.
+        $file = "{$path}/dsn/{$driver}.php";
+
+        if (file_exists($file)) {
+            $items = $this->fileGetRequire($file);
+        }
+        return $items;
+    }
+
+
+    /**
+     * Load the given configuration group.
+     *
+     * @param  string $environment
+     * @param  string $driver
+     * @param  string $namespace
+     * @return array
+     */
+    public function fileLoadJson($driver, $includePath = '') {
+        $items = array();
+
         if (!empty($includePath)) {
             $this->includePath = $includePath;
         }

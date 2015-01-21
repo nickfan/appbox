@@ -41,13 +41,13 @@ class BoxRepository implements ArrayAccess {
     /**
      * Create a new configuration repository.
      *
-     * @param  \Nickfan\AppBox\Common\Usercache\BoxUsercacheInterface $userCacheObj
      * @param  string $includePath
+     * @param  \Nickfan\AppBox\Common\Usercache\BoxUsercacheInterface | null $userCacheObj
      * @return void
      */
-    public function __construct(BoxUsercacheInterface $userCacheObj = null, $includePath = '') {
-        $this->userCacheObj = $userCacheObj;
+    public function __construct($includePath = '',BoxUsercacheInterface $userCacheObj = null) {
         $this->includePath = $includePath;
+        $this->userCacheObj = $userCacheObj;
     }
 
     public static function getVersion() {

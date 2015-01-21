@@ -21,10 +21,16 @@ $getopt = new Getopt(array(
     new Option('v', 'verbose'),
     new Option('h', 'help'),
     new Option(null, 'version'),
-    (new Option('s', 'service', Getopt::OPTIONAL_ARGUMENT))
-        ->setDescription('run appbox in service mode'),
-    (new Option('d', 'daemon', Getopt::OPTIONAL_ARGUMENT))
-        ->setDescription('run appbox as a daemon process'),
+    (new Option('p', 'port', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('run appbox in serve mode @ port')
+        ->setDefaultValue('8000')
+        ->setValidation(function($value) {
+            return is_numeric($value);
+        }),
+    (new Option(null, 'serve', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('run appbox in serve mode'),
+//    (new Option('d', 'daemon', Getopt::OPTIONAL_ARGUMENT))
+//        ->setDescription('run appbox as a daemon process'),
     (new Option('r', 'rcbasepath', Getopt::OPTIONAL_ARGUMENT))
     ->setDescription('route config files base path contain dsn and route config files')
     ->setDefaultValue('./app/data/etc/local')
@@ -51,9 +57,9 @@ $getopt = new Getopt(array(
             }
             return false;
         }),
-    (new Option('a', 'appsrcpath', Getopt::OPTIONAL_ARGUMENT))
+    (new Option('a', 'apppath', Getopt::OPTIONAL_ARGUMENT))
     ->setDescription('application programs source files base path')
-    ->setDefaultValue('./src')
+    ->setDefaultValue('./app')
     ->setValidation(function($value) {
             $realpath = realpath($value);
             if(file_exists($realpath) && is_dir($realpath)){
@@ -74,6 +80,15 @@ try {
         echo $getopt->getHelpText();
         exit(0);
     }
+
+    !isset($app) && $app = \Nickfan\AppBox\Foundation\AppBox::box();
+    if ($getopt['confpath']) {
+        \Nickfan\AppBox\Foundation\AppBox::setRepositoryPath($getopt['confpath']);
+    }
+    if ($getopt['rcbasepath']) {
+        \Nickfan\AppBox\Foundation\AppBox::setRouteConfPath($getopt['rcbasepath']);
+    }
+
     if(count($operands)<1){
 
         try{
