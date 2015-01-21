@@ -13,10 +13,10 @@
 
 require_once __DIR__.'/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Config\DataRouteConf;
-use Nickfan\AppBox\Common\Usercache\ApcUsercache;
+use Nickfan\AppBox\Config\BoxRouteConf;
+use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
 
-$instDataRouteConf = new DataRouteConf(new ApcUsercache(),$app['path.storage'].'/etc/local');
+$instDataRouteConf = new BoxRouteConf(new ApcBoxBaseUsercache(),$app['path.storage'].'/etc/local');
 
 
 $clearResult = $instDataRouteConf->cacheFlush();var_dump($clearResult);

@@ -16,9 +16,9 @@
 namespace Nickfan\BoxApp\DataObject;
 
 
-use Nickfan\AppBox\DataObject\BaseDataObject;
+use Nickfan\AppBox\DataObject\BoxObject;
 
-class AccountDataObject extends BaseDataObject {
+class AccountObject extends BoxObject {
     const DO_VERSION = '20140702';            // 版本号
 
     const ACCOUNT_PASSSTATUS_NOTSET = 0;     //  本地密码状态,未激活/未启用

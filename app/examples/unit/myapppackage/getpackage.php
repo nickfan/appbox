@@ -13,18 +13,18 @@
 
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Common\Usercache\ApcUsercache;
-use Nickfan\AppBox\Config\DataRouteConf;
-use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Config\BoxRouteConf;
+use Nickfan\AppBox\Instance\BoxRouteInstance;
 
-use Nickfan\BoxApp\Package\UserPackage;
-use Nickfan\BoxApp\Package\DummyPackage;
+use Nickfan\BoxApp\Package\UserBasePackage;
+use Nickfan\BoxApp\Package\DummyBasePackage;
 
-$instDataRouteInstance = DataRouteInstance::getInstance(new DataRouteConf(new ApcUsercache(), $app['path.storage'] . '/etc/local'));
+$instDataRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxBaseUsercache(), $app['path.storage'] . '/etc/local'));
 //var_dump($instDataRouteInstance);
 //exit;
-$instUserPackage = UserPackage::getInstance($instDataRouteInstance);
-$instDummyPackage = DummyPackage::getInstance($instDataRouteInstance);
+$instUserPackage = UserBasePackage::getInstance($instDataRouteInstance);
+$instDummyPackage = DummyBasePackage::getInstance($instDataRouteInstance);
 
 var_dump($instUserPackage->getObjectName());
 var_dump($instUserPackage->getDefaultNamespace());

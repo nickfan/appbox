@@ -19,12 +19,12 @@ require_once __DIR__.'/autoload.php';
 !defined('APPBOX_PATH_WEB') && define('APPBOX_PATH_WEB',APPBOX_PATH_APP.'/webroot');
 
 use Pimple\Container;
-use Nickfan\AppBox\Common\Usercache\ApcUsercache;
-use Nickfan\AppBox\Common\Usercache\YacUsercache;
-use Nickfan\AppBox\Common\Usercache\NullUsercache;
-use Nickfan\AppBox\Config\Repository;
-use Nickfan\AppBox\Config\DataRouteConf;
-use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\YacBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\NullBoxBaseUsercache;
+use Nickfan\AppBox\Config\BoxRepository;
+use Nickfan\AppBox\Config\BoxRouteConf;
+use Nickfan\AppBox\Instance\BoxRouteInstance;
 
 if(!function_exists('appbox')){
     function appbox(){
@@ -45,22 +45,22 @@ if(!function_exists('appbox')){
             $app['path.public']= $app['path']['public'];
             $userCacheObject = null;
             if(extension_loaded('apc')){
-                $userCacheObject = new ApcUsercache;
+                $userCacheObject = new ApcBoxBaseUsercache;
             }elseif(extension_loaded('yac')){
-                $userCacheObject = new YacUsercache;
+                $userCacheObject = new YacBoxBaseUsercache;
             }else{
-                $userCacheObject = new NullUsercache;
+                $userCacheObject = new NullBoxBaseUsercache;
             }
             $app['usercache'] = $userCacheObject;
 
             $app['config'] = function ($app) {
-                return new Repository($app['usercache'],$app['path.storage'].'/conf');
+                return new BoxRepository($app['usercache'],$app['path.storage'].'/conf');
             };
             $app['datarouteconf'] = function ($app) {
-                return new DataRouteConf($app['usercache'],$app['path.storage'].'/etc/local');
+                return new BoxRouteConf($app['usercache'],$app['path.storage'].'/etc/local');
             };
             $app['datarouteinstance'] = function ($app) {
-                return DataRouteInstance::getInstance($app['datarouteconf']);
+                return BoxRouteInstance::getInstance($app['datarouteconf']);
             };
         }
         return $app;

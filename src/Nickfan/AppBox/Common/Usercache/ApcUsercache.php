@@ -15,7 +15,7 @@
 namespace Nickfan\AppBox\Common\Usercache;
 
 
-class ApcUsercache extends BaseUsercache implements UsercacheInterface {
+class ApcBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
 
     public function get($key, $option = array()) {
         $option += array(

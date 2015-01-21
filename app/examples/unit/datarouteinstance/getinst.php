@@ -13,11 +13,11 @@
 
 require_once __DIR__.'/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Common\Usercache\ApcUsercache;
-use Nickfan\AppBox\Config\DataRouteConf;
-use Nickfan\AppBox\Instance\DataRouteInstance;
+use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Config\BoxRouteConf;
+use Nickfan\AppBox\Instance\BoxRouteInstance;
 
-$instDataRouteInstance = DataRouteInstance::getInstance(new DataRouteConf(new ApcUsercache(),$app['path.storage'].'/etc/local'));
+$instDataRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxBaseUsercache(),$app['path.storage'].'/etc/local'));
 
 
 $routeInstance = $instDataRouteInstance->getRouteInstance('cfg','mygroup',array('id'=>3));

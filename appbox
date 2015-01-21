@@ -67,7 +67,7 @@ try {
     $getopt->parse();
     $operands = $getopt->getOperands();
     if ($getopt['version']) {
-        echo \Nickfan\AppBox\Common\AppConstants::VERSION.PHP_EOL;
+        echo \Nickfan\AppBox\Common\BoxConstants::VERSION.PHP_EOL;
         exit(0);
     }
     if ($getopt['help']) {

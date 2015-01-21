@@ -23,7 +23,7 @@ class Index extends AbstractController{
         echo 'helloworld';
         $confDict = Config::get('common.itemPerPages');
         var_dump($confDict);
-        //$clearResult = DataRouteConf::cacheFlush();var_dump($clearResult);
+        //$clearResult = BoxRouteConf::cacheFlush();var_dump($clearResult);
         $routeConfKeys = DataRouteConf::getRouteConfSubKeys('redis','mygroup');
         var_dump($routeConfKeys);
         $routeConf = DataRouteConf::getRouteConfByScript('redis','mygroup',array('id'=>3));

@@ -15,7 +15,7 @@
 namespace Nickfan\AppBox\Common\Usercache;
 
 
-class YacUsercache extends BaseUsercache implements UsercacheInterface {
+class YacBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
 
     protected function getInstance() {
         if (is_null($this->instance)) {

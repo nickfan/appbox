@@ -16,9 +16,9 @@
 namespace Nickfan\BoxApp\DataObject;
 
 
-use Nickfan\AppBox\DataObject\BaseDataObject;
+use Nickfan\AppBox\DataObject\BoxObject;
 
-class UserDataObject extends BaseDataObject {
+class UserObject extends BoxObject {
     const DO_VERSION = '20140702';            // 版本号
 
     const USER_GENDER_UNKNOWN = 0; //用户性别 未知/保密

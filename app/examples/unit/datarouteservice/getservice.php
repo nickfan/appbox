@@ -13,34 +13,34 @@
 
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Common\AppConstants;
-use Nickfan\AppBox\Common\Usercache\ApcUsercache;
-use Nickfan\AppBox\Config\DataRouteConf;
-use Nickfan\AppBox\Instance\DataRouteInstance;
-use Nickfan\AppBox\Service\Drivers\CfgDataRouteServiceDriver;
-use Nickfan\AppBox\Service\Drivers\RedisDataRouteServiceDriver;
+use Nickfan\AppBox\Common\BoxConstants;
+use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Config\BoxRouteConf;
+use Nickfan\AppBox\Instance\BoxRouteInstance;
+use Nickfan\AppBox\Service\Drivers\CfgBoxBaseRouteServiceDriver;
+use Nickfan\AppBox\Service\Drivers\RedisBoxBaseRouteServiceDriver;
 
-$instDataRouteInstance = DataRouteInstance::getInstance(new DataRouteConf(new ApcUsercache(), $app['path.storage'] . '/etc/local'));
-$cfgService = CfgDataRouteServiceDriver::factory($instDataRouteInstance);
+$instDataRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxBaseUsercache(), $app['path.storage'] . '/etc/local'));
+$cfgService = CfgBoxBaseRouteServiceDriver::factory($instDataRouteInstance);
 // \Nickfan\AppBox\Foundation\AppBox::debug(true,$cfgService);  //exit; // [DEV-DEBUG]---
 $key = 'dsn';
 $optionEg1 = array(
     'routeKey' => 'root',
-    //'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
+    //'routeMode' => BoxConstants::DATAROUTE_MODE_ATTR,
 );
 $optionEg2 = array(
     'routeKey' => 'mygroup',
-    'routeMode' => AppConstants::DATAROUTE_MODE_ATTR,
+    'routeMode' => BoxConstants::DATAROUTE_MODE_ATTR,
     'routeAttr' => array('id'=>3),
 );
 
 $optionEg3 = array(
-    'routeMode' => AppConstants::DATAROUTE_MODE_IDSET,
+    'routeMode' => BoxConstants::DATAROUTE_MODE_IDSET,
     'routeIdSet' => array('routeKey'=>'mygroup','group'=>'g1'),
 );
 
 $optionEg4 = array(
-    'routeMode' => AppConstants::DATAROUTE_MODE_DIRECT,
+    'routeMode' => BoxConstants::DATAROUTE_MODE_DIRECT,
     'routeSettings' => array(
         'dsn'=>'ftp://myuser:mypass@myhost/mypath?arg1=v1&arg2=v2#anchor1=a1&anchor2=a2',
         'timeout'=>30,
@@ -61,7 +61,7 @@ $data4 = $cfgService->getByKey($key, $optionEg4);
 var_dump($data4);
 
 
-$redisService = RedisDataRouteServiceDriver::factory($instDataRouteInstance);
+$redisService = RedisBoxBaseRouteServiceDriver::factory($instDataRouteInstance);
 // \Nickfan\AppBox\Foundation\AppBox::debug(true,$redisService);  //exit; // [DEV-DEBUG]---
 $mykey='abc';
 $myval='def';

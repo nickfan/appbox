@@ -13,10 +13,10 @@
 
 require_once __DIR__.'/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Config\Repository;
-use Nickfan\AppBox\Common\Usercache\ApcUsercache;
+use Nickfan\AppBox\Config\BoxRepository;
+use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
 
-$instRepository = new Repository(new ApcUsercache(),$app['path.storage'].'/conf');
+$instRepository = new BoxRepository(new ApcBoxBaseUsercache(),$app['path.storage'].'/conf');
 
 $timezone = $instRepository->get('app.timezone');
 var_dump($timezone);
