@@ -13,22 +13,20 @@
 
 namespace Nickfan\BoxApp\Controller\Localhost\Index;
 
-use Nickfan\AppBox\Support\Facades\Config;
-use Nickfan\AppBox\Support\Facades\DataRouteConf;
-use Nickfan\AppBox\Support\Facades\DataRouteInstance;
+use Nickfan\AppBox\Foundation\AppBox;
 use Nickfan\BoxApp\Controller\AbstractController;
 
 class Index extends AbstractController {
 
     public function Index(){
         echo 'helloworld';
-        $confDict = Config::get('common.itemPerPages');
+        $confDict = AppBox::make('conf')->get('common.itemPerPages');
         var_dump($confDict);
-        $clearResult = DataRouteConf::cacheFlush();
+        $clearResult = AppBox::make('routeconf')->cacheFlush();
         var_dump($clearResult);
-        $routeConf = DataRouteConf::getRouteConfByScript('redis','mygroup',array('id'=>3));
+        $routeConf = AppBox::make('routeconf')->getRouteConfByScript('redis','mygroup',array('id'=>3));
         var_dump($routeConf);
-        $routeInstance = DataRouteInstance::getRouteInstance('cfg','mygroup',array('id'=>3));
+        $routeInstance = AppBox::make('routeinst')->getRouteInstance('cfg','mygroup',array('id'=>3));
         var_dump($routeInstance);
         $instance = $routeInstance->getInstance();
         var_dump($instance);

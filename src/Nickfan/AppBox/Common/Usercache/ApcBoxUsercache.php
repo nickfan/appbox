@@ -15,21 +15,20 @@
 namespace Nickfan\AppBox\Common\Usercache;
 
 
-class NullBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
-
-    protected function getInstance() {
-        if (is_null($this->instance)) {
-            $this->instance = new \stdClass();
-        }
-        return $this->instance;
-    }
+class ApcBoxUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
 
     public function get($key, $option = array()) {
         $option += array(
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        return isset($this->getInstance()->$querykey) ? $this->decodeVal($this->getInstance()->$querykey) : null;
+        $ok = false;
+        $result = apc_fetch($querykey, $ok);
+        if ($ok == true) {
+            return $this->decodeVal($result);
+        } else {
+            return null;
+        }
     }
 
     public function set($key, $val, $option = array()) {
@@ -37,7 +36,7 @@ class NullBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInter
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        $this->getInstance()->$querykey = $this->encodeVal($val);
+        return apc_store($querykey, $this->encodeVal($val), $option['ttl']);
     }
 
     public function del($key, $option = array()) {
@@ -45,7 +44,7 @@ class NullBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInter
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        unset($this->getInstance()->$querykey);
+        return apc_delete($querykey);
     }
 
     public function exits($key, $option = array()) {
@@ -53,15 +52,14 @@ class NullBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInter
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        return isset($this->getInstance()->$querykey);
+        return apc_exists($querykey);
     }
 
     public function flush($option = array()) {
         $option += array(
             'ttl' => $this->defaultOption['ttl'],
         );
-        $this->setInstance(new \stdClass());
-        return true;
+        return apc_clear_cache('user');
     }
 
 }

@@ -15,11 +15,11 @@
 namespace Nickfan\AppBox\Common\Usercache;
 
 
-class YacBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
+class NullBoxUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
 
     protected function getInstance() {
         if (is_null($this->instance)) {
-            $this->instance = new Yac();
+            $this->instance = new \stdClass();
         }
         return $this->instance;
     }
@@ -29,13 +29,7 @@ class YacBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterf
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-
-        $getVal = $this->getInstance()->get($querykey);
-        if (!is_null($getVal)) {
-            return $this->decodeVal($getVal);
-        } else {
-            return null;
-        }
+        return isset($this->getInstance()->$querykey) ? $this->decodeVal($this->getInstance()->$querykey) : null;
     }
 
     public function set($key, $val, $option = array()) {
@@ -43,7 +37,7 @@ class YacBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterf
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        return $this->getInstance()->set($querykey, $this->encodeVal($val), $option['ttl']);
+        $this->getInstance()->$querykey = $this->encodeVal($val);
     }
 
     public function del($key, $option = array()) {
@@ -51,7 +45,7 @@ class YacBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterf
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        return $this->getInstance()->delete($querykey);
+        unset($this->getInstance()->$querykey);
     }
 
     public function exits($key, $option = array()) {
@@ -59,15 +53,15 @@ class YacBoxBaseUsercache extends BoxBaseUsercache implements BoxUsercacheInterf
             'ttl' => $this->defaultOption['ttl'],
         );
         $querykey = $this->formatKey($key);
-        $getVal = $this->getInstance()->get($querykey);
-        return !is_null($getVal);
+        return isset($this->getInstance()->$querykey);
     }
 
     public function flush($option = array()) {
         $option += array(
             'ttl' => $this->defaultOption['ttl'],
         );
-        return $this->getInstance()->flush();
+        $this->setInstance(new \stdClass());
+        return true;
     }
 
 }

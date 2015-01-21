@@ -13,15 +13,15 @@
 
 
 
-namespace Nickfan\BoxApp\Package;
+namespace Nickfan\BoxApp\BoxPackage;
 
 
 use Nickfan\AppBox\Package\BoxBasePackage;
 use Nickfan\AppBox\Instance\BoxRouteInstanceInterface;
 
-class UserBasePackage extends BoxBasePackage{
-    protected function __construct(BoxRouteInstanceInterface $instDataRouteInstance = NULL, $objectName = ""){
-        parent::__construct($instDataRouteInstance,$objectName);
+class UserBoxPackage extends BoxBasePackage{
+    protected function __construct(BoxRouteInstanceInterface $instBoxRouteInstance = NULL, $objectName = ""){
+        parent::__construct($instBoxRouteInstance,$objectName);
         //$this->setDefaultNamespace(__NAMESPACE__);
         return $this;
     }

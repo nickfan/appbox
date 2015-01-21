@@ -13,12 +13,12 @@
 
 
 
-namespace Nickfan\BoxApp\DataObject;
+namespace Nickfan\BoxApp\BoxObject;
 
 
-use Nickfan\AppBox\DataObject\BoxObject;
+use Nickfan\AppBox\BoxObject\BoxObject;
 
-class UserObject extends BoxObject {
+class UserBoxObject extends BoxObject {
     const DO_VERSION = '20140702';            // 版本号
 
     const USER_GENDER_UNKNOWN = 0; //用户性别 未知/保密

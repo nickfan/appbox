@@ -14,8 +14,8 @@
 require_once __DIR__.'/../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Config\BoxRepository;
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 
-$instRepository = new BoxRepository(new ApcBoxBaseUsercache(),$app['path.storage'].'/conf');
+$instRepository = new BoxRepository(new ApcBoxUsercache(),$app['path.storage'].'/conf');
 
 echo $instRepository->getVersion();

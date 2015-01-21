@@ -13,18 +13,18 @@
 
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
 
-use Nickfan\BoxApp\Package\UserBasePackage;
-use Nickfan\BoxApp\Package\DummyBasePackage;
+use Nickfan\BoxApp\BoxPackage\UserBoxPackage;
+use Nickfan\BoxApp\BoxPackage\DummyBoxPackage;
 
-$instDataRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxBaseUsercache(), $app['path.storage'] . '/etc/local'));
-//var_dump($instDataRouteInstance);
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxUsercache(), $app['path.storage'] . '/etc/local'));
+//var_dump($instBoxRouteInstance);
 //exit;
-$instUserPackage = UserBasePackage::getInstance($instDataRouteInstance);
-$instDummyPackage = DummyBasePackage::getInstance($instDataRouteInstance);
+$instUserPackage = UserBoxPackage::getInstance($instBoxRouteInstance);
+$instDummyPackage = DummyBoxPackage::getInstance($instBoxRouteInstance);
 
 var_dump($instUserPackage->getObjectName());
 var_dump($instUserPackage->getDefaultNamespace());
@@ -32,9 +32,9 @@ var_dump($instUserPackage->getDefaultNamespace());
 var_dump($instDummyPackage->getObjectName());
 var_dump($instDummyPackage->getDefaultNamespace());
 
-$instUserPackage->setDefaultNamespace('Nickfan\\BoxApp\\DataObject');
+$instUserPackage->setDefaultNamespace('Nickfan\\BoxApp\\BoxObject');
 var_dump($instUserPackage->getDefaultNamespace());
 
-$userObject = $instUserPackage->getDataObjectTemplateByLabel('user',array('id'=>123,'screen_name'=>'abc'));
+$userObject = $instUserPackage->getBoxObjectTemplateByLabel('user',array('id'=>123,'screen_name'=>'abc'));
 
 var_dump($userObject);

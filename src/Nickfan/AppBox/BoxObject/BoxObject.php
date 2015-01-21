@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\AppBox\DataObject;
+namespace Nickfan\AppBox\BoxObject;
 
 use ArrayAccess;
 use Traversable;

@@ -14,14 +14,14 @@
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Common\BoxConstants;
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
 use Nickfan\AppBox\Service\Drivers\CfgBoxBaseRouteServiceDriver;
 use Nickfan\AppBox\Service\Drivers\RedisBoxBaseRouteServiceDriver;
 
-$instDataRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxBaseUsercache(), $app['path.storage'] . '/etc/local'));
-$cfgService = CfgBoxBaseRouteServiceDriver::factory($instDataRouteInstance);
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxUsercache(), $app['path.storage'] . '/etc/local'));
+$cfgService = CfgBoxBaseRouteServiceDriver::factory($instBoxRouteInstance);
 // \Nickfan\AppBox\Foundation\AppBox::debug(true,$cfgService);  //exit; // [DEV-DEBUG]---
 $key = 'dsn';
 $optionEg1 = array(
@@ -61,7 +61,7 @@ $data4 = $cfgService->getByKey($key, $optionEg4);
 var_dump($data4);
 
 
-$redisService = RedisBoxBaseRouteServiceDriver::factory($instDataRouteInstance);
+$redisService = RedisBoxBaseRouteServiceDriver::factory($instBoxRouteInstance);
 // \Nickfan\AppBox\Foundation\AppBox::debug(true,$redisService);  //exit; // [DEV-DEBUG]---
 $mykey='abc';
 $myval='def';

@@ -20,11 +20,11 @@ use Nickfan\AppBox\Instance\BoxRouteInstanceInterface;
 
 interface BoxRouteServiceDriverInterface {
 
-    //public function __construct(BoxRouteInstance $instDataRouteInstance);
+    //public function __construct(BoxRouteInstance $instBoxRouteInstance);
 
-    public function getDataRouteInstance();
+    public function getBoxRouteInstance();
 
-    public function setDataRouteInstance(BoxRouteInstanceInterface $instDataRouteInstance);
+    public function setBoxRouteInstance(BoxRouteInstanceInterface $instBoxRouteInstance);
 
     public function getDriverKey();
 

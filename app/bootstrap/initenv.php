@@ -19,9 +19,9 @@ require_once __DIR__.'/autoload.php';
 !defined('APPBOX_PATH_WEB') && define('APPBOX_PATH_WEB',APPBOX_PATH_APP.'/webroot');
 
 use Pimple\Container;
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
-use Nickfan\AppBox\Common\Usercache\YacBoxBaseUsercache;
-use Nickfan\AppBox\Common\Usercache\NullBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
+use Nickfan\AppBox\Common\Usercache\YacBoxUsercache;
+use Nickfan\AppBox\Common\Usercache\NullBoxUsercache;
 use Nickfan\AppBox\Config\BoxRepository;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
@@ -45,11 +45,11 @@ if(!function_exists('appbox')){
             $app['path.public']= $app['path']['public'];
             $userCacheObject = null;
             if(extension_loaded('apc')){
-                $userCacheObject = new ApcBoxBaseUsercache;
+                $userCacheObject = new ApcBoxUsercache;
             }elseif(extension_loaded('yac')){
-                $userCacheObject = new YacBoxBaseUsercache;
+                $userCacheObject = new YacBoxUsercache;
             }else{
-                $userCacheObject = new NullBoxBaseUsercache;
+                $userCacheObject = new NullBoxUsercache;
             }
             $app['usercache'] = $userCacheObject;
 

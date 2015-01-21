@@ -13,14 +13,14 @@
 
 require_once __DIR__.'/../../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
 
-$instDataRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxBaseUsercache(),$app['path.storage'].'/etc/local'));
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf(new ApcBoxUsercache(),$app['path.storage'].'/etc/local'));
 
 
-$routeInstance = $instDataRouteInstance->getRouteInstance('cfg','mygroup',array('id'=>3));
+$routeInstance = $instBoxRouteInstance->getRouteInstance('cfg','mygroup',array('id'=>3));
 var_dump($routeInstance);
 $instance = $routeInstance->getInstance();
 var_dump($instance);

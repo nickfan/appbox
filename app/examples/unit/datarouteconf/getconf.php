@@ -14,15 +14,15 @@
 require_once __DIR__.'/../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Config\BoxRouteConf;
-use Nickfan\AppBox\Common\Usercache\ApcBoxBaseUsercache;
+use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 
-$instDataRouteConf = new BoxRouteConf(new ApcBoxBaseUsercache(),$app['path.storage'].'/etc/local');
+$instBoxRouteConf = new BoxRouteConf(new ApcBoxUsercache(),$app['path.storage'].'/etc/local');
 
 
-$clearResult = $instDataRouteConf->cacheFlush();var_dump($clearResult);
+$clearResult = $instBoxRouteConf->cacheFlush();var_dump($clearResult);
 
-$routeConfKeys = $instDataRouteConf->getRouteConfSubKeys('redis','mygroup');
+$routeConfKeys = $instBoxRouteConf->getRouteConfSubKeys('redis','mygroup');
 var_dump($routeConfKeys);
-$routeConf = $instDataRouteConf->getRouteConfByScript('redis','mygroup',array('id'=>3));
+$routeConf = $instBoxRouteConf->getRouteConfByScript('redis','mygroup',array('id'=>3));
 var_dump($routeConf);
 

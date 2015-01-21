@@ -12,10 +12,10 @@
  */
 require_once __DIR__ . '/../../../bootstrap/initenv.php';
 
-use Nickfan\BoxApp\DataObject\UserObject;
-use Nickfan\BoxApp\DataObject\AccountObject;
+use Nickfan\BoxApp\BoxObject\UserBoxObject;
+use Nickfan\BoxApp\BoxObject\AccountBoxObject;
 
-//$user = new UserObject();
+//$user = new UserBoxObject();
 //$user->id=123;
 //$user->screen_name='foo';
 //$user->crts = $user->upts = time();
@@ -26,7 +26,7 @@ $defProps = array(
     'upts'=>time(),
     'crts'=>time(),
 );
-$user = UserObject::factory($defProps);
+$user = UserBoxObject::factory($defProps);
 
 $userDict = $user->toArray();
 
@@ -45,7 +45,7 @@ $serializedStr = serialize($user);
 $unserializedObj = unserialize($serializedStr);
 var_dump($unserializedObj);
 
-$account = new AccountObject();
+$account = new AccountBoxObject();
 $account->id=123;
 $account['regip']='0.0.0.0';
 

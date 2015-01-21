@@ -16,7 +16,7 @@ namespace Nickfan\AppBox\Package;
 
 use Nickfan\AppBox\Common\BoxConstants;
 use Nickfan\AppBox\Common\Exception\RuntimeException;
-use Nickfan\AppBox\DataObject\BoxObject;
+use Nickfan\AppBox\BoxObject\BoxObject;
 use Nickfan\AppBox\Instance\BoxRouteInstanceInterface;
 use Nickfan\AppBox\Service\Drivers\DbBoxRouteServiceDriver;
 use Nickfan\AppBox\Service\Drivers\MongoBoxRouteServiceDriver;
@@ -57,8 +57,8 @@ abstract class BoxBasePackage implements BoxPackageInterface {
         $shortClassName = substr(
             $className,
             strrpos($className, '\\') + 1,
-            -7
-        ); // -7 = strlen(Package)
+            -10
+        ); // -10 = strlen(BoxPackage)
         if (!empty($shortClassName)) {
             $objectName = lcfirst($shortClassName);
         } else {
@@ -67,26 +67,26 @@ abstract class BoxBasePackage implements BoxPackageInterface {
         return array($className, $shortClassName, $objectName);
     }
 
-    public static function getInstance(BoxRouteInstanceInterface $instDataRouteInstance, $objectName = "") {
+    public static function getInstance(BoxRouteInstanceInterface $instBoxRouteInstance, $objectName = "") {
         if ($objectName == '') {
             list($className, $shortClassName, $objectName) = self::parseClassNameObjectName();
         }
         if (!isset(static::$instances[$objectName])) {
-            static::$instances[$objectName] = new $className($instDataRouteInstance, $objectName);
+            static::$instances[$objectName] = new $className($instBoxRouteInstance, $objectName);
         }
         return static::$instances[$objectName];
     }
 
-    protected function __construct(BoxRouteInstanceInterface $instDataRouteInstance = null, $objectName = "") {
+    protected function __construct(BoxRouteInstanceInterface $instBoxRouteInstance = null, $objectName = "") {
         if ($objectName == "") {
             list($className, $shortClassName, $objectName) = self::parseClassNameObjectName();
         } else {
             $this->objectName = $objectName;
         }
-        if (is_null($instDataRouteInstance)) {
-            throw new RuntimeException('Package.BoxRouteInstance is null :' . get_class($this));
+        if (is_null($instBoxRouteInstance)) {
+            throw new RuntimeException('BoxPackage.BoxRouteInstance is null :' . get_class($this));
         } else {
-            self::$routeInstance = $instDataRouteInstance;
+            self::$routeInstance = $instBoxRouteInstance;
         }
         $this->setDefaultNamespace(__NAMESPACE__);
         return $this;
@@ -121,12 +121,12 @@ abstract class BoxBasePackage implements BoxPackageInterface {
         return is_string($namespace) && strpos($namespace, '\\') !== 0;
     }
 
-    public function getDataRouteInstance() {
+    public function getBoxRouteInstance() {
         return self::$routeInstance;
     }
 
-    public function setDataRouteInstance(BoxRouteInstanceInterface $instDataRouteInstance) {
-        self::$routeInstance = $instDataRouteInstance;
+    public function setBoxRouteInstance(BoxRouteInstanceInterface $instBoxRouteInstance) {
+        self::$routeInstance = $instBoxRouteInstance;
     }
 
     /**
@@ -260,7 +260,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
      * @param string $namespace
      * @return array
      */
-    public function getDataObjectTemplateByLabel($objectLabel = '', $defprops = array(), $namespace = '') {
+    public function getBoxObjectTemplateByLabel($objectLabel = '', $defprops = array(), $namespace = '') {
         $retObject = array();
         $namespace == '' && $namespace = $this->getDefaultNamespace();
         if(!empty($namespace)){
@@ -268,7 +268,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
                 $namespace.='\\';
             }
         }
-        $objectClassName = $namespace . ucfirst($objectLabel) . 'DataObject';
+        $objectClassName = $namespace . ucfirst($objectLabel) . 'BoxObject';
         if (!empty($defprops)) {
             $doInstance = new $objectClassName($defprops);
         } else {
@@ -296,7 +296,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
                 $namespace.='\\';
             }
         }
-        $objectClassName = $namespace . ucfirst($objectLabel) . 'DataObject';
+        $objectClassName = $namespace . ucfirst($objectLabel) . 'BoxObject';
 
         if(array_key_exists(BoxObject::DO_VERSION_PROP, $reqData) && $reqData[BoxObject::DO_VERSION_PROP]!=$objectClassName::DO_VERSION){
             $retObject=true;
@@ -318,7 +318,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
             'mqPrefix'=>static::$prefixMq,
             'options'=>array(),
             'encode'=>true,
-            'dataRouteInstance'=>$this->getDataRouteInstance(),
+            'dataRouteInstance'=>$this->getBoxRouteInstance(),
         );
         $retStatus = null;
         $message = $option['encode']==true?BoxUtil::datapack($data):$data;
@@ -495,7 +495,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
 
         // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
         if(empty($requestIds)){
-            return array($this->getDataObjectTemplateByLabel($objectLabel));
+            return array($this->getBoxObjectTemplateByLabel($objectLabel));
         }
         $requestIds = array_map('intval', $requestIds);
         $requestIds = array_unique($requestIds,SORT_NUMERIC);
@@ -622,7 +622,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
 
 
         if(empty($requestId)){
-            return $this->getDataObjectTemplateByLabel($objectLabel);
+            return $this->getBoxObjectTemplateByLabel($objectLabel);
         }
 
 
@@ -815,7 +815,7 @@ abstract class BoxBasePackage implements BoxPackageInterface {
         // mongo对类型敏感，假设所有的ID是数字类型时，强制类型转换
         is_numeric($requestId) && $requestId = intval($requestId);
 
-        $storeData = $tplRowData = $this->getDataObjectTemplateByLabel($objectLabel);
+        $storeData = $tplRowData = $this->getBoxObjectTemplateByLabel($objectLabel);
         $upData = array();
         $gotServiceSyntax = false;
         foreach ($reqData as $reqKey => $reqValue){
