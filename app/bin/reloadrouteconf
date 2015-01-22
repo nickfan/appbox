@@ -12,14 +12,9 @@
  *
  */
 
-require_once __DIR__.'/../bootstrap/initenv.php';
+require_once __DIR__ . '/../../bootstrap/initenv.php';
 
-//use Nickfan\AppBox\Config\DataRouteConf;
-//use Nickfan\AppBox\Common\Usercache\ApcUsercache;
-//$instDataRouteConf = new DataRouteConf(new ApcUsercache(),$app['path.storage'].'/etc/local');
-//$status = $instDataRouteConf->cacheFlush();
-
-$status = $app['datarouteconf']->cacheFlush();
+$status = \Nickfan\AppBox\Support\Facades\AppBox::make('routeconf')->cacheFlush();
 
 if ($status) {
     echo 'route conf cache reloaded.' . PHP_EOL;

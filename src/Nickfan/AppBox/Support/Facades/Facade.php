@@ -19,7 +19,7 @@ abstract class Facade {
     /**
      * The application instance being facaded.
      *
-     * @var \Nickfan\AppBox\Foundation\AppBox
+     * @var \Nickfan\AppBox\Foundation\BoxApp
      */
     protected static $app;
 
@@ -59,13 +59,13 @@ abstract class Facade {
      * @throws \RuntimeException
      */
     protected static function getFacadeAccessor() {
-        $className = get_called_class();
-        $sepNsPos = strrpos($className, '\\');
-        if ($sepNsPos !== false) {
-            $className = substr($className, $sepNsPos + 1);
-        }
-        return strtolower($className);
-        //throw new \RuntimeException("Facade does not implement getFacadeAccessor method.");
+        throw new \RuntimeException("Facade does not implement getFacadeAccessor method.");
+//        $className = get_called_class();
+//        $sepNsPos = strrpos($className, '\\');
+//        if ($sepNsPos !== false) {
+//            $className = substr($className, $sepNsPos + 1);
+//        }
+//        return strtolower($className);
     }
 
     /**
@@ -108,7 +108,7 @@ abstract class Facade {
     /**
      * Get the application instance behind the facade.
      *
-     * @return \Nickfan\AppBox\Foundation\AppBox
+     * @return \Nickfan\AppBox\Foundation\BoxApp
      */
     public static function getFacadeApplication() {
         return static::$app;
@@ -117,7 +117,7 @@ abstract class Facade {
     /**
      * Set the application instance.
      *
-     * @param  \Nickfan\AppBox\Foundation\AppBox $app
+     * @param  \Nickfan\AppBox\Foundation\BoxApp $app
      * @return void
      */
     public static function setFacadeApplication($app) {

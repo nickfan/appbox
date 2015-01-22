@@ -12,7 +12,6 @@
  */
 
 return array(
-    'debug' => true,
     'itemPerPage' => 15,
     'itemPerPages' => array(3, 6, 5, 10, 15, 20, 50, 100),
 );

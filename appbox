@@ -14,67 +14,83 @@
 
 use Ulrichsg\Getopt\Getopt;
 use Ulrichsg\Getopt\Option;
+use Nickfan\AppBox\Support\Facades\AppBox;
 
-
-require_once __DIR__ . '/app/bootstrap/initenv.php';
+!defined('PHP_BINARY') && define('PHP_BINARY', '/usr/bin/env php');
+require_once __DIR__ . '/bootstrap/initenv.php';
 $getopt = new Getopt(array(
     new Option('v', 'verbose'),
-    new Option('h', 'help'),
+    new Option(null, 'help'),
     new Option(null, 'version'),
-    (new Option('s', 'service', Getopt::OPTIONAL_ARGUMENT))
-        ->setDescription('run appbox in service mode'),
-    (new Option('d', 'daemon', Getopt::OPTIONAL_ARGUMENT))
-        ->setDescription('run appbox as a daemon process'),
-    (new Option('r', 'rcbasepath', Getopt::OPTIONAL_ARGUMENT))
-    ->setDescription('route config files base path contain dsn and route config files')
-    ->setDefaultValue('./app/data/etc/local')
-    ->setValidation(function($value) {
-            $realpath = realpath($value);
-            if(file_exists($realpath) && is_dir($realpath)){
-                if(file_exists($realpath.'/dsn')
-                    && is_dir($realpath.'/dsn')
-                    && file_exists($realpath.'/route')
-                    && is_dir($realpath.'/route')
-                ){
-                    return true;
-                }
-            }
-            return false;
+    (new Option('h', 'host', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('run appbox in serve mode @ host')
+        ->setDefaultValue('localhost'),
+    (new Option('p', 'port', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('run appbox in serve mode @ port')
+        ->setDefaultValue('8000')
+        ->setValidation(function($value) {
+            return is_numeric($value);
         }),
-    (new Option('c', 'confpath', Getopt::OPTIONAL_ARGUMENT))
-    ->setDescription('repository config files base path contain application config files')
-    ->setDefaultValue('./app/data/conf')
-    ->setValidation(function($value) {
-            $realpath = realpath($value);
-            if(file_exists($realpath) && is_dir($realpath)){
-                return true;
-            }
-            return false;
-        }),
-    (new Option('a', 'appsrcpath', Getopt::OPTIONAL_ARGUMENT))
-    ->setDescription('application programs source files base path')
-    ->setDefaultValue('./src')
-    ->setValidation(function($value) {
-            $realpath = realpath($value);
-            if(file_exists($realpath) && is_dir($realpath)){
-                return true;
-            }
-            return false;
-        }),
+    (new Option(null, 'serve', Getopt::OPTIONAL_ARGUMENT))
+        ->setDescription('run appbox in serve mode'),
+//    (new Option('r', 'rcbasepath', Getopt::OPTIONAL_ARGUMENT))
+//    ->setDescription('route config files base path contain dsn and route config files')
+//    ->setDefaultValue('./app/data/etc/local')
+//    ->setValidation(function($value) {
+//            $realpath = realpath($value);
+//            if(file_exists($realpath) && is_dir($realpath)){
+//                if(file_exists($realpath.'/dsn')
+//                    && is_dir($realpath.'/dsn')
+//                    && file_exists($realpath.'/route')
+//                    && is_dir($realpath.'/route')
+//                ){
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }),
+//    (new Option('c', 'confpath', Getopt::OPTIONAL_ARGUMENT))
+//    ->setDescription('repository config files base path contain application config files')
+//    ->setDefaultValue('./app/data/conf')
+//    ->setValidation(function($value) {
+//            $realpath = realpath($value);
+//            if(file_exists($realpath) && is_dir($realpath)){
+//                return true;
+//            }
+//            return false;
+//        }),
+//    (new Option('a', 'apppath', Getopt::OPTIONAL_ARGUMENT))
+//    ->setDescription('application programs source files base path')
+//    ->setDefaultValue('./app')
+//    ->setValidation(function($value) {
+//            $realpath = realpath($value);
+//            if(file_exists($realpath) && is_dir($realpath)){
+//                return true;
+//            }
+//            return false;
+//        }),
 ));
 
 try {
     $getopt->parse();
     $operands = $getopt->getOperands();
     if ($getopt['version']) {
-        echo \Nickfan\AppBox\Common\AppConstants::VERSION.PHP_EOL;
+        echo \Nickfan\AppBox\Common\BoxConstants::VERSION.PHP_EOL;
         exit(0);
     }
     if ($getopt['help']) {
         echo $getopt->getHelpText();
         exit(0);
     }
-    if(count($operands)<1){
+
+    !isset($app) && $app = AppBox::inst();
+
+    if($getopt['serve']){
+        chdir($app['path.base']);
+        $public = $app['path.public'];
+        passthru('"'.PHP_BINARY.'"'." -S {$getopt['host']}:{$getopt['port']} -t \"{$public}\" server.php");
+    }
+    if(!$getopt['serve'] && count($operands)<1){
 
         try{
             $boris = new \Boris\Boris('appbox> ');
