@@ -1,3 +1,3 @@
 <?php
 
-require_once realpath(__DIR__ . '/../app/bootstrap/initenv.php');
+require_once realpath(__DIR__ . '/../bootstrap/initenv.php');

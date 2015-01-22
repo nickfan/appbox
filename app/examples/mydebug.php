@@ -12,17 +12,16 @@
  */
 
 
-require_once __DIR__.'/../bootstrap/initenv.php';
+require_once __DIR__ . '/../../bootstrap/initenv.php';
 
-use Nickfan\AppBox\Foundation\AppBox;
+use Nickfan\AppBox\Support\Facades\AppBox;
 
-$paths = $app['path'];
-var_dump($paths);
-//
-//$paths['public'] = 'abc';
-//$app->extend('path', $paths);
-//
-//$pathDict = AppBox::make('path');
-//
-//var_dump($pathDict);
-//
+$myexampleDict = array('abc','def','hig');
+AppBox::debug($myexampleDict);
+$confInst = AppBox::make('conf');
+var_dump($confInst->get('app.timezone'));
+
+BoxDict::set('abc.bbc',array('test'=>'valtest','test2'=>23));
+var_dump(BoxDict::get('abc.bbc'));
+BoxDict::cleanup();
+var_dump(BoxDict::get('abc.bbc'));

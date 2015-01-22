@@ -11,16 +11,16 @@
  *
  */
 
-require_once __DIR__ . '/../../../bootstrap/initenv.php';
+require_once __DIR__ . '/../../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
 
-use Nickfan\BoxApp\BoxPackage\UserBoxPackage;
-use Nickfan\BoxApp\BoxPackage\DummyBoxPackage;
+use App\Boxpackages\UserBoxPackage;
+use App\Boxpackages\DummyBoxPackage;
 
-$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($app['path']['storage'] . '/etc/local',new ApcBoxUsercache()));
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($app['path.storage'] . '/etc/local',new ApcBoxUsercache()));
 //var_dump($instBoxRouteInstance);
 //exit;
 $instUserPackage = UserBoxPackage::getInstance($instBoxRouteInstance);
@@ -32,7 +32,7 @@ var_dump($instUserPackage->getDefaultNamespace());
 var_dump($instDummyPackage->getObjectName());
 var_dump($instDummyPackage->getDefaultNamespace());
 
-$instUserPackage->setDefaultNamespace('Nickfan\\BoxApp\\BoxObject');
+$instUserPackage->setDefaultNamespace('App\\Boxobjects');
 var_dump($instUserPackage->getDefaultNamespace());
 
 $userObject = $instUserPackage->getBoxObjectTemplateByLabel('user',array('id'=>123,'screen_name'=>'abc'));

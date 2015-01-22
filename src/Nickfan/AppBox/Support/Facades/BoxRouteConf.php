@@ -15,13 +15,13 @@
 namespace Nickfan\AppBox\Support\Facades;
 
 
-class BoxConf extends Facade {
+class BoxRouteConf extends Facade {
     /**
      * Get the registered name of the component.
      *
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'conf';
+        return 'routeconf';
     }
 }

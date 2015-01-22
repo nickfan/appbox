@@ -23,12 +23,15 @@ class BoxUtil {
      * @return  string
      */
     public static function debug() {
-        if (func_num_args() === 0 || func_num_args() === 1) {
+        if (func_num_args() === 0) {
             return null;
         }
         // Get params
         $params = func_get_args();
-        $printBool = boolval(array_shift($params));
+        $printBool = true;
+        if(func_num_args() > 1){
+            $printBool = boolval(array_shift($params));
+        }
         $output = array();
         foreach ($params as $var) {
             $output[] = '(' . gettype($var) . ') ' . var_export($var, true) . '';

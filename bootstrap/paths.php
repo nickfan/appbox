@@ -49,7 +49,7 @@ return array(
     |
     */
 
-    'base' => __DIR__ . '/../..',
+    'base' => __DIR__ . '/..',
     /*
     |--------------------------------------------------------------------------
     | Storage Path
@@ -61,9 +61,5 @@ return array(
     |
     */
 
-    'storage' => __DIR__ . '/../../app/data',
-
-    'conf' => __DIR__ . '/../../app/data/conf',
-    'routeconf' => __DIR__ . '/../../app/data/etc/local',
-
+    'storage' => __DIR__ . '/../app/data',
 );

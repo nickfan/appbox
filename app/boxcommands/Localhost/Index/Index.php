@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -11,11 +11,12 @@
  *
  */
 
-namespace Nickfan\BoxApp\BoxController\AppboxDotdev\Index;
+namespace App\Boxcommands\Localhost\Index;
 
-use Nickfan\AppBox\Foundation\AppBox;
+use Nickfan\AppBox\Support\Facades\AppBox;
 use Nickfan\BoxApp\BoxController\BoxAbstractController;
-class Index extends BoxAbstractController{
+
+class Index extends BoxAbstractController {
 
     public function Index(){
         echo 'helloworld';
@@ -32,10 +33,8 @@ class Index extends BoxAbstractController{
         $getCurrentUri = $this->dispatcher->getCurrentUri();
         var_dump($getCurrentUri);
     }
-    public function Ping($myvar1=0,$myvar2='abc'){
-        echo 'pong'.'<br/>';
-        echo $myvar1.'<br/>';
-        echo $myvar2.'<br/>';
+    public function Ping(){
+        echo 'pong';
         return 9527;
     }
 }

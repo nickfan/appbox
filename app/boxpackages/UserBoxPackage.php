@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\BoxApp\BoxPackage;
+namespace App\Boxpackages;
 
 
 use Nickfan\AppBox\Package\BoxBasePackage;
@@ -25,4 +25,4 @@ class UserBoxPackage extends BoxBasePackage{
         //$this->setDefaultNamespace(__NAMESPACE__);
         return $this;
     }
-} 
+}

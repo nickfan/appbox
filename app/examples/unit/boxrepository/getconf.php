@@ -11,12 +11,12 @@
  *
  */
 
-require_once __DIR__.'/../../../bootstrap/initenv.php';
+require_once __DIR__ . '/../../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Config\BoxRepository;
 use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 
-$instRepository = new BoxRepository($app['path']['storage'].'/conf',new ApcBoxUsercache());
+$instRepository = new BoxRepository($app['path.storage'].'/conf',new ApcBoxUsercache());
 
 $timezone = $instRepository->get('app.timezone');
 var_dump($timezone);

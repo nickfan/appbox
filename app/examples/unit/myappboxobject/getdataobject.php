@@ -10,10 +10,10 @@
  * @lastmodified: 2014-07-02 16:58
  *
  */
-require_once __DIR__ . '/../../../bootstrap/initenv.php';
+require_once __DIR__ . '/../../../../bootstrap/initenv.php';
 
-use Nickfan\BoxApp\BoxObject\UserBoxObject;
-use Nickfan\BoxApp\BoxObject\AccountBoxObject;
+use App\Boxobjects\UserBoxObject;
+use App\Boxobjects\AccountBoxObject;
 
 //$user = new UserBoxObject();
 //$user->id=123;

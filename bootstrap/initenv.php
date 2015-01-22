@@ -11,39 +11,32 @@
  *
  */
 
-require_once __DIR__ . '/autoload.php';
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader
+| for our application. We just need to utilize it! We'll require it
+| into the script here so that we do not have to worry about the
+| loading of any our classes "manually". Feels great to relax.
+|
+*/
 
-use Nickfan\AppBox\Foundation\AppBox;
-use Nickfan\AppBox\Foundation\BoxSettings;
-use Nickfan\AppBox\Config\BoxRepository;
-use Nickfan\AppBox\Config\BoxRouteConf;
-use Nickfan\AppBox\Instance\BoxRouteInstance;
+require __DIR__ . '/autoload.php';
 
-if(!function_exists('appbox')){
-    function appbox(){
-        static $app;
-        if(empty($app)){
-            AppBox::instSettings(BoxSettings::factory(array(
-                'path' => AppBox::buildRealPaths(require(__DIR__ . '/paths.php')),
-            )));
-            AppBox::init(function(){
-                $paths = AppBox::getInstSetVar('path');
-                $app = AppBox::app();
-                $app['usercache'] = AppBox::makeUserCacheInstance();
-                $app['conf'] = function ($app,$paths) {
-                    return new BoxRepository($paths['conf'],$app['usercache']);
-                };
-                $app['routeconf'] = function ($app,$paths) {
-                    return new BoxRouteConf($paths['routeconf'],$app['usercache']);
-                };
-                $app['routeinst'] = function ($app) {
-                    return BoxRouteInstance::getInstance($app['routeconf']);
-                };
-                return $app;
-            });
-            $app = AppBox::box();
-        }
-        return $app;
-    }
-}
-!isset($app) && $app = appbox();
+/*
+|--------------------------------------------------------------------------
+| Turn On The Lights
+|--------------------------------------------------------------------------
+|
+| We need to illuminate PHP development, so let's turn on the lights.
+| This bootstraps the framework and gets it ready for use, then it
+| will load up this application so that we can run it and send
+| the responses back to the browser and delight these users.
+|
+*/
+
+$app = require_once __DIR__ . '/start.php';
+
+

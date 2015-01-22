@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\BoxApp\BoxObject;
+namespace App\Boxobjects;
 
 
 use Nickfan\AppBox\BoxObject\BoxObject;

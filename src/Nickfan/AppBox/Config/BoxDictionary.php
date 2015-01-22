@@ -20,78 +20,44 @@ use Traversable;
 use Serializable;
 use IteratorAggregate;
 use ArrayIterator;
+use Nickfan\AppBox\Support\BoxUtil;
 
-class BoxSettings implements ArrayAccess,Serializable,IteratorAggregate{
-    const TYPE_AUTO = 'auto';
-    const TYPE_BOOL = 'bool';
-    const TYPE_INT = 'int';
-    const TYPE_FLOAT = 'float';
-    const TYPE_STRING = 'string';
-    const TYPE_BINARY = 'binary';
-    const TYPE_OBJECT = 'object';
+class BoxDictionary implements ArrayAccess,Serializable,IteratorAggregate{
 
-    const KEYTYPE_NONE = 'none';
-    const KEYTYPE_ID = 'id';
-    const KEYTYPE_IDSTR = 'idstr';
-    const KEYTYPE_UUID = 'uuid';
-
+    const ENCODER_SERIALIZE = 'serialize';
     const ENCODER_JSON = 'json';
     const ENCODER_MSGPACK = 'msgpack';
-    const ENCODER_SERIALIZE = 'serialize';
 
-    const DO_VERSION_PROP = '_version';
+    protected $parsed = array();
 
-    const DO_VERSION = '0';
-
-    protected static $dataEncoder = self::ENCODER_SERIALIZE;
-    protected static $strictMode = true;
-
-    protected $propSetDefault = array(
-        'key'=>self::KEYTYPE_NONE,          // keytype
-        'type'=>self::TYPE_AUTO,          // prop var type
-        'default'=>0,                      // default value
-        'length'=>null,                     // data length limit
-        'enabled'=>true,                   // enable this field
+    protected $option = array(
+        'packer'=>self::ENCODER_SERIALIZE,
     );
-    protected $props = array(
-        'id'=>array(
-            'key'=>self::KEYTYPE_ID,          // keytype
-            'type'=>self::TYPE_INT,          // prop var type
-            'default'=>0,                      // default value
-            'length'=>null,                     // data length limit
-            'enabled'=>false,                   // enable this field
-        ),
-        'idstr'=>array(
-            'key'=>self::KEYTYPE_IDSTR,          // keytype
-            'type'=>self::TYPE_STRING,          // prop var type
-            'default'=>'',                      // default value
-            'length'=>null,                     // data length limit
-            'enabled'=>false,                   // enable this field
-        ),
-//        '_id'=>array(
-//            'key'=>self::KEYTYPE_UUID,          // keytype
-//            'type'=>self::TYPE_STRING,          // prop var type
-//            'default'=>'',                      // default value
-//            'length'=>null,                     // data length limit
-//            'enabled'=>false,                   // enable this field
-//        ),
-        '_version'=>array(
-            'key'=>self::KEYTYPE_NONE,          // keytype
-            'type'=>self::TYPE_STRING,          // prop var type
-            'default'=>self::DO_VERSION,                      // default value
-            'length'=>null,                     // data length limit
-            'enabled'=>false,                   // enable this field
-        ),
-    );
-    protected $idPropKey = null;
-    protected $idStrPropKey = null;
 
-    protected $keys = array();
-    protected $data = array();
+    /**
+     * All of the configuration items.
+     *
+     * @var array
+     */
+    protected $items = array();
+
+    public function __construct($items=array(),$option=array()){
+        $option+=array(
+            'packer'=>self::ENCODER_SERIALIZE,
+        );
+        $this->option = array_merge($this->option,$option);
+        $this->setItems($items);
+        return $this;
+    }
+
+    public static function factory($items=array(),$option=array()){
+        $className = get_called_class();
+        return new $className($items,$option);
+    }
 
     public function packData($var,$bool=true,$option=array()){
         $option+=array(
-            'packer'=>self::$dataEncoder,
+            'packer'=>$this->option['packer'],
         );
         switch($option['packer']){
             case self::ENCODER_JSON:
@@ -119,298 +85,132 @@ class BoxSettings implements ArrayAccess,Serializable,IteratorAggregate{
         }
     }
 
-    public function keys(){
-        if(empty($this->keys)){
-            if(self::$strictMode == true){
-                //$keys = array_keys($this->props);
-                // keep prop keys order
-                $keys = array();
-                foreach ($this->props as $propKey=>$propSet) {
-                    if(!isset($propSet['enabled']) || $propSet['enabled']==true){
-                        $keys[$propKey] = $propKey;
-                    }
-                }
-                $this->keys = $keys;
-            }else{
-                //$keys = array_unique(array_keys($this->props),array_keys($this->data));
-                // keep prop keys order
-                $keys = array();
-                foreach ($this->data as $propKey=>$propVal) {
-                    $keys[$propKey] = $propKey;
-                }
-                foreach ($this->props as $propKey=>$propSet) {
-                    if(!isset($keys[$propKey]) && (!isset($propSet['enabled']) || $propSet['enabled']==true)){
-                        $keys[$propKey] = $propKey;
-                    }
-                }
-                $this->keys = $keys;
-            }
+    /**
+     * Get all of the configuration items.
+     *
+     * @return array
+     */
+    public function getItems() {
+        return $this->items;
+    }
+
+    public function setItems($items=array()){
+        $this->items = $items;
+        $this->parsed = array();
+    }
+
+    public function cleanup(){
+        $this->items = array();
+        $this->parsed = array();
+    }
+    /**
+     * Parse a key into  group, and item.
+     *
+     * @param  string $key
+     * @return array
+     */
+    public function parseKey($key) {
+        // If we've already parsed the given key, we'll return the cached version we
+        // already have, as this will save us some processing. We cache off every
+        // key we parse so we can quickly return it on all subsequent requests.
+        if (isset($this->parsed[$key])) {
+            return $this->parsed[$key];
         }
-        return $this->keys;
+
+        $segments = explode('.', $key);
+
+        $parsed = $this->parseSegments($segments);
+
+        // Once we have the parsed array of this key's elements, such as its groups
+        // and namespace, we will cache each array inside a simple list that has
+        // the key and the parsed array for quick look-ups for later requests.
+        return $this->parsed[$key] = $parsed;
     }
 
-    protected function getIdPropKey(){
-        if(is_null($this->idPropKey)){
-            foreach ($this->props as $propKey=>$propSet) {
-                if(isset($propSet['key']) && $propSet['key']==self::KEYTYPE_ID){
-                    if(!isset($propSet['enabled']) || $propSet['enabled']==true){
-                        $this->idPropKey = $propKey;
-                    }else{
-                        $this->idPropKey = '';
-                    }
-                    break;
-                }
-            }
+    /**
+     * Parse an array of basic segments.
+     *
+     * @param  array $segments
+     * @return array
+     */
+    protected function parseSegments(array $segments) {
+        // The first segment in a basic array will always be the group, so we can go
+        // ahead and grab that segment. If there is only one total segment we are
+        // just pulling an entire group out of the array and not a single item.
+        $group = $segments[0];
+
+        if (count($segments) == 1) {
+            return array($group, null);
         }
-        return $this->idPropKey;
-    }
-    protected function setIdPropKey($key=null){
-        return $this->idPropKey=$key;
-    }
-    protected function getIdStrPropKey(){
-        if(is_null($this->idStrPropKey)){
-            foreach ($this->props as $propKey=>$propSet) {
-                if(isset($propSet['key']) && $propSet['key']==self::KEYTYPE_IDSTR){
-                    if(!isset($propSet['enabled']) || $propSet['enabled']==true){
-                        $this->idStrPropKey = $propKey;
-                    }else{
-                        $this->idStrPropKey = '';
-                    }
-                    break;
-                }
-            }
-        }
-        return $this->idStrPropKey;
-    }
-    protected function setIdStrPropKey($key=null){
-        return $this->idStrPropKey=$key;
-    }
 
-    public function get($key){
-        if(array_key_exists($key,$this->props) && (!isset($this->props[$key]['enabled']) || $this->props[$key]['enabled']==true)){
-            if(isset($this->props[$key]['key']) && $this->props[$key]['key']==self::KEYTYPE_IDSTR){
-                $getIdPropKey = $this->getIdPropKey();
-                if(!empty($getIdPropKey)){
-                    if(array_key_exists($getIdPropKey,$this->data)){
-                        return strval($this->data[$getIdPropKey]);
-                    }
-                }
-            }
+        // If there is more than one segment in this group, it means we are pulling
+        // a specific item out of a groups and will need to return the item name
+        // as well as the group so we know which item to pull from the arrays.
+        else {
+            $item = implode('.', array_slice($segments, 1));
 
-            if(array_key_exists($key,$this->data)){
-                if(!is_null($this->data[$key])){
-                    if(isset($this->props[$key]['type']) && $this->props[$key]['type']==self::TYPE_OBJECT){
-                        return $this->packData($this->data[$key],false);
-                    }else{
-                        return $this->data[$key];
-                    }
-                }else{
-                    return null;
-                }
-            }else{
-                return isset($this->props[$key]['default'])?$this->props[$key]['default']:null;
-            }
-        }else{
-            if(self::$strictMode == false && array_key_exists($key,$this->data)){
-                return $this->data[$key];
-            }else{
-                return null;
-            }
-
+            return array($group, $item);
         }
     }
 
+    /**
+     * Get the specified configuration value.
+     *
+     * @param  string $key
+     * @param  mixed $default
+     * @return mixed
+     */
+    public function get($key = '', $default = null) {
+        list($group, $item) = $this->parseKey($key);
+        return isset($this->items[$group])?BoxUtil::array_get($this->items[$group], $item, $default):$default;
+    }
 
-    public function set($key, $value){
-        if(array_key_exists($key,$this->props) && (!isset($this->props[$key]['enabled']) || $this->props[$key]['enabled']==true)){
-            if(isset($this->props[$key]['type'])){
-                switch($this->props[$key]['type']){
-                    case self::TYPE_BOOL:
-                        $this->data[$key] = boolval($value);
-                        break;
-                    case self::TYPE_INT:
-                        $this->data[$key] = intval($value);
-                        break;
-                    case self::TYPE_FLOAT:
-                        $this->data[$key] = floatval($value);
-                        break;
-                    case self::TYPE_STRING:
-                        $this->data[$key] = strval($value);
-                        break;
-                    case self::TYPE_BINARY:
-                        $this->data[$key] = $value;
-                        break;
-                    case self::TYPE_OBJECT:
-                        $this->data[$key] = !is_scalar($value)?$this->packData($value,true):$value;
-                        break;
-                    case self::TYPE_AUTO:
-                    default:
-                        if(is_bool($value)){
-                            $this->data[$key] = boolval($value);
-                        }elseif(is_float($value)){
-                            $this->data[$key] = floatval($value);
-                        }elseif(is_numeric($value)){
-                            $this->data[$key] = intval($value);
-                        }elseif(is_string($value)){
-                            $this->data[$key] = strval($value);
-                        }elseif(is_object($value) || is_array($value)){
-                            $this->data[$key] = $this->packData($value,true);
-                        }else{
-                            $this->data[$key] = $value;
-                        }
-                        break;
-                }
-            }else{
-                if(is_bool($value)){
-                    $this->data[$key] = boolval($value);
-                }elseif(is_float($value)){
-                    $this->data[$key] = floatval($value);
-                }elseif(is_numeric($value)){
-                    $this->data[$key] = intval($value);
-                }elseif(is_string($value)){
-                    $this->data[$key] = strval($value);
-                }elseif(is_object($value) || is_array($value)){
-                    $this->data[$key] = $this->packData($value,true);
-                }else{
-                    $this->data[$key] = $value;
-                }
-            }
-            if(isset($this->props[$key]['key'])){
-                if($this->props[$key]['key']==self::KEYTYPE_ID){
-                    $this->setIdPropKey($key);
-                    $getIdStrPropKey = $this->getIdStrPropKey();
-                    if(!empty($getIdStrPropKey)){
-                        $this->data[$getIdStrPropKey] = strval($value);
-                    }
-                }elseif($this->props[$key]['key']==self::KEYTYPE_IDSTR){
-                    $this->setIdStrPropKey($key);
-                }
-            }
-        }elseif(self::$strictMode == false){
-            if(is_bool($value)){
-                $this->data[$key] = boolval($value);
-            }elseif(is_float($value)){
-                $this->data[$key] = floatval($value);
-            }elseif(is_numeric($value)){
-                $this->data[$key] = intval($value);
-            }elseif(is_string($value)){
-                $this->data[$key] = strval($value);
-            }elseif(is_object($value) || is_array($value)){
-                $this->data[$key] = $this->packData($value,true);
-            }else{
-                $this->data[$key] = $value;
-            }
+    /**
+     * Set a given configuration value.
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @return void
+     */
+    public function set($key, $value) {
+        list($group, $item) = $this->parseKey($key);
+
+        if (is_null($item)) {
+            $this->items[$group] = $value;
+        } else {
+            BoxUtil::array_set($this->items[$group], $item, $value);
         }
+    }
+
+    /**
+     * Determine if the given configuration value exists.
+     *
+     * @param  string $key
+     * @return bool
+     */
+    public function has($key) {
+        $default = microtime(true);
+        return $this->get($key, $default) !== $default;
     }
 
     public function exists($key){
-        if(array_key_exists($key,$this->props) && (!isset($this->props[$key]['enabled']) || $this->props[$key]['enabled']==true)){
-            return true;
-        }else{
-            if(self::$strictMode == false && array_key_exists($key,$this->data)){
-                return true;
-            }else{
-                return false;
-            }
-        }
+        return $this->has($key);
     }
     public function remove($key){
-        if(array_key_exists($key,$this->data)){
-            unset($this->data[$key]);
-        }
+        $this->set($key, null);
     }
-
-    public function setProps($setProps=array(),$option=array()){
-        $option+=array(
-            'init'=>true, // init all props.
-        );
-        $changedKeys = array();
-        if(!empty($setProps)){
-            foreach ($setProps as $key => $value) {
-                $this->set($key,$value);
-                $changedKeys[$key] = $key;
-            }
-        }
-        if($option['init']==true){
-            $remainKeys = array_diff(array_keys($this->props),$changedKeys);
-            if(!empty($remainKeys)){
-                foreach ($remainKeys as $key) {
-                    if(!isset($this->props[$key]['enabled']) || $this->props[$key]['enabled']==true){
-                        if(isset($this->props[$key]['default'])){
-                            $this->data[$key] = $this->props[$key]['default'];
-                        }else{
-                            if(isset($this->props[$key]['type'])){
-                                switch($this->props[$key]['type']){
-                                    case self::TYPE_BOOL:
-                                        $this->data[$key] = false;
-                                        break;
-                                    case self::TYPE_INT:
-                                        $this->data[$key] = 0;
-                                        break;
-                                    case self::TYPE_FLOAT:
-                                        $this->data[$key] = 0.0;
-                                        break;
-                                    case self::TYPE_STRING:
-                                        $this->data[$key] = '';
-                                        break;
-                                    case self::TYPE_BINARY:
-                                        $this->data[$key] = '';
-                                        break;
-                                    case self::TYPE_OBJECT:
-                                        $this->data[$key] = $this->packData('',true);
-                                        break;
-                                    case self::TYPE_AUTO:
-                                    default:
-                                        $this->data[$key] = null;
-                                        break;
-                                }
-                            }else{
-                                $this->data[$key] = null;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    public function keys(){
+        return array_keys($this->items);
     }
-
-
-    public function upgradeObject($objectData = null){
-        $retData = null;
-        if(!empty($objectData)){
-            $this->setProps($objectData,array('init'=>true));
-            $retData = $this->toArray();
-        }
-        return $retData;
-    }
-
-    public static function factory($defaultProps=array()){
-        $className = get_called_class();
-        return new $className($defaultProps);
-    }
-
 
     public function toArray() {
-        return $this->data;
-    }
-    public function extraStruct(){
-        $data = $this->data;
-        foreach ($data as $propKey=>$propVal) {
-            if(isset($this->props[$propKey]) && isset($this->props[$propKey]['type']) && $this->props[$propKey]['type']==self::TYPE_OBJECT){
-                $data[$propKey] = !empty($propVal)?$this->packData($propVal,false):$propVal;
-            }
-        }
-        return $data;
+        return $this->items;
     }
 
     public function __toString() {
-        return $this->packData($this->data,true);
+        return $this->packData($this->items,true,$this->option);
     }
 
-    public function __construct($setProps=array()){
-        $this->setProps($setProps);
-        return $this;
-    }
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
@@ -425,7 +225,7 @@ class BoxSettings implements ArrayAccess,Serializable,IteratorAggregate{
 
 
     public function __set($key, $value){
-        return $this->set($key, $value);
+        $this->set($key, $value);
     }
 
 
@@ -434,18 +234,12 @@ class BoxSettings implements ArrayAccess,Serializable,IteratorAggregate{
     }
 
     public function __isset($key){
-        return $this->exists($key);
+        return $this->has($key);
     }
     public function __unset($key){
-        return $this->remove($key);
+        $this->set($key, null);
     }
 
-    /**
-     * @param array $data
-     */
-    public function setData($data) {
-        $this->data = $data;
-    }
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
@@ -454,7 +248,7 @@ class BoxSettings implements ArrayAccess,Serializable,IteratorAggregate{
      * @return string the string representation of the object or null
      */
     public function serialize() {
-        return $this->packData($this->data,true);
+        return $this->packData($this->items,true,$this->option);
     }
 
     /**
@@ -467,71 +261,48 @@ class BoxSettings implements ArrayAccess,Serializable,IteratorAggregate{
      * @return void
      */
     public function unserialize($serialized) {
-        $this->data = $this->packData($serialized,false);
+        $this->items = $this->packData($serialized,false,$this->option);
     }
 
     /**
-     * @return array
+     * Determine if the given configuration option exists.
+     *
+     * @param  string $key
+     * @return bool
      */
-    public function getData() {
-        return $this->data;
+    public function offsetExists($key) {
+        return $this->has($key);
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Whether a offset exists
-     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
-     * An offset to check for.
-     * </p>
-     * @return boolean true on success or false on failure.
-     * </p>
-     * <p>
-     * The return value will be casted to boolean if non-boolean was returned.
+     * Get a configuration option.
+     *
+     * @param  string $key
+     * @return mixed
      */
-    public function offsetExists($offset) {
-        return $this->exists($offset);
+    public function offsetGet($key) {
+        return $this->get($key);
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Offset to retrieve
-     * @link http://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
-     * The offset to retrieve.
-     * </p>
-     * @return mixed Can return all value types.
-     */
-    public function offsetGet($offset) {
-        return $this->get($offset);
-    }
-
-    /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Offset to set
-     * @link http://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
-     * The offset to assign the value to.
-     * </p>
-     * @param mixed $value <p>
-     * The value to set.
-     * </p>
+     * Set a configuration option.
+     *
+     * @param  string $key
+     * @param  mixed $value
      * @return void
      */
-    public function offsetSet($offset, $value) {
-        return $this->set($offset,$value);
+    public function offsetSet($key, $value) {
+        $this->set($key, $value);
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Offset to unset
-     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
-     * The offset to unset.
-     * </p>
+     * Unset a configuration option.
+     *
+     * @param  string $key
      * @return void
      */
-    public function offsetUnset($offset) {
-        return $this->remove($offset);
+    public function offsetUnset($key) {
+        $this->set($key, null);
     }
+
 }

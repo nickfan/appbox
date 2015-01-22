@@ -12,15 +12,9 @@
  *
  */
 
-require_once __DIR__.'/../bootstrap/initenv.php';
+require_once __DIR__ . '/../../bootstrap/initenv.php';
 
-//use Nickfan\AppBox\Config\BoxRouteConf;
-//use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
-//$instBoxRouteConf = new BoxRouteConf($app['path']['storage'].'/etc/local',new ApcBoxUsercache());
-//$status = $instBoxRouteConf->cacheFlush();
-
-//$status = $app['routeconf']->cacheFlush();
-$status = \Nickfan\AppBox\Foundation\AppBox::make('routeconf')->cacheFlush();
+$status = \Nickfan\AppBox\Support\Facades\AppBox::make('routeconf')->cacheFlush();
 
 if ($status) {
     echo 'route conf cache reloaded.' . PHP_EOL;

@@ -12,129 +12,117 @@
  */
 namespace Nickfan\AppBox\Foundation;
 
+use Illuminate\Container\Container;
 use Nickfan\AppBox\Support\BoxUtil;
-use Nickfan\AppBox\Common\Exception\UnexpectedValueException;
-
-use Nickfan\AppBox\Config\BoxRouteConf;
-use Nickfan\AppBox\Foundation\BoxSettings;
-use Nickfan\AppBox\Config\BoxRepository;
-use Nickfan\AppBox\Common\Usercache\BoxUsercacheInterface;
 use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Common\Usercache\YacBoxUsercache;
 use Nickfan\AppBox\Common\Usercache\NullBoxUsercache;
+use Nickfan\AppBox\Common\Exception\UnexpectedValueException;
+class BoxApp extends Container{
 
-class AppBox extends Container{
-    protected static $instance = null;
-    protected $box = null;
-    protected $settings = null;
-    protected $userCacheInstance = null;
-    /**
-     * Protected constructor to prevent creating a new instance of the
-     * *Singleton* via the `new` operator from outside of this class.
-     */
-    protected function __construct() {
-        $this->settings = new BoxSettings();
-//        $this->box = new Container();
+    public function inst(){
         return $this;
     }
-
     /**
-     * Private clone method to prevent cloning of the instance of the
-     * *Singleton* instance.
+     * Quick debugging of any variable. Any number of parameters can be set.
      *
-     * @return void
+     * @return  string
      */
-    private function __clone() {
-    }
-
-    /**
-     * Private unserialize method to prevent unserializing of the *Singleton*
-     * instance.
-     *
-     * @return void
-     */
-    private function __wakeup() {
-    }
-
-    /**
-     * Returns the *Singleton* instance of this class.
-     *
-     * @staticvar Singleton $instance The *Singleton* instances of this class.
-     *
-     * @return Singleton The *Singleton* instance.
-     */
-    public static function getInstance() {
-        if (null === static::$instance) {
-            static::$instance = new static();
+    public static function debug() {
+        if (func_num_args() === 0) {
+            return null;
         }
-        return static::$instance;
-    }
-
-    public static function app(){
-        return new Container();
-    }
-
-    public static function box(){
-        $instance = static::getInstance();
-        return $instance->getBox();
-    }
-    public function getBox(){
-        return $this->box;
-    }
-    public function setBox(Container $container){
-        $this->box = $container;
-    }
-
-    public static function settings(){
-        $instance = static::getInstance();
-        return $instance->getBox();
-    }
-    public function getSettings(){
-        return $this->settings;
-    }
-    public function setSettings(BoxSettings $settings){
-        $this->settings = $settings;
-    }
-    public static function instSettings(BoxSettings $settings){
-        $instance = static::getInstance();
-        $instance->setSettings($settings);
-    }
-    public static function getInstSetVar($key){
-        $instance = static::getInstance();
-        return $instance->getSetVar($key);
-    }
-
-    public function getSetVar($key){
-        return $this->settings->get($key);
-    }
-    public function setSetVar($key,$val){
-        $this->settings->set($key,$val);
-    }
-
-    public static function make($abstract=''){
-        $instance = static::getInstance();
-        $box = $instance->getBox();
-        return isset($box[$abstract])?$box[$abstract]:null;
-    }
-    public static function register($abstract='',$value=null){
-        $instance = static::getInstance();
-        $box = $instance->getBox();
-        $box[$abstract] = $value;
-    }
-    public static function init(\Closure $callback=null){
-        $instance = static::getInstance();
-        if(!is_null($callback)){
-            if (!is_callable($callback)) {
-                throw new UnexpectedValueException('init script error');
-            }else{
-                $box = call_user_func($callback);
-                if($box instanceof Container){
-                    $instance->setBox($box);
-                }
+        // Get params
+        $params = func_get_args();
+        $printBool = true;
+        if(func_num_args() > 1){
+            $printBool = boolval(array_shift($params));
+        }
+        $output = array();
+        foreach ($params as $var) {
+            $output[] = '(' . gettype($var) . ') ' . var_export($var, true) . '';
+        }
+        if (php_sapi_name() == 'cli') {
+            if ($printBool == true) {
+                print(implode("\n", $output));
+            } else {
+                return implode("\n", $output);
+            }
+        } else {
+            if ($printBool == true) {
+                print('<pre>' . implode("</pre>\n<pre>", $output) . '</pre>');
+            } else {
+                return '<pre>' . implode("</pre>\n<pre>", $output) . '</pre>';
             }
         }
-        return $instance;
+        return null;
     }
+
+    /**
+     * Create a new Illuminate application instance.
+     *
+     * @return void
+     */
+    public function __construct(){
+        $this->registerBaseBindings();
+    }
+
+    public static function appbox(\Closure $callback=null){
+        $app = null;
+        if (!is_callable($callback)) {
+            throw new UnexpectedValueException('init script error');
+        }else{
+            $app = call_user_func($callback);
+        }
+        return $app;
+    }
+
+    /**
+     * Register the basic bindings into the container.
+     *
+     * @return void
+     */
+    protected function registerBaseBindings(){
+        $this->instance('Illuminate\Container\Container', $this);
+    }
+
+    /**
+     * Bind the installation paths to the application.
+     *
+     * @param  array $paths
+     * @return void
+     */
+    public function bindInstallPaths(array $paths) {
+        $this->instance('path', realpath($paths['app']));
+
+        // Here we will bind the install paths into the container as strings that can be
+        // accessed from any point in the system. Each path key is prefixed with path
+        // so that they have the consistent naming convention inside the container.
+        foreach (BoxUtil::array_except($paths, array('app')) as $key => $value) {
+            $this->instance("path.{$key}", realpath($value));
+        }
+    }
+
+
+    /**
+     * Register the core class aliases in the container.
+     *
+     * @return void
+     */
+    public function registerCoreContainerAliases() {
+        $aliases = array(
+            'app' => 'Nickfan\AppBox\Foundation\BoxApp',
+            'dict' => 'Nickfan\AppBox\Config\BoxDictionary',
+            'conf' => 'Nickfan\AppBox\Config\BoxRepository',
+            'routeconf' => 'Nickfan\AppBox\Config\BoxRouteConf',
+            'routeinst' => 'Nickfan\AppBox\Instance\DataRouteInstance',
+        );
+
+        foreach ($aliases as $key => $alias) {
+            $this->alias($key, $alias);
+        }
+    }
+
 
     public static function verifyRepositoryPath($confPath=''){
         $realpath = realpath($confPath);
@@ -142,18 +130,6 @@ class AppBox extends Container{
             return true;
         }
         return false;
-    }
-    public static function setRepositoryPath($confPath=''){
-        $instance = static::getInstance();
-        $app = $instance->getBox();
-        $paths = $instance->getSetVar('path');
-        if($confPath!=$paths['conf'] && self::verifyRepositoryPath($confPath)){
-            $paths['conf'] = $confPath;
-            $instance->setSetVar('path',$paths);
-            $app->extend('conf', function ($app,$paths) {
-                return new BoxRepository($paths['conf'],$app['usercache']);
-            });
-        }
     }
 
     public static function verifyRouteConfPath($routeConfPath=''){
@@ -170,32 +146,10 @@ class AppBox extends Container{
         return false;
     }
 
-    public static function setRouteConfPath($routeConfPath=''){
-        $instance = static::getInstance();
-        $app = $instance->getBox();
-        $paths = $instance->getSetVar('path');
-        if($routeConfPath!=$paths['routeconf'] && self::verifyRouteConfPath($routeConfPath)){
-            $paths['routeconf'] = $routeConfPath;
-            $instance->setSetVar('path',$paths);
-            $app->extend('routeconf', function ($app,$paths) {
-                return new BoxRouteConf($paths['routeconf'],$app['usercache']);
-            });
-            $app->extend('routeinst', function ($app) {
-                return BoxRouteInstance::getInstance($app['routeconf']);
-            });
-        }
+    public function setRepositoryPath($confPath=''){
+
     }
 
-
-    public function getUserCacheInstance(){
-        return $this->userCacheInstance;
-    }
-    public function setUserCacheInstance(BoxUsercacheInterface $usercacheInterface = null,$detect=true){
-        if(is_null($usercacheInterface) && $detect==true){
-            $usercacheInterface =  self::makeUserCacheInstance();
-        }
-        $this->userCacheInstance = $usercacheInterface;
-    }
     public static function makeUserCacheInstance(){
         if(extension_loaded('apc')){
             $usercacheInterface = new ApcBoxUsercache;
@@ -214,4 +168,27 @@ class AppBox extends Container{
         }
         return $realPaths;
     }
+
+
+    /**
+     * Dynamically access application services.
+     *
+     * @param  string $key
+     * @return mixed
+     */
+    public function __get($key) {
+        return $this[$key];
+    }
+
+    /**
+     * Dynamically set application services.
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @return void
+     */
+    public function __set($key, $value) {
+        $this[$key] = $value;
+    }
+
 }

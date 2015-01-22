@@ -18,6 +18,11 @@ namespace Nickfan\AppBox\Common;
 class BoxConstants {
 
     const VERSION = '0.1';
+
+    const ENCODER_SERIALIZE = 'serialize';
+    const ENCODER_JSON = 'json';
+    const ENCODER_MSGPACK = 'msgpack';
+
     const CONF_KEY_ROOT = 'root';
     const CONF_LABEL_INIT = 'init';
     const USERCACHE_TTL_DEFAULT = 300;

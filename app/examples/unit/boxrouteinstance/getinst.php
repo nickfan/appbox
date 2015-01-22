@@ -11,13 +11,13 @@
  *
  */
 
-require_once __DIR__.'/../../../bootstrap/initenv.php';
+require_once __DIR__ . '/../../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
 
-$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($app['path']['storage'].'/etc/local',new ApcBoxUsercache()));
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($app['path.storage'].'/etc/local',new ApcBoxUsercache()));
 
 
 $routeInstance = $instBoxRouteInstance->getRouteInstance('cfg','mygroup',array('id'=>3));

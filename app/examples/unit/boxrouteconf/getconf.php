@@ -11,12 +11,12 @@
  *
  */
 
-require_once __DIR__.'/../../../bootstrap/initenv.php';
+require_once __DIR__ . '/../../../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 
-$instBoxRouteConf = new BoxRouteConf($app['path']['storage'].'/etc/local',new ApcBoxUsercache());
+$instBoxRouteConf = new BoxRouteConf($app['path.storage'].'/etc/local',new ApcBoxUsercache());
 
 
 $clearResult = $instBoxRouteConf->cacheFlush();var_dump($clearResult);

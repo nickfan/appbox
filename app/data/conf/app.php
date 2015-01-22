@@ -25,6 +25,20 @@ return array(
     */
 
     'debug' => true,
+
+
+    'namespace'=>array(
+        'cli'=>'',
+        //'cli'=>'\\App\\Boxcommands',
+        //'cli'=>'\\Nickfan\\BoxApp\\BoxCommand',
+        'web'=>'',
+        //'web'=>'\\App\\Boxcontrollers',
+        //'web'=>'\\Nickfan\\BoxApp\\BoxController',
+
+        'object'=>'',
+        'object'=>'\\App\\Boxobjects',
+        //'object'=>'\\Nickfan\\AppBox\\BoxObject',
+    ),
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -61,19 +75,7 @@ return array(
     */
 
     'fallback_locale' => 'en',
-    /*
-    |--------------------------------------------------------------------------
-    | Autoloaded Service Providers
-    |--------------------------------------------------------------------------
-    |
-    | The service providers listed here will be automatically loaded on the
-    | request to your application. Feel free to add your own services to
-    | this array to grant expanded functionality to your applications.
-    |
-    */
 
-    'providers' => array(//'Nickfan\AppBox\Config\ConfigServiceProvider',
-    ),
     /*
     |--------------------------------------------------------------------------
     | Class Aliases
@@ -87,10 +89,11 @@ return array(
 
     'aliases' => array(
         'ClassLoader' => 'Nickfan\AppBox\Support\ClassLoader',
-        'App' => 'Nickfan\AppBox\Support\Facades\App',
-        'Config' => 'Nickfan\AppBox\Support\Facades\Config',
+        'AppBox' => 'Nickfan\AppBox\Support\Facades\AppBox',
+        'BoxDict' => 'Nickfan\AppBox\Support\Facades\BoxDict',
+        'BoxConf' => 'Nickfan\AppBox\Support\Facades\BoxConf',
         'BoxRouteConf' => 'Nickfan\AppBox\Support\Facades\BoxRouteConf',
-        'BoxRouteInstance' => 'Nickfan\AppBox\Support\Facades\BoxRouteInstance',
+        'BoxRouteInst' => 'Nickfan\AppBox\Support\Facades\BoxRouteInst',
     ),
 
 );

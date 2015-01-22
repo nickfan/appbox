@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\BoxApp\BoxPackage;
+namespace App\Boxpackages;
 
 
 use Nickfan\AppBox\Package\BoxBasePackage;

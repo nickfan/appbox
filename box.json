@@ -1,7 +1,7 @@
 {
     "directories": ["src"],
-    "directories-bin": ["app","vendor","tests"],
-    "files-bin": ["composer.json","appbox","LICENSE","README.md","build.xml","phpunit.xml.dist",".travis.yml"],
+    "directories-bin": ["bootstrap","app","vendor","tests"],
+    "files-bin": ["composer.json","appbox","LICENSE","README.md","build.xml","phpunit.xml.dist",".travis.yml","server.php"],
     "main": "appbox",
     "output": "appbox.phar",
     "stub": true

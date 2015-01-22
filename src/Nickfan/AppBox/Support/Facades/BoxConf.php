@@ -15,13 +15,13 @@
 namespace Nickfan\AppBox\Support\Facades;
 
 
-class BoxDict extends Facade {
+class BoxConf extends Facade {
     /**
      * Get the registered name of the component.
      *
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'dict';
+        return 'conf';
     }
 }
