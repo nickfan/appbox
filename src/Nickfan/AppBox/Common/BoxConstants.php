@@ -17,6 +17,8 @@ namespace Nickfan\AppBox\Common;
 
 class BoxConstants {
 
+    const TRANSGIFDATA = 'R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw'; // 透明1x1GIF图base64
+
     const VERSION = '0.1';
 
     const ENCODER_SERIALIZE = 'serialize';

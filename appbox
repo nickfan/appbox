@@ -90,7 +90,7 @@ try {
         $public = $app['path.public'];
         passthru('"'.PHP_BINARY.'"'." -S {$getopt['host']}:{$getopt['port']} -t \"{$public}\" server.php");
     }
-    if(count($operands)<1){
+    if(!$getopt['serve'] && count($operands)<1){
 
         try{
             $boris = new \Boris\Boris('appbox> ');

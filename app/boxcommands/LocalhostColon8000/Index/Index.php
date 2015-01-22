@@ -11,7 +11,7 @@
  *
  */
 
-namespace Nickfan\BoxApp\BoxController\Localhost\Index;
+namespace App\Boxcommands\LocalhostColon8000\Index;
 
 use Nickfan\AppBox\Support\Facades\AppBox;
 use Nickfan\BoxApp\BoxController\BoxAbstractController;

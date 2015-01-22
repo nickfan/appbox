@@ -137,7 +137,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
                     }elseif(preg_match('/^\d+.\d+.\d+.\d+$/',$domain)){
                         $domain_dir = 'ip'.$domain;
                     }
-                    $this->domain = ucfirst(str_replace('.','Dot',$domain_dir));
+                    $this->domain = ucfirst(str_replace(array('.',':'),array('Dot','Colon'),$domain_dir));
 
                     $gotAction = false;
                     $gotSegments = false;
@@ -230,7 +230,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
             }elseif(preg_match('/^\d+.\d+.\d+.\d+$/',$domain)){
                 $domain_dir = 'ip'.$domain;
             }
-            $this->domain = ucfirst(str_replace('.','Dot',$domain_dir));
+            $this->domain = ucfirst(str_replace(array('.',':'),array('Dot','Colon'),$domain_dir));
 
             $this->parseCurrentUri();
             $gotAction = false;
