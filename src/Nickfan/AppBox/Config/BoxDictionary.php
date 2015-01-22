@@ -13,7 +13,7 @@
 
 
 
-namespace Nickfan\AppBox\Foundation;
+namespace Nickfan\AppBox\Config;
 
 use ArrayAccess;
 use Traversable;

@@ -11,7 +11,7 @@
  *
  */
 
-require_once __DIR__.'/autoload.php';
+require_once __DIR__ . '/autoload.php';
 
 use Nickfan\AppBox\Foundation\AppBox;
 use Nickfan\AppBox\Foundation\BoxSettings;
@@ -24,7 +24,7 @@ if(!function_exists('appbox')){
         static $app;
         if(empty($app)){
             AppBox::instSettings(BoxSettings::factory(array(
-                'path' => AppBox::buildRealPaths(require( __DIR__ . '/paths.php')),
+                'path' => AppBox::buildRealPaths(require(__DIR__ . '/paths.php')),
             )));
             AppBox::init(function(){
                 $paths = AppBox::getInstSetVar('path');

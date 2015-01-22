@@ -13,7 +13,6 @@
 namespace Nickfan\AppBox\Foundation;
 
 use Nickfan\AppBox\Support\BoxUtil;
-use Pimple\Container;
 use Nickfan\AppBox\Common\Exception\UnexpectedValueException;
 
 use Nickfan\AppBox\Config\BoxRouteConf;
@@ -24,7 +23,7 @@ use Nickfan\AppBox\Common\Usercache\ApcBoxUsercache;
 use Nickfan\AppBox\Common\Usercache\YacBoxUsercache;
 use Nickfan\AppBox\Common\Usercache\NullBoxUsercache;
 
-class AppBox{
+class AppBox extends Container{
     protected static $instance = null;
     protected $box = null;
     protected $settings = null;
