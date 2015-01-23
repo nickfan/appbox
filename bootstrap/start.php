@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -77,11 +77,11 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         $userCacheObject = $app->makeUserCacheInstance();
         $app->instance('usercache', $userCacheObject);
         $app->instance('dict', $dict = new BoxDictionary(array()));
-        $app->instance('conf', $config = new BoxRepository($app['path.storage'] . '/conf', $userCacheObject));
-        $app->instance('routeconf', $routeconf = new BoxRouteConf($app['path.storage'] . '/etc/local', $userCacheObject));
-        $app->instance('routeinst', $routeinstance = BoxRouteInstance::getInstance($routeconf));
+        $app->instance('boxconf', $config = new BoxRepository($app['path.storage'] . '/conf', $userCacheObject));
+        $app->instance('boxrouteconf', $routeconf = new BoxRouteConf($app['path.storage'] . '/etc/local', $userCacheObject));
+        $app->instance('boxrouteinst', $routeinstance = BoxRouteInstance::getInstance($routeconf));
 
-        $config = $app['conf']['app'];
+        $config = $app['boxconf']['app'];
 
         date_default_timezone_set($config['timezone']);
         /*

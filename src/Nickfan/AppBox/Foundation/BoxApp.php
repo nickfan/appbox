@@ -113,9 +113,9 @@ class BoxApp extends Container{
         $aliases = array(
             'app' => 'Nickfan\AppBox\Foundation\BoxApp',
             'dict' => 'Nickfan\AppBox\Config\BoxDictionary',
-            'conf' => 'Nickfan\AppBox\Config\BoxRepository',
-            'routeconf' => 'Nickfan\AppBox\Config\BoxRouteConf',
-            'routeinst' => 'Nickfan\AppBox\Instance\DataRouteInstance',
+            'boxconf' => 'Nickfan\AppBox\Config\BoxRepository',
+            'boxrouteconf' => 'Nickfan\AppBox\Config\BoxRouteConf',
+            'boxrouteinst' => 'Nickfan\AppBox\Instance\DataRouteInstance',
         );
 
         foreach ($aliases as $key => $alias) {

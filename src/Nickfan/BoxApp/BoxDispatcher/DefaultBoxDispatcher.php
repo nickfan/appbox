@@ -115,7 +115,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
                 'app_root' => isset(static::$app['path.app']) ? static::$app['path.app'] : '',
                 'data_root' => isset(static::$app['path.storage']) ? static::$app['path.storage'] : '',
                 'public_root' => isset(static::$app['path.public']) ? static::$app['path.public'] : '',
-                'basenamespace' => static::$app['conf']->get('app.namespace.cli'),
+                'basenamespace' => static::$app['boxconf']->get('app.namespace.cli'),
             );
             if(isset($_SERVER['argv'])){
                 $argvars = $_SERVER['argv'];
@@ -125,6 +125,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
                     if(strpos($req_uri,'//')===false){
                         $req_uri = 'ssh://'.$req_uri;
                     }
+                    $this->current_uri = $req_uri;
                     $req_urlinfo = parse_url($req_uri);
                     $domain = isset($req_urlinfo['host'])?$req_urlinfo['host']:'localhost';
                     $port = isset($req_urlinfo['port'])?$req_urlinfo['port']:'80';
@@ -212,7 +213,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
                 'app_root' => isset(static::$app['path.app']) ? static::$app['path.app'] : '',
                 'data_root' => isset(static::$app['path.storage']) ? static::$app['path.storage'] : '',
                 'public_root' => isset(static::$app['path.public']) ? static::$app['path.public'] : '',
-                'basenamespace' => static::$app['conf']->get('app.namespace.web'),
+                'basenamespace' => static::$app['boxconf']->get('app.namespace.web'),
             );
 
             if(strlen($params['domain'])==0){
@@ -334,4 +335,4 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
             throw new \BadMethodCallException('undefined controller:'.$controllername, 500);
         }
     }
-} 
+}

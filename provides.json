@@ -1,0 +1,5 @@
+{
+	"providers": [
+		"Nickfan\\Appbox\\Embed\\Laravel\\AppboxServiceProvider"
+	]
+}

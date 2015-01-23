@@ -1,4 +1,4 @@
-<?php namespace Nickfan\Appbox;
+<?php namespace Nickfan\Appbox\Embed\Laravel;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -18,7 +18,7 @@ class AppboxServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('nickfan/appbox');
+		$this->package('nickfan/appbox', 'appbox', __DIR__.'/../../../../');
 	}
 
 	/**

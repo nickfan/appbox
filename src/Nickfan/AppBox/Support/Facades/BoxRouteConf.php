@@ -22,6 +22,6 @@ class BoxRouteConf extends Facade {
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'routeconf';
+        return 'boxrouteconf';
     }
 }

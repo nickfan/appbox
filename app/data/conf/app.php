@@ -36,7 +36,7 @@ return array(
         //'web'=>'\\Nickfan\\BoxApp\\BoxController',
 
         'object'=>'',
-        'object'=>'\\App\\Boxobjects',
+        //'object'=>'\\App\\Boxobjects',
         //'object'=>'\\Nickfan\\AppBox\\BoxObject',
     ),
     /*
