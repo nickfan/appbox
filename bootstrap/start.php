@@ -76,7 +76,7 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         $app->registerCoreContainerAliases();
         $userCacheObject = $app->makeUserCacheInstance();
         $app->instance('usercache', $userCacheObject);
-        $app->instance('dict', $dict = new BoxDictionary(array()));
+        $app->instance('boxdict', $dict = new BoxDictionary(array()));
         $app->instance('boxconf', $config = new BoxRepository($app['path.storage'] . '/conf', $userCacheObject));
         $app->instance('boxrouteconf', $routeconf = new BoxRouteConf($app['path.storage'] . '/etc/local', $userCacheObject));
         $app->instance('boxrouteinst', $routeinstance = BoxRouteInstance::getInstance($routeconf));

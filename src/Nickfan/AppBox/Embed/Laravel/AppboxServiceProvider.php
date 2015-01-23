@@ -19,6 +19,8 @@ class AppboxServiceProvider extends ServiceProvider {
 	public function boot()
 	{
 		$this->package('nickfan/appbox', 'appbox', __DIR__.'/../../../../');
+
+		$app = $this->app;
 	}
 
 	/**
@@ -38,7 +40,12 @@ class AppboxServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return array(
+			'boxconf',
+			'boxdict',
+			'boxrouteconf',
+			'boxrouteinst',
+			);
 	}
 
 }

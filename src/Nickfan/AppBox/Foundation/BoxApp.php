@@ -112,7 +112,7 @@ class BoxApp extends Container{
     public function registerCoreContainerAliases() {
         $aliases = array(
             'app' => 'Nickfan\AppBox\Foundation\BoxApp',
-            'dict' => 'Nickfan\AppBox\Config\BoxDictionary',
+            'boxdict' => 'Nickfan\AppBox\Config\BoxDictionary',
             'boxconf' => 'Nickfan\AppBox\Config\BoxRepository',
             'boxrouteconf' => 'Nickfan\AppBox\Config\BoxRouteConf',
             'boxrouteinst' => 'Nickfan\AppBox\Instance\DataRouteInstance',
