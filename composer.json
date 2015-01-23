@@ -14,6 +14,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
         "illuminate/container": "4.2.*@dev",
         "ulrichsg/getopt-php": "2.1.*",
         "jeremeamia/superclosure": "~1.0",
@@ -31,15 +32,16 @@
     },
     "autoload": {
         "psr-0": {
-            "Nickfan\\BoxApp": "src/",
-            "Nickfan\\AppBox": "src/"
+            "Nickfan\\AppBox\\": "src/",
+            "Nickfan\\BoxApp\\": "src/"
         },
         "classmap": [
             "app/boxcommands",
             "app/boxcontrollers",
             "app/boxdispatchers",
             "app/boxobjects",
-            "app/boxpackages"
+            "app/boxpackages",
+            "src/migrations"
         ],
         "files": [
         ]
