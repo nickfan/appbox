@@ -16,6 +16,7 @@ namespace Nickfan\AppBox\Common\Usercache;
 
 
 class RedisBoxUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
+    protected $cachedriverkey = 'redis';
 
     protected $defaultOption = array(
         'redisHost' => '127.0.0.1:6379',

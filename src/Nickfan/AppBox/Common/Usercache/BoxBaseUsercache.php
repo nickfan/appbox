@@ -22,12 +22,16 @@ abstract class BoxBaseUsercache implements BoxUsercacheInterface {
         'formatprefix' => '',
         'ttl' => 300,
     );
-
+    protected $cachedriverkey = null;
     protected $instance = null;
 
     public function __construct($option = array()) {
         $this->setOption($option);
         return $this;
+    }
+
+    public function getCacheDriverKey() {
+        return $this->cachedriverkey;
     }
 
     protected function getInstance() {
@@ -106,4 +110,4 @@ abstract class BoxBaseUsercache implements BoxUsercacheInterface {
 
     abstract function flush($option = array());
 
-} 
+}

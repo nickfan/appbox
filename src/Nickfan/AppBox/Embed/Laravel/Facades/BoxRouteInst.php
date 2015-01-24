@@ -12,7 +12,7 @@
  */
 
 
-namespace Nickfan\AppBox\Support\Facades;
+namespace Nickfan\AppBox\Embed\Laravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

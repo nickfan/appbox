@@ -12,17 +12,16 @@
  */
 
 
-namespace Nickfan\AppBox\Embed\Laravel\Facades;
+namespace Nickfan\AppBox\Support\Facades;
 
-use Illuminate\Support\Facades\Facade;
 
-class BoxRouteConf extends Facade {
+class BoxUsercache extends Facade {
     /**
      * Get the registered name of the component.
      *
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'boxrouteconf';
+        return 'boxusercache';
     }
 }

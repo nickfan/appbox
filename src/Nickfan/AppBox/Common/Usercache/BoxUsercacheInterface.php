@@ -16,6 +16,8 @@ namespace Nickfan\AppBox\Common\Usercache;
 
 interface BoxUsercacheInterface {
 
+    public function getCacheDriverKey();
+    
     public function setOption($option = array());
 
     public function getOption();

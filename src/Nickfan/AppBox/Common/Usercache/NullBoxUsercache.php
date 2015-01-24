@@ -16,6 +16,7 @@ namespace Nickfan\AppBox\Common\Usercache;
 
 
 class NullBoxUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
+    protected $cachedriverkey = 'null';
 
     protected function getInstance() {
         if (is_null($this->instance)) {
