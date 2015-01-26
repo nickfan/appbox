@@ -14,7 +14,8 @@
 
 
 if (php_sapi_name() != 'cli') {
-    require_once __DIR__ . '/app/webroot/index.php';
+    require_once __DIR__ . '/public/index.php';
 } else {
-    require_once __DIR__ . '/appbox';
+    require_once __DIR__ . '/public/index.php';
+    //require_once __DIR__ . '/appbox';
 }

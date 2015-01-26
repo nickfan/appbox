@@ -10,6 +10,7 @@
  * @lastmodified: 2015-01-22 14:39
  *
  */
+use Nickfan\AppBox\Common\Usercache\AutoBoxUsercache;
 use Nickfan\AppBox\Config\BoxDictionary;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Config\BoxRepository;
@@ -74,6 +75,7 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         */
 
         $app->registerCoreContainerAliases();
+        //$userCacheObject = new AutoBoxUsercache();
         $userCacheObject = $app->makeUserCacheInstance();
         $app->instance('usercache', $userCacheObject);
         $app->instance('boxdict', $dict = new BoxDictionary(array()));

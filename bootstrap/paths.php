@@ -37,7 +37,7 @@ return array(
     |
     */
 
-    'public' => __DIR__ . '/../app/webroot',
+    'public' => __DIR__ . '/../public',
     /*
     |--------------------------------------------------------------------------
     | Base Path
@@ -61,5 +61,5 @@ return array(
     |
     */
 
-    'storage' => __DIR__ . '/../app/data',
+    'storage' => __DIR__ . '/../app/boxdata',
 );

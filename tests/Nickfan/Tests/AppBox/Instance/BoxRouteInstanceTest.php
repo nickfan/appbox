@@ -25,8 +25,8 @@ class BoxRouteInstanceTest extends \PHPUnit_Framework_TestCase {
     protected function setUp() {
         $this->basePath = $basePath = realpath(__DIR__ . '/../../../../../');
         $appPath = $basePath . '/app';
-        $this->confPath = $confPath = $appPath . '/data/conf';
-        $this->etcPath = $etcPath = $appPath . '/data/etc/local';
+        $this->confPath = $confPath = $appPath . '/boxdata/conf';
+        $this->etcPath = $etcPath = $appPath . '/boxdata/etc/local';
         $this->object = BoxRouteInstance::getInstance(new BoxRouteConf($etcPath,null));
     }
 

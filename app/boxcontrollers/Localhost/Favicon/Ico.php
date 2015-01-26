@@ -11,7 +11,7 @@
  *
  */
 
-namespace Nickfan\BoxApp\BoxController\LocalhostColon8000\Favicon;
+namespace App\Boxcontrollers\Localhost\Favicon;
 
 use Nickfan\AppBox\Common\BoxConstants;
 use Nickfan\AppBox\Support\Facades\AppBox;

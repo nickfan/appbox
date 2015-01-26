@@ -150,6 +150,15 @@ class BoxApp extends Container{
 
     }
 
+    /**
+     * Determine if we are running in the console.
+     *
+     * @return bool
+     */
+    public static function runningInConsole(){
+        return php_sapi_name() == 'cli';
+    }
+
     public static function makeUserCacheInstance(){
         if(extension_loaded('apc')){
             $usercacheInterface = new ApcBoxUsercache;

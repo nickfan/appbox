@@ -13,8 +13,9 @@
  */
 
 require_once __DIR__ . '/../../bootstrap/initenv.php';
-
-$status = \Nickfan\AppBox\Support\Facades\AppBox::make('boxrouteconf')->cacheFlush();
+use Nickfan\AppBox\Support\Facades\BoxRouteConf;
+//$status = \Nickfan\AppBox\Support\Facades\AppBox::make('boxrouteconf')->cacheFlush();
+$status = BoxRouteConf::cacheFlush();
 
 if ($status) {
     echo 'route conf cache reloaded.' . PHP_EOL;

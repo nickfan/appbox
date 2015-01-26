@@ -11,7 +11,7 @@
  *
  */
 
-require_once __DIR__ . '/../../bootstrap/initenv.php';
+require_once __DIR__ . '/../bootstrap/app_init.php';
 
 $inst = \Nickfan\BoxApp\BoxDispatcher\DefaultBoxDispatcher::getInstance($app);
 $inst->run();
