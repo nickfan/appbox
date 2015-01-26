@@ -12,10 +12,7 @@
  */
 use \NoahBuscher\Macaw\Macaw as Route;
 use Nickfan\AppBox\Common\BoxConstants;
-
-Route::get('/', function() {
-    echo 'Hello world!';
-});
+use Nickfan\BoxApp\Support\Facades\BoxDispatcher;
 Route::get('/favicon.ico', function() {
     $content = base64_decode(BoxConstants::TRANSGIFDATA);
     $contentType = 'image/gif';
@@ -27,3 +24,15 @@ Route::get('/favicon.ico', function() {
     echo $content;
     exit;
 });
+
+Route::get('/', function() {
+    echo 'Welcome to AppBox'.'<br>'.PHP_EOL;
+    echo BoxDispatcher::getHost();
+});
+
+Route::get('/hello', function() {
+    echo 'Hello world!';
+});
+
+Route::get('/box', '\App\Boxcontrollers\Localhost\Index\Index@Index');
+Route::get('/ping', '\App\Boxcontrollers\Localhost\Index\Index@Ping');

@@ -13,9 +13,8 @@
 
 namespace App\Boxcontrollers\Localhost\Favicon;
 
-use Nickfan\AppBox\Common\BoxConstants;
-use Nickfan\AppBox\Support\Facades\AppBox;
 use Nickfan\BoxApp\BoxController\BoxAbstractController;
+use Nickfan\AppBox\Common\BoxConstants;
 
 class Ico extends BoxAbstractController {
 

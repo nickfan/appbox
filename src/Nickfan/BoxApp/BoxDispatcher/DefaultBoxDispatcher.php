@@ -28,6 +28,8 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
 
     protected static $app;
 
+    protected static $instance = null;
+
     protected $baseNamespace = '';
 
     /**
@@ -67,14 +69,15 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
      * @return Singleton The *Singleton* instance.
      */
     public static function getInstance($app = null) {
-        static $instance = null;
-        if (null === $instance) {
-            $instance = new static($app);
+        if (null === self::$instance) {
+            self::$instance = new static($app);
         }
-
-        return $instance;
+        return self::$instance;
     }
 
+    public function instance(){
+        return self::$instance;
+    }
     public static function setApp($app) {
         static::$app = $app;
     }
@@ -82,15 +85,6 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
     public static function getApp() {
         return static::$app;
     }
-
-    public function setBaseNamespace($baseNamespace = '\\Nickfan\\BoxApp\\BoxController') {
-        $this->baseNamespace = $baseNamespace;
-    }
-
-    public function getBaseNamespace() {
-        return $this->baseNamespace;
-    }
-
 
     private static function verifyLabel($label = '') {
         if (preg_match('/[a-z0-9\_]+/i', $label) || strlen($label) == 0) {
@@ -110,6 +104,37 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
     protected static $app_root = '';
     protected static $data_root = '';
     protected static $public_root = '';
+
+    public function getBaseNamespace() {
+        return $this->baseNamespace;
+    }
+
+    public function setBaseNamespace($baseNamespace = '') {
+        $this->baseNamespace = $baseNamespace;
+    }
+
+    public function getDomain(){
+        return $this->domain;
+    }
+    public function getCurrentUri(){
+        return $this->current_uri;
+    }
+
+    public function getPkg(){
+        return $this->pkg;
+    }
+    public function getMod(){
+        return $this->mod;
+    }
+    public function getAct(){
+        return $this->act;
+    }
+    public function getSegments(){
+        return $this->segments;
+    }
+    public function getHost(){
+        return $this->host;
+    }
 
     /**
      * Determine if we are running in the console.
@@ -335,6 +360,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
     }
 
     public function init($args=array()){
+
         $params = $args;
         if($this->runningInConsole()){
             $params += array(
@@ -370,9 +396,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
         self::$data_root = $params['data_root'];
         self::$public_root = $params['public_root'];
     }
-    public function getCurrentUri(){
-        return $this->current_uri;
-    }
+
     public function runCall($baseNamespace = null) {
         if(empty($baseNamespace)){
             if(empty($this->baseNamespace)){

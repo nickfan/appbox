@@ -13,8 +13,10 @@
 
 namespace App\Boxcontrollers\AppboxDotdev\Index;
 
-use Nickfan\AppBox\Support\Facades\AppBox;
 use Nickfan\BoxApp\BoxController\BoxAbstractController;
+use Nickfan\AppBox\Support\Facades\AppBox;
+use Nickfan\BoxApp\Support\Facades\BoxDispatcher;
+
 class Index extends BoxAbstractController{
 
     public function Index(){
@@ -29,7 +31,7 @@ class Index extends BoxAbstractController{
         var_dump($routeInstance);
         $instance = $routeInstance->getInstance();
         var_dump($instance);
-        $getCurrentUri = $this->dispatcher->getCurrentUri();
+        $getCurrentUri = BoxDispatcher::getCurrentUri();
         var_dump($getCurrentUri);
     }
     public function Ping($myvar1=0,$myvar2='abc'){

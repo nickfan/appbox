@@ -12,9 +12,10 @@
  */
 
 
-namespace Nickfan\BoxApp\BoxController;
+namespace Nickfan\BoxApp\BoxCommand;
 
-abstract class BoxAbstractController {
+
+abstract class BoxAbstractCommand {
 
     public function __construct() {
     }
