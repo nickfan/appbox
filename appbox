@@ -17,6 +17,14 @@ use Ulrichsg\Getopt\Option;
 use Nickfan\AppBox\Support\Facades\AppBox;
 
 !defined('PHP_BINARY') && define('PHP_BINARY', '/usr/bin/env php');
+
+if($_SERVER['argc']>1){
+    if(filter_var($_SERVER['argv'][1],FILTER_VALIDATE_URL)){
+        require_once __DIR__ . '/public/index.php';
+        exit;
+    }
+}
+
 require_once __DIR__ . '/bootstrap/app_init.php';
 $getopt = new Getopt(array(
     new Option('v', 'verbose'),
@@ -35,42 +43,6 @@ $getopt = new Getopt(array(
         ->setDescription('run appbox in serve mode'),
     (new Option(null, 'shell', Getopt::OPTIONAL_ARGUMENT))
         ->setDescription('run appbox in interactive mode'),
-//    (new Option('r', 'rcbasepath', Getopt::OPTIONAL_ARGUMENT))
-//    ->setDescription('route config files base path contain dsn and route config files')
-//    ->setDefaultValue('./app/boxdata/etc/local')
-//    ->setValidation(function($value) {
-//            $realpath = realpath($value);
-//            if(file_exists($realpath) && is_dir($realpath)){
-//                if(file_exists($realpath.'/dsn')
-//                    && is_dir($realpath.'/dsn')
-//                    && file_exists($realpath.'/route')
-//                    && is_dir($realpath.'/route')
-//                ){
-//                    return true;
-//                }
-//            }
-//            return false;
-//        }),
-//    (new Option('c', 'confpath', Getopt::OPTIONAL_ARGUMENT))
-//    ->setDescription('repository config files base path contain application config files')
-//    ->setDefaultValue('./app/boxdata/conf')
-//    ->setValidation(function($value) {
-//            $realpath = realpath($value);
-//            if(file_exists($realpath) && is_dir($realpath)){
-//                return true;
-//            }
-//            return false;
-//        }),
-//    (new Option('a', 'apppath', Getopt::OPTIONAL_ARGUMENT))
-//    ->setDescription('application programs source files base path')
-//    ->setDefaultValue('./app')
-//    ->setValidation(function($value) {
-//            $realpath = realpath($value);
-//            if(file_exists($realpath) && is_dir($realpath)){
-//                return true;
-//            }
-//            return false;
-//        }),
 ));
 
 try {

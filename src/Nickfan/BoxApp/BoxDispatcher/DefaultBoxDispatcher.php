@@ -32,6 +32,9 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
 
     protected $baseNamespace = '';
 
+    // 域名类中是否包含端口号
+    protected $domainIncludePort = false;
+
     /**
      * Protected constructor to prevent creating a new instance of the
      * *Singleton* via the `new` operator from outside of this class.
@@ -113,6 +116,14 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
         $this->baseNamespace = $baseNamespace;
     }
 
+    public function getDomainIncludePort() {
+        return $this->domainIncludePort;
+    }
+
+    public function setDomainIncludePort($domainIncludePort = true) {
+        $this->domainIncludePort = $domainIncludePort;
+    }
+
     public function getDomain(){
         return $this->domain;
     }
@@ -145,12 +156,23 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
         return php_sapi_name() == 'cli';
     }
 
-    protected function parseDomain($domain=''){
+    protected function parseDomain($domain='',$port = '80'){
         $domain_dir = $domain;
         if(strlen($domain)==0){
             $domain_dir = 'localhost';
-        }elseif(preg_match('/^\d+.\d+.\d+.\d+$/',$domain)){
+        }elseif(preg_match('/^\d+.\d+.\d+.\d+(:?:\d+|)$/',$domain)){
             $domain_dir = 'ip'.$domain;
+        }else{
+            $domain_set = explode(':',$domain_dir);
+            $domain_dir = $domain_set[0];
+            if(count($domain_set)>1){
+                $port = $domain_set[1];
+            }
+        }
+        if($this->getDomainIncludePort()==true){
+            if($port!='80'){
+                $domain_dir.=':'.$port;
+            }
         }
         return ucfirst(str_replace(array('.',':'),array('Dot','Colon'),$domain_dir));
     }
@@ -210,7 +232,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
 
                 $this->host = $port=='80'?$domain:$domain.':'.$port;
 
-                $this->domain =  $this->parseDomain($domain);
+                $this->domain =  $this->parseDomain($domain,$port);
 
                 $gotAction = false;
                 $gotSegments = false;
@@ -305,13 +327,7 @@ class DefaultBoxDispatcher implements BoxDispatcherInterface{
             $port = count($domain_set)>1?$domain_set[1]:'80';
         }
         $this->host = $port=='80'?$domain:$domain.':'.$port;
-        $domain_dir = $domain;
-        if(strlen($domain)==0){
-            $domain_dir = 'localhost';
-        }elseif(preg_match('/^\d+.\d+.\d+.\d+$/',$domain)){
-            $domain_dir = 'ip'.$domain;
-        }
-        $this->domain = ucfirst(str_replace(array('.',':'),array('Dot','Colon'),$domain_dir));
+        $this->domain = $this->parseDomain($domain,$port);
 
         $this->current_uri = $this->parseCurrentUri4Web();
 

@@ -27,7 +27,8 @@ Route::get('/favicon.ico', function() {
 
 Route::get('/', function() {
     echo 'Welcome to AppBox'.'<br>'.PHP_EOL;
-    echo BoxDispatcher::getHost();
+    echo BoxDispatcher::getHost().'<br>'.PHP_EOL;
+    echo BoxDispatcher::getDomain().'<br>'.PHP_EOL;
 });
 
 Route::get('/hello', function() {

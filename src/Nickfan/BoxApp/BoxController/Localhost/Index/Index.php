@@ -33,6 +33,8 @@ class Index extends BoxAbstractController {
         var_dump($instance);
         $getCurrentUri = BoxDispatcher::getCurrentUri();
         var_dump($getCurrentUri);
+        $getCurrentDomain = BoxDispatcher::getDomain();
+        var_dump($getCurrentDomain);
     }
     public function Ping(){
         echo 'pong';
