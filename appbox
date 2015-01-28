@@ -54,19 +54,19 @@ try {
         exit(0);
     }
 
-    !isset($app) && $app = AppBox::inst();
+    !isset($boxapp) && $boxapp = AppBox::inst();
 
     if($getopt['shell'] || (count($operands)== 1 && $operands[0]=='shell')){
         try{
             $boris = new \Boris\Boris('appbox> ');
-            $boris->setLocal(array('app' => $app));
+            $boris->setLocal(array('app' => $boxapp));
             $boris->start();
         }catch (\Exception $ex){
             echo $ex->getMessage()."\n";
         }
     }elseif($getopt['serve'] || (count($operands)== 1 && $operands[0]=='serve')){
-        chdir($app['path.base']);
-        $public = $app['path.public'];
+        chdir($boxapp['path.base']);
+        $public = $boxapp['path.public'];
         passthru('"'.PHP_BINARY.'"'." -S {$getopt['host']}:{$getopt['port']} -t \"{$public}\" server.php");
     }elseif($getopt['help'] || (count($operands)== 1 && $operands[0]=='help')) {
         echo $getopt->getHelpText();

@@ -12,6 +12,6 @@
  */
 
 require_once __DIR__ . '/../bootstrap/app_init.php';
-$app->instance('boxdispatcher',  \Nickfan\BoxApp\BoxDispatcher\DefaultBoxDispatcher::getInstance($app));
+$boxapp->instance('boxdispatcher',  \Nickfan\BoxApp\BoxDispatcher\DefaultBoxDispatcher::getInstance($boxapp));
 use Nickfan\BoxApp\Support\Facades\BoxDispatcher;
 BoxDispatcher::run();

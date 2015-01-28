@@ -17,10 +17,10 @@ require_once __DIR__ . '/initenv.php';
 $whoops = new \Whoops\Run;
 //$whoops->allowQuit(false);
 //$whoops->writeToOutput(false);
-if($app->runningInConsole()==true) {
+if($boxapp->runningInConsole()==true) {
     $whoops->pushHandler(new \Whoops\Handler\PlainTextHandler);
 }else{
     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
 }
 $whoops->register();
-$app->instance('whoops', $whoops);
+$boxapp->instance('whoops', $whoops);
