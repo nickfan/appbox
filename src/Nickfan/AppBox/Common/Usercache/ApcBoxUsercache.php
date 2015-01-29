@@ -16,6 +16,7 @@ namespace Nickfan\AppBox\Common\Usercache;
 
 
 class ApcBoxUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
+    protected $cachedriverkey = 'apc';
 
     public function get($key, $option = array()) {
         $option += array(

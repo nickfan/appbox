@@ -22,6 +22,6 @@ class BoxConf extends Facade {
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'conf';
+        return 'boxconf';
     }
 }

@@ -16,6 +16,7 @@
 namespace Nickfan\AppBox\Config;
 
 use ArrayAccess;
+use Nickfan\AppBox\Common\BoxConstants;
 use Traversable;
 use Serializable;
 use IteratorAggregate;
@@ -24,14 +25,10 @@ use Nickfan\AppBox\Support\BoxUtil;
 
 class BoxDictionary implements ArrayAccess,Serializable,IteratorAggregate{
 
-    const ENCODER_SERIALIZE = 'serialize';
-    const ENCODER_JSON = 'json';
-    const ENCODER_MSGPACK = 'msgpack';
-
     protected $parsed = array();
 
     protected $option = array(
-        'packer'=>self::ENCODER_SERIALIZE,
+        'packer'=>BoxConstants::ENCODER_SERIALIZE,
     );
 
     /**
@@ -43,7 +40,7 @@ class BoxDictionary implements ArrayAccess,Serializable,IteratorAggregate{
 
     public function __construct($items=array(),$option=array()){
         $option+=array(
-            'packer'=>self::ENCODER_SERIALIZE,
+            'packer'=>BoxConstants::ENCODER_SERIALIZE,
         );
         $this->option = array_merge($this->option,$option);
         $this->setItems($items);
@@ -60,21 +57,21 @@ class BoxDictionary implements ArrayAccess,Serializable,IteratorAggregate{
             'packer'=>$this->option['packer'],
         );
         switch($option['packer']){
-            case self::ENCODER_JSON:
+            case BoxConstants::ENCODER_JSON:
                 if($bool==true){
                     return json_encode($var);
                 }else{
                     return json_decode($var,true);
                 }
                 break;
-            case self::ENCODER_MSGPACK:
+            case BoxConstants::ENCODER_MSGPACK:
                 if($bool==true){
                     return msgpack_pack($var);
                 }else{
                     return msgpack_unpack($var);
                 }
                 break;
-            case self::ENCODER_SERIALIZE:
+            case BoxConstants::ENCODER_SERIALIZE:
             default:
                 if($bool==true){
                     return serialize($var);

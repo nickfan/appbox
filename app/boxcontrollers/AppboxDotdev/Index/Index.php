@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -13,23 +13,27 @@
 
 namespace App\Boxcontrollers\AppboxDotdev\Index;
 
-use Nickfan\AppBox\Support\Facades\AppBox;
 use Nickfan\BoxApp\BoxController\BoxAbstractController;
+use Nickfan\BoxApp\Support\Facades\BoxDispatcher;
+use Nickfan\AppBox\Support\Facades\BoxConf;
+use Nickfan\AppBox\Support\Facades\BoxRouteConf;
+use Nickfan\AppBox\Support\Facades\BoxRouteInst;
+
 class Index extends BoxAbstractController{
 
     public function Index(){
         echo 'helloworld';
-        $confDict = AppBox::make('conf')->get('common.itemPerPages');
+        $confDict = BoxConf::get('common.itemPerPages');
         var_dump($confDict);
-        $clearResult = AppBox::make('routeconf')->cacheFlush();
+        $clearResult = BoxRouteConf::cacheFlush();
         var_dump($clearResult);
-        $routeConf = AppBox::make('routeconf')->getRouteConfByScript('redis','mygroup',array('id'=>3));
+        $routeConf = BoxRouteConf::getRouteConfByScript('redis','mygroup',array('id'=>3));
         var_dump($routeConf);
-        $routeInstance = AppBox::make('routeinst')->getRouteInstance('cfg','mygroup',array('id'=>3));
+        $routeInstance = BoxRouteInst::getRouteInstance('cfg','mygroup',array('id'=>3));
         var_dump($routeInstance);
         $instance = $routeInstance->getInstance();
         var_dump($instance);
-        $getCurrentUri = $this->dispatcher->getCurrentUri();
+        $getCurrentUri = BoxDispatcher::getCurrentUri();
         var_dump($getCurrentUri);
     }
     public function Ping($myvar1=0,$myvar2='abc'){

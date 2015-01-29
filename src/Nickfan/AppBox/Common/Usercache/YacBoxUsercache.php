@@ -16,6 +16,7 @@ namespace Nickfan\AppBox\Common\Usercache;
 
 
 class YacBoxUsercache extends BoxBaseUsercache implements BoxUsercacheInterface {
+    protected $cachedriverkey = 'yac';
 
     protected function getInstance() {
         if (is_null($this->instance)) {

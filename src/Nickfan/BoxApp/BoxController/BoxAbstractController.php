@@ -14,13 +14,9 @@
 
 namespace Nickfan\BoxApp\BoxController;
 
-use Nickfan\BoxApp\BoxDispatcher\BoxDispatcherInterface;
-
 abstract class BoxAbstractController {
-    protected $dispatcher;
 
-    public function __construct(BoxDispatcherInterface $dispatcherInstance) {
-        $this->dispatcher = $dispatcherInstance;
+    public function __construct() {
     }
 
     public function Index() {

@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -15,10 +15,10 @@
 require_once __DIR__ . '/../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Support\Facades\AppBox;
-
+use Nickfan\AppBox\Support\Facades\BoxDict;
 $myexampleDict = array('abc','def','hig');
 AppBox::debug($myexampleDict);
-$confInst = AppBox::make('conf');
+$confInst = AppBox::make('boxconf');
 var_dump($confInst->get('app.timezone'));
 
 BoxDict::set('abc.bbc',array('test'=>'valtest','test2'=>23));

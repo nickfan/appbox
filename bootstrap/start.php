@@ -3,23 +3,24 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
  * @lastmodified: 2015-01-22 14:39
  *
  */
+use Nickfan\AppBox\Common\Usercache\AutoBoxUsercache;
 use Nickfan\AppBox\Config\BoxDictionary;
 use Nickfan\AppBox\Config\BoxRouteConf;
 use Nickfan\AppBox\Config\BoxRepository;
 use Nickfan\AppBox\Instance\BoxRouteInstance;
 use Nickfan\AppBox\Support\Facades\Facade;
 use Nickfan\AppBox\Foundation\AliasLoader;
-!isset($app) && $app = Nickfan\AppBox\Foundation\BoxApp::appbox(function(){
-    static $app;
-    if(empty($app)){
-        $app = new Nickfan\AppBox\Foundation\BoxApp;
+!isset($boxapp) && $boxapp = Nickfan\AppBox\Foundation\BoxApp::appbox(function(){
+    static $boxapp;
+    if(empty($boxapp)){
+        $boxapp = new Nickfan\AppBox\Foundation\BoxApp;
 
         /*
         |--------------------------------------------------------------------------
@@ -32,7 +33,7 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         |
         */
 
-        $app->bindInstallPaths(require __DIR__ . '/paths.php');
+        $boxapp->bindInstallPaths(require __DIR__ . '/paths.php');
 
         /*
         |--------------------------------------------------------------------------
@@ -45,7 +46,7 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         |
         */
 
-        $app->instance('app', $app);
+        $boxapp->instance('app', $boxapp);
 
         /*
         |--------------------------------------------------------------------------
@@ -60,7 +61,7 @@ use Nickfan\AppBox\Foundation\AliasLoader;
 
         Facade::clearResolvedInstances();
 
-        Facade::setFacadeApplication($app);
+        Facade::setFacadeApplication($boxapp);
 
         /*
         |--------------------------------------------------------------------------
@@ -73,17 +74,16 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         |
         */
 
-        $app->registerCoreContainerAliases();
-        $userCacheObject = $app->makeUserCacheInstance();
-        $app->instance('usercache', $userCacheObject);
-        $app->instance('dict', $dict = new BoxDictionary(array()));
-        $app->instance('conf', $config = new BoxRepository($app['path.storage'] . '/conf', $userCacheObject));
-        $app->instance('routeconf', $routeconf = new BoxRouteConf($app['path.storage'] . '/etc/local', $userCacheObject));
-        $app->instance('routeinst', $routeinstance = BoxRouteInstance::getInstance($routeconf));
+        $boxapp->registerCoreContainerAliases();
+        //$userCacheObject = new AutoBoxUsercache();
+        $userCacheObject = $boxapp->makeUserCacheInstance();
+        $boxapp->instance('usercache', $userCacheObject);
+        $boxapp->instance('boxdict', $dict = new BoxDictionary(array()));
+        $boxapp->instance('boxconf', $config = new BoxRepository($boxapp['path.storage'] . '/conf', $userCacheObject));
+        $boxapp->instance('boxrouteconf', $routeconf = new BoxRouteConf($boxapp['path.storage'] . '/etc/local', $userCacheObject));
+        $boxapp->instance('boxrouteinst', $routeinstance = BoxRouteInstance::getInstance($routeconf));
 
-        $config = $app['conf']['app'];
-
-        date_default_timezone_set($config['timezone']);
+        date_default_timezone_set($boxapp['boxconf']['app']['timezone']);
         /*
         |--------------------------------------------------------------------------
         | Register The Alias Loader
@@ -95,11 +95,9 @@ use Nickfan\AppBox\Foundation\AliasLoader;
         |
         */
 
-        $aliases = $config['aliases'];
-
-        AliasLoader::getInstance($aliases)->register();
+        AliasLoader::getInstance($boxapp['boxconf']['app']['aliases'])->register();
 
     }
-    return $app;
+    return $boxapp;
 });
-return $app;
+return $boxapp;

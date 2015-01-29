@@ -112,10 +112,10 @@ class BoxApp extends Container{
     public function registerCoreContainerAliases() {
         $aliases = array(
             'app' => 'Nickfan\AppBox\Foundation\BoxApp',
-            'dict' => 'Nickfan\AppBox\Config\BoxDictionary',
-            'conf' => 'Nickfan\AppBox\Config\BoxRepository',
-            'routeconf' => 'Nickfan\AppBox\Config\BoxRouteConf',
-            'routeinst' => 'Nickfan\AppBox\Instance\DataRouteInstance',
+            'boxdict' => 'Nickfan\AppBox\Config\BoxDictionary',
+            'boxconf' => 'Nickfan\AppBox\Config\BoxRepository',
+            'boxrouteconf' => 'Nickfan\AppBox\Config\BoxRouteConf',
+            'boxrouteinst' => 'Nickfan\AppBox\Instance\DataRouteInstance',
         );
 
         foreach ($aliases as $key => $alias) {
@@ -148,6 +148,15 @@ class BoxApp extends Container{
 
     public function setRepositoryPath($confPath=''){
 
+    }
+
+    /**
+     * Determine if we are running in the console.
+     *
+     * @return bool
+     */
+    public static function runningInConsole(){
+        return php_sapi_name() == 'cli';
     }
 
     public static function makeUserCacheInstance(){

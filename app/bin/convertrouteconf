@@ -4,7 +4,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -55,7 +55,7 @@ $mode=isset($argv[1])?$argv[1]:'fromjson';
 
 $dsnbasepath = isset($argv[2])?$argv[2]:'';
 if(empty($dsnbasepath)){
-    $confbasepath = dirname(dirname(__DIR__)).'app/data/etc/local';
+    $confbasepath = dirname(dirname(__DIR__)).'app/boxdata/etc/local';
     $dsnbasepath = $confbasepath.'/dsn';
 }
 

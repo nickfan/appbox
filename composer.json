@@ -14,15 +14,19 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
         "illuminate/container": "4.2.*@dev",
         "ulrichsg/getopt-php": "2.1.*",
         "jeremeamia/superclosure": "~1.0",
         "nesbot/carbon": "1.*",
         "guzzlehttp/guzzle": "4.*",
         "patchwork/utf8": "~1.1",
-        "filp/whoops": "1.0.10",
-        "d11wtq/boris": "1.0.*",
+        "noahbuscher/macaw": "dev-master",
+        "filp/whoops": "1.1.*",
+        "d11wtq/boris": "~1.0",
+        "illuminate/database": "~4.2",
         "jv2222/ezsql":"dev-master",
+        "predis/predis": "0.8.*",
         "pda/pheanstalk": "~2.1",
         "swiftmailer/swiftmailer": "~5.2",
         "packaged/thrift":"~0.9",
@@ -31,15 +35,17 @@
     },
     "autoload": {
         "psr-0": {
-            "Nickfan\\BoxApp": "src/",
-            "Nickfan\\AppBox": "src/"
+            "Nickfan\\AppBox\\": "src/",
+            "Nickfan\\BoxApp\\": "src/"
         },
         "classmap": [
             "app/boxcommands",
             "app/boxcontrollers",
+            "app/boxviews",
             "app/boxdispatchers",
             "app/boxobjects",
-            "app/boxpackages"
+            "app/boxpackages",
+            "src/migrations"
         ],
         "files": [
         ]

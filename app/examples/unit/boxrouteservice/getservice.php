@@ -20,7 +20,7 @@ use Nickfan\AppBox\Instance\BoxRouteInstance;
 use Nickfan\AppBox\Service\Drivers\CfgBoxRouteServiceDriver;
 use Nickfan\AppBox\Service\Drivers\RedisBoxRouteServiceDriver;
 
-$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($app['path.storage'] . '/etc/local',new ApcBoxUsercache()));
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($boxapp['path.storage'] . '/etc/local',new ApcBoxUsercache()));
 $cfgService = CfgBoxRouteServiceDriver::factory($instBoxRouteInstance);
 // \Nickfan\AppBox\Support\Facades\AppBox::debug(true,$cfgService);  //exit; // [DEV-DEBUG]---
 $key = 'dsn';

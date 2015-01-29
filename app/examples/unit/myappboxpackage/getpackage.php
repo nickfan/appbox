@@ -3,7 +3,7 @@
  * Description
  *
  * @project appbox
- * @package 
+ * @package
  * @author nickfan<nickfan81@gmail.com>
  * @link http://www.axiong.me
  * @version $Id$
@@ -20,7 +20,7 @@ use Nickfan\AppBox\Instance\BoxRouteInstance;
 use App\Boxpackages\UserBoxPackage;
 use App\Boxpackages\DummyBoxPackage;
 
-$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($app['path.storage'] . '/etc/local',new ApcBoxUsercache()));
+$instBoxRouteInstance = BoxRouteInstance::getInstance(new BoxRouteConf($boxapp['path.storage'] . '/etc/local',new ApcBoxUsercache()));
 //var_dump($instBoxRouteInstance);
 //exit;
 $instUserPackage = UserBoxPackage::getInstance($instBoxRouteInstance);

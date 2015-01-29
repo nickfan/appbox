@@ -37,6 +37,6 @@ require __DIR__ . '/autoload.php';
 |
 */
 
-$app = require_once __DIR__ . '/start.php';
+$boxapp = require_once __DIR__ . '/start.php';
 
 
