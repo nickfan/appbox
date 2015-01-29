@@ -95,6 +95,7 @@ return array(
         'BoxRouteConf' => 'Nickfan\AppBox\Support\Facades\BoxRouteConf',
         'BoxRouteInst' => 'Nickfan\AppBox\Support\Facades\BoxRouteInst',
         'BoxDispatcher' => 'Nickfan\BoxApp\Support\Facades\BoxDispatcher',
+        'BoxView' => 'Nickfan\BoxApp\Support\Facades\BoxView',
     ),
 
 );

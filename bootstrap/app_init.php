@@ -24,3 +24,8 @@ if($boxapp->runningInConsole()==true) {
 }
 $whoops->register();
 $boxapp->instance('whoops', $whoops);
+
+$boxapp->instance('boxdispatcher',  \Nickfan\BoxApp\BoxDispatcher\DefaultBoxDispatcher::getInstance($boxapp));
+$boxapp->bindShared('boxview',function($boxapp){
+        return new \Nickfan\BoxApp\BoxView\BoxView($boxapp['path'].'/boxviews');
+});
