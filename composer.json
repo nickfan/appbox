@@ -4,6 +4,11 @@
     "homepage": "https://github.com/nickfan/appbox",
     "license": "MIT",
     "repositories" : [
+        {
+            "type": "git",
+            "url": "https://github.com/nickfan/ezSQL.git",
+            "vendor-alias":"jv2222"
+        }
     ],
     "authors": [
         {
@@ -21,17 +26,17 @@
         "nesbot/carbon": "1.*",
         "guzzlehttp/guzzle": "4.*",
         "patchwork/utf8": "~1.1",
-        "noahbuscher/macaw": "dev-master",
+        "noahbuscher/macaw": "dev-master as 1.0.x-dev",
         "filp/whoops": "1.1.*",
         "d11wtq/boris": "~1.0",
         "illuminate/database": "~4.2",
-        "jv2222/ezsql":"dev-master",
+        "jv2222/ezsql":"dev-master as 1.0.x-dev",
         "predis/predis": "0.8.*",
         "pda/pheanstalk": "~2.1",
         "swiftmailer/swiftmailer": "~5.2",
         "packaged/thrift":"~0.9",
-        "ruflin/Elastica": "dev-master",
-        "munkie/elasticsearch-thrift-php" : "dev-master"
+        "ruflin/Elastica": "dev-master as 1.0.x-dev",
+        "munkie/elasticsearch-thrift-php" : "dev-master as 1.0.x-dev"
     },
     "autoload": {
         "psr-0": {
@@ -49,5 +54,10 @@
         ],
         "files": [
         ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }

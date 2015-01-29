@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "40b282870763d276adbfc5381e3d3d7d",
+    "hash": "603eebf065ecf9c6b56a925718eaeb96",
     "packages": [
         {
             "name": "d11wtq/boris",
@@ -458,14 +458,8 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "git@github.com:jv2222/ezSQL.git",
-                "reference": "cc620863b78c65597d72aec581161d9cb81cedd9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jv2222/ezSQL/zipball/cc620863b78c65597d72aec581161d9cb81cedd9",
-                "reference": "cc620863b78c65597d72aec581161d9cb81cedd9",
-                "shasum": ""
+                "url": "https://github.com/nickfan/ezSQL.git",
+                "reference": "b0961432e996435e8daea68bf72d787b37655e18"
             },
             "type": "library",
             "autoload": {
@@ -484,7 +478,6 @@
                     "codeigniter/Ezsql_codeigniter.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "LGPL"
             ],
@@ -495,7 +488,7 @@
                 }
             ],
             "description": "PHP class to make interacting with a database ridiculusly easy.",
-            "time": "2014-10-16 08:07:37"
+            "time": "2014-06-16 14:14:07"
         },
         {
             "name": "leric/php-thrift",
@@ -742,16 +735,16 @@
         },
         {
             "name": "patchwork/utf8",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tchwork/utf8.git",
-                "reference": "9639d28f1aa24add93ca7a0cf2a5cc3169ddb7d5"
+                "reference": "01f0ed1628db7794e2d4e336f55a09daef4248a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tchwork/utf8/zipball/9639d28f1aa24add93ca7a0cf2a5cc3169ddb7d5",
-                "reference": "9639d28f1aa24add93ca7a0cf2a5cc3169ddb7d5",
+                "url": "https://api.github.com/repos/tchwork/utf8/zipball/01f0ed1628db7794e2d4e336f55a09daef4248a5",
+                "reference": "01f0ed1628db7794e2d4e336f55a09daef4248a5",
                 "shasum": ""
             },
             "require": {
@@ -795,7 +788,7 @@
                 "utf-8",
                 "utf8"
             ],
-            "time": "2015-01-12 20:01:53"
+            "time": "2015-01-29 08:36:50"
         },
         {
             "name": "pda/pheanstalk",
@@ -1080,7 +1073,32 @@
         }
     ],
     "packages-dev": [],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "1.0.x-dev",
+            "alias_normalized": "1.0.9999999.9999999-dev",
+            "version": "9999999-dev",
+            "package": "noahbuscher/macaw"
+        },
+        {
+            "alias": "1.0.x-dev",
+            "alias_normalized": "1.0.9999999.9999999-dev",
+            "version": "9999999-dev",
+            "package": "jv2222/ezsql"
+        },
+        {
+            "alias": "1.0.x-dev",
+            "alias_normalized": "1.0.9999999.9999999-dev",
+            "version": "9999999-dev",
+            "package": "ruflin/elastica"
+        },
+        {
+            "alias": "1.0.x-dev",
+            "alias_normalized": "1.0.9999999.9999999-dev",
+            "version": "9999999-dev",
+            "package": "munkie/elasticsearch-thrift-php"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "illuminate/container": 20,
