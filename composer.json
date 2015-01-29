@@ -26,7 +26,7 @@
         "nesbot/carbon": "1.*",
         "guzzlehttp/guzzle": "4.*",
         "patchwork/utf8": "~1.1",
-        "noahbuscher/macaw": "dev-master as 1.0.x-dev",
+        "noahbuscher/macaw": "dev-master",
         "filp/whoops": "1.1.*",
         "d11wtq/boris": "~1.0",
         "illuminate/database": "~4.2",
@@ -35,8 +35,8 @@
         "pda/pheanstalk": "~2.1",
         "swiftmailer/swiftmailer": "~5.2",
         "packaged/thrift":"~0.9",
-        "ruflin/Elastica": "dev-master as 1.0.x-dev",
-        "munkie/elasticsearch-thrift-php" : "dev-master as 1.0.x-dev"
+        "ruflin/Elastica": "dev-master",
+        "munkie/elasticsearch-thrift-php" : "dev-master"
     },
     "autoload": {
         "psr-0": {

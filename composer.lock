@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "603eebf065ecf9c6b56a925718eaeb96",
+    "hash": "bbb37d7d19cce53332647a774ad36310",
     "packages": [
         {
             "name": "d11wtq/boris",
@@ -459,9 +459,14 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nickfan/ezSQL.git",
-                "reference": "b0961432e996435e8daea68bf72d787b37655e18"
+                "reference": "fa0aaf4fc39e6ce3daca335573d7503e935c89e9"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "cubrid/ez_sql_cubrid.php",
@@ -488,7 +493,7 @@
                 }
             ],
             "description": "PHP class to make interacting with a database ridiculusly easy.",
-            "time": "2014-06-16 14:14:07"
+            "time": "2015-01-29 09:52:26"
         },
         {
             "name": "leric/php-thrift",
@@ -1078,25 +1083,7 @@
             "alias": "1.0.x-dev",
             "alias_normalized": "1.0.9999999.9999999-dev",
             "version": "9999999-dev",
-            "package": "noahbuscher/macaw"
-        },
-        {
-            "alias": "1.0.x-dev",
-            "alias_normalized": "1.0.9999999.9999999-dev",
-            "version": "9999999-dev",
             "package": "jv2222/ezsql"
-        },
-        {
-            "alias": "1.0.x-dev",
-            "alias_normalized": "1.0.9999999.9999999-dev",
-            "version": "9999999-dev",
-            "package": "ruflin/elastica"
-        },
-        {
-            "alias": "1.0.x-dev",
-            "alias_normalized": "1.0.9999999.9999999-dev",
-            "version": "9999999-dev",
-            "package": "munkie/elasticsearch-thrift-php"
         }
     ],
     "minimum-stability": "stable",
