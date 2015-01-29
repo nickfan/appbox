@@ -30,7 +30,7 @@
         "filp/whoops": "1.1.*",
         "d11wtq/boris": "~1.0",
         "illuminate/database": "~4.2",
-        "jv2222/ezsql":"dev-master as 1.0.x-dev",
+        "jv2222/ezsql":"dev-master",
         "predis/predis": "0.8.*",
         "pda/pheanstalk": "~2.1",
         "swiftmailer/swiftmailer": "~5.2",

@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bbb37d7d19cce53332647a774ad36310",
+    "hash": "05c5fe99f3f24847bca2215828f488cc",
     "packages": [
         {
             "name": "d11wtq/boris",
@@ -1078,14 +1078,7 @@
         }
     ],
     "packages-dev": [],
-    "aliases": [
-        {
-            "alias": "1.0.x-dev",
-            "alias_normalized": "1.0.9999999.9999999-dev",
-            "version": "9999999-dev",
-            "package": "jv2222/ezsql"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "illuminate/container": 20,
