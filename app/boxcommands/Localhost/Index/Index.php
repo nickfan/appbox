@@ -14,20 +14,22 @@
 namespace App\Boxcommands\Localhost\Index;
 
 use Nickfan\BoxApp\BoxCommand\BoxAbstractCommand;
-use Nickfan\AppBox\Support\Facades\AppBox;
 use Nickfan\BoxApp\Support\Facades\BoxDispatcher;
+use Nickfan\AppBox\Support\Facades\BoxConf;
+use Nickfan\AppBox\Support\Facades\BoxRouteConf;
+use Nickfan\AppBox\Support\Facades\BoxRouteInst;
 
 class Index extends BoxAbstractCommand {
 
     public function Index(){
         echo 'helloworld';
-        $confDict = AppBox::make('boxconf')->get('common.itemPerPages');
+        $confDict = BoxConf::get('common.itemPerPages');
         var_dump($confDict);
-        $clearResult = AppBox::make('boxrouteconf')->cacheFlush();
+        $clearResult = BoxRouteConf::cacheFlush();
         var_dump($clearResult);
-        $routeConf = AppBox::make('boxrouteconf')->getRouteConfByScript('redis','mygroup',array('id'=>3));
+        $routeConf = BoxRouteConf::getRouteConfByScript('redis','mygroup',array('id'=>3));
         var_dump($routeConf);
-        $routeInstance = AppBox::make('boxrouteinst')->getRouteInstance('cfg','mygroup',array('id'=>3));
+        $routeInstance = BoxRouteInst::getRouteInstance('cfg','mygroup',array('id'=>3));
         var_dump($routeInstance);
         $instance = $routeInstance->getInstance();
         var_dump($instance);

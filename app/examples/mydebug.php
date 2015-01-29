@@ -15,7 +15,7 @@
 require_once __DIR__ . '/../../bootstrap/initenv.php';
 
 use Nickfan\AppBox\Support\Facades\AppBox;
-
+use Nickfan\AppBox\Support\Facades\BoxDict;
 $myexampleDict = array('abc','def','hig');
 AppBox::debug($myexampleDict);
 $confInst = AppBox::make('boxconf');
